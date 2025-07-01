@@ -1625,6 +1625,14 @@ END:VCALENDAR`;
                 submitRegistrationButton.disabled = true;
                 formMessage.textContent = "Registrazione in corso...";
 
+                // Controllo per assicurarsi che Firebase sia inizializzato
+                if (!db || !registrationsCollection) {
+                    console.error("Firestore non è ancora inizializzato. Impossibile registrare.");
+                    formMessage.textContent = "Errore: il sistema non è ancora pronto. Riprova tra un momento.";
+                    formMessage.classList.remove('success-message');
+                    return; // Esci se non è pronto
+                }
+
                 if (selectedDates.size === 0) {
                     formMessage.textContent = translations[currentLanguage].selectValidFutureDate;
                     formMessage.classList.remove('success-message');
@@ -1665,8 +1673,9 @@ END:VCALENDAR`;
                 }, 1500);
                 
             } catch (e) {
-                console.error("Errore durante l'aggiunta della registrazione a Firestore: ", e);
-                formMessage.textContent = `${translations[currentLanguage].registrationFailed}`;
+                // Logga l'errore completo per il debug
+                console.error("Errore durante l'aggiunta della registrazione a Firestore:", e.code, e.message, e);
+                formMessage.textContent = `${translations[currentLanguage].registrationFailed}: ${e.message || e}`; // Mostra il messaggio di errore di Firebase
                 formMessage.classList.remove('success-message');
                 eventMessageElement.textContent = `${translations[currentLanguage].registrationFailed}`;
             } finally {
