@@ -824,6 +824,9 @@
         const submitPasswordButton = document.getElementById('submitPasswordButton');
 
         const CORRECT_PASSWORD = "imagroup";
+        const WHATSAPP_PHONE_NUMBER = "393356259151"; // Numero di telefono per WhatsApp (con prefisso internazionale)
+        // Messaggio WhatsApp aggiornato
+        const WHATSAPP_MESSAGE = "Hey, ho prenotato, controlla il calendario al seguente link: https://raoulfilippi.github.io/locazione-gianna/index.html"; 
 
         let countdownInterval;
         let eventDate = null;
@@ -854,7 +857,7 @@
                 registerButton: "Prenota la tua vacanza",
                 outlookButton: "Aggiungi al calendario",
                 outlookTooltip: "Un file ICS è stato generato. Se non si apre automaticamente, controlla i tuoi download e aprilo manualmente per aggiungere l'evento al tuo calendario.",
-                registrationSuccess: "Registrazione avvenuta con successo!",
+                registrationSuccess: "Registrazione avvenuta con successo! Verrai reindirizzato a WhatsApp per inviare una notifica.",
                 registrationFailed: "Errore durante la registrazione.",
                 registeredEventsTitle: "Eventi Registrati",
                 currentUserIdLabel: "Il tuo ID Utente (locale): ",
@@ -901,7 +904,7 @@
                 registerButton: "Book your vacation",
                 outlookButton: "Add to Calendar",
                 outlookTooltip: "An ICS file has been generated. If it doesn't open automatically, please check your downloads and open it manually to add the event to your calendar.",
-                registrationSuccess: "Registration successful!",
+                registrationSuccess: "Registration successful! You will be redirected to WhatsApp to send a notification.",
                 registrationFailed: "Error during registration.",
                 registeredEventsTitle: "Registered Events",
                 currentUserIdLabel: "Your User ID (local): ",
@@ -948,7 +951,7 @@
                 registerButton: "Buche deinen Urlaub",
                 outlookButton: "Zum Kalender hinzufügen",
                 outlookTooltip: "Eine ICS-Datei wurde generiert. Wenn sie sich nicht automatisch öffnet, überprüfen Sie Ihre Downloads und öffnen Sie sie manuell, um das Ereignis zu Ihrem Kalender hinzuzufügen.",
-                registrationSuccess: "Registrierung erfolgreich!",
+                registrationSuccess: "Registrierung erfolgreich! Sie werden zu WhatsApp weitergeleitet, um eine Benachrichtigung zu senden.",
                 registrationFailed: "Fehler bei der Registrierung.",
                 registeredEventsTitle: "Registrierte Veranstaltungen",
                 currentUserIdLabel: "Ihre Benutzer-ID (lokal): ",
@@ -995,7 +998,7 @@
                 registerButton: "Réservez vos vacances",
                 outlookButton: "Ajouter au calendrier",
                 outlookTooltip: "Un fichier ICS a été généré. S'il ne s'ouvre pas automatiquement, veuillez vérifier vos téléchargements et l'ouvrir manuellement pour ajouter l'événement à votre calendrier.",
-                registrationSuccess: "Inscription réussie !",
+                registrationSuccess: "Inscription réussie ! Vous serez redirigé vers WhatsApp pour envoyer une notification.",
                 registrationFailed: "Erreur lors de l'inscription.",
                 registeredEventsTitle: "Événements enregistrés",
                 currentUserIdLabel: "Votre ID utilisateur (local) : ",
@@ -1042,7 +1045,7 @@
                 registerButton: "Reserva tus vacaciones",
                 outlookButton: "Añadir al calendario",
                 outlookTooltip: "Se ha generado un archivo ICS. Si no se abre automáticamente, por favor, revise sus descargas y ábralo manualmente para añadir el evento a su calendario.",
-                registrationSuccess: "¡Registro exitoso!",
+                registrationSuccess: "¡Registro exitoso! Será redirigido a WhatsApp para enviar una notificación.",
                 registrationFailed: "Error durante el registro.",
                 registeredEventsTitle: "Eventos registrados",
                 currentUserIdLabel: "Su ID de usuario (local): ",
@@ -1490,6 +1493,16 @@ END:VCALENDAR`;
             URL.revokeObjectURL(url);
         }
 
+        /**
+         * Invia un messaggio WhatsApp al numero predefinito con il messaggio predefinito.
+         * L'utente dovrà confermare l'invio nell'app WhatsApp.
+         */
+        function sendWhatsAppMessage() {
+            const encodedMessage = encodeURIComponent(WHATSAPP_MESSAGE);
+            const whatsappUrl = `https://wa.me/${WHATSAPP_PHONE_NUMBER}?text=${encodedMessage}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
         let clickTimeout;
 
         prevMonthButton.addEventListener('click', () => {
@@ -1633,6 +1646,9 @@ END:VCALENDAR`;
                 loadRegistrations();
                 generateCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
                 updateEventDateAndCountdown();
+
+                // Invia il messaggio WhatsApp dopo la registrazione riuscita
+                sendWhatsAppMessage();
 
                 setTimeout(() => {
                     registrationForm.reset();
