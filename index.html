@@ -1,96 +1,1822 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Locazione Turistica Gianna</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f5f5f5;
-      color: #333;
-    }
-    header {
-      background-color: #4db6ac;
-      color: white;
-      padding: 1.5rem;
-      text-align: center;
-    }
-    .language-switch {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      font-size: 0.9rem;
-    }
-    section {
-      max-width: 900px;
-      margin: auto;
-      padding: 2rem;
-      background-color: white;
-    }
-    h2 {
-      color: #4db6ac;
-    }
-    .gallery img {
-      width: 100%;
-      max-width: 300px;
-      margin: 0.5rem;
-      border-radius: 8px;
-    }
-    .gallery {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    footer {
-      background-color: #4db6ac;
-      color: white;
-      text-align: center;
-      padding: 1rem;
-      margin-top: 2rem;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="docTitle">Prenota ora la tua vacanza!!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Stili base */
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #e2e8f0; /* Sfondo grigio-blu chiaro */
+            color: #2d3748; /* Testo grigio scuro */
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            line-height: 1.6;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            width: 100%;
+            max-width: 1000px; /* Larghezza massima aumentata per il calendario */
+            box-sizing: border-box;
+            margin-bottom: 20px; /* Spazio dal basso */
+            position: relative; /* Necessario per posizionare gli elementi lingua e registro assolutamente */
+        }
+
+        h1 {
+            color: #2a69ac; /* Blu leggermente più scuro per il titolo */
+            margin-bottom: 5px; /* Riduci il margine inferiore per avvicinare la didascalia */
+            font-size: 2.8em; /* Titolo più grande */
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #4a5568; /* Colore più tenue per la didascalia */
+            font-size: 1.1em; /* Dimensione leggermente più grande per la leggibilità */
+            margin-bottom: 25px; /* Spazio sotto la didascalia */
+            margin-top: 0;
+            line-height: 1.4;
+        }
+
+        /* Sezione calendario */
+        .calendar-section {
+            margin-bottom: 30px;
+            background-color: #edf2f7; /* Sfondo più chiaro per l'area del calendario */
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+            position: sticky; /* Rende il calendario sticky */
+            top: 20px; /* Distanza dal top della viewport */
+            z-index: 10; /* Assicura che sia sopra il contenuto che scorre */
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between; /* Distribuisce gli elementi */
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px; /* Spazio tra gli elementi */
+        }
+
+        .calendar-header h2 {
+            font-size: 1.8em;
+            color: #2c5282; /* Blu più scuro */
+            margin: 0;
+            /* Rimuovi flex-grow: 1; per non far occupare tutto lo spazio disponibile al titolo */
+        }
+
+        .calendar-header select {
+            padding: 10px 15px;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            font-size: 1em;
+            background-color: #f7fafc;
+            color: #2d3748;
+            cursor: pointer;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            flex-grow: 1; /* Permette al select di occupare lo spazio centrale */
+            max-width: 300px; /* Limita la larghezza del select */
+            text-align: center; /* Centra il testo nel dropdown */
+            text-align-last: center; /* Per compatibilità con IE/Edge */
+        }
+
+        .calendar-header select:hover {
+            border-color: #a0aec0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .calendar-header button {
+            background-color: #4299e1; /* Pulsante blu per la navigazione */
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .calendar-header button:hover {
+            background-color: #3182ce;
+            transform: translateY(-2px);
+        }
+
+        .calendar-grid {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed; /* Assicura larghezza colonna uguale */
+        }
+
+        .calendar-grid th, .calendar-grid td {
+            padding: 12px 0; /* Padding verticale */
+            text-align: center;
+            border: 1px solid #e2e8f0; /* Bordo chiaro per le celle */
+            font-size: 1.1em;
+        }
+
+        .calendar-grid th {
+            background-color: #a0aec0; /* Intestazione grigia per i giorni */
+            color: white;
+            font-weight: 600;
+            padding: 15px 0;
+            border-bottom: 2px solid #718096;
+        }
+
+        .calendar-grid td {
+            background-color: #f7fafc; /* Sfondo molto chiaro per i giorni */
+            cursor: default; /* Cursore predefinito per tutte le celle */
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        .calendar-grid td.disabled-date {
+            color: #cbd5e0; /* Colore più chiaro per le date disabilitate */
+            background-color: #e2e8f0; /* Sfondo leggermente più scuro per le disabilitate */
+            cursor: not-allowed;
+        }
+
+        .calendar-grid td.selectable-date {
+            color: #2b6cb0; /* Colore distinto per le date selezionabili */
+            font-weight: 600;
+            cursor: pointer;
+            background-color: #bee3f8; /* Sfondo azzurro chiaro per selezionabili */
+        }
+
+        .calendar-grid td.selectable-date:hover {
+            background-color: #90cdf4; /* Blu più scuro al passaggio del mouse */
+            transform: translateY(-2px);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .calendar-grid td.selected-date {
+            background-color: #3182ce; /* La data selezionata è blu */
+            color: white;
+            border: 2px solid #2b6cb0;
+            font-weight: 700;
+            transform: scale(1.05); /* Leggermente più grande quando selezionata */
+        }
+
+        /* Nuovo stile per le domeniche selezionabili */
+        .calendar-grid td.sunday-date {
+            background-color: #ffe0b2; /* Arancione chiaro per le domeniche */
+            color: #e65100; /* Testo arancione scuro */
+            font-weight: 600;
+        }
+
+        .calendar-grid td.sunday-date.selected-date {
+            background-color: #ff9800; /* Arancione più scuro quando selezionata */
+            color: white;
+            border: 2px solid #e65100;
+        }
+
+
+        /* Visualizzazione messaggi */
+        .message {
+            margin-top: 20px;
+            font-size: 1.3em;
+            color: #e53e3e; /* Rosso per messaggi di errore/info */
+            font-weight: 700;
+        }
+
+        /* Pulsanti di registrazione evento e aggiungi al calendario */
+        .button-group {
+            margin-top: 35px;
+            display: flex;
+            flex-direction: row; /* Imposta i pulsanti in riga */
+            justify-content: center; /* Centra i pulsanti */
+            gap: 20px; /* Spazio tra i pulsanti */
+            align-items: stretch; /* cruciale: allunga gli elementi per avere la stessa altezza */
+            flex-wrap: wrap; /* Permette agli elementi di andare a capo su schermi piccoli */
+        }
+
+        .button-group a {
+            text-decoration: none;
+            /* Flex properties to ensure equal sizing */
+            flex: 1; /* Permette ai link di occupare spazio uguale */
+            min-width: 250px; /* Assicura una larghezza minima per evitare che si comprimano troppo */
+            max-width: 350px; /* Limita la larghezza massima per estetica */
+            box-sizing: border-box; /* Include padding e border nella larghezza totale */
+            display: flex; /* Rende il link un contenitore flex */
+        }
+
+        .button-group button {
+            width: 100%; /* Il pulsante occupa tutta la larghezza del suo contenitore <a> */
+            height: 100%; /* Il pulsante occupa tutta l'altezza del suo contenitore <a> (grazie ad align-items: stretch sul genitore) */
+            padding: 18px 40px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.4em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+            display: flex; /* Rende il pulsante un contenitore flex per centrare il testo */
+            align-items: center;
+            justify-content: center;
+            text-align: center; /* Assicura che il testo sia centrato */
+        }
+
+        .button-group button:hover {
+            transform: translateY(-3px);
+        }
+
+        .button-group .register-button {
+            background-color: #48bb78; /* Pulsante verde */
+            color: white;
+        }
+
+        .button-group .register-button:hover {
+            background-color: #38a169;
+        }
+
+        /* Stili specifici per il contenitore del pulsante Outlook e il tooltip */
+        .outlook-button-container {
+            position: relative; /* Per posizionare il tooltip relativamente a questo */
+            display: flex; /* Mantiene il comportamento flex esistente */
+            flex: 1; /* Permette ai link di occupare spazio uguale */
+            min-width: 250px; /* Assicura una larghezza minima per evitare che si comprimano troppo */
+            max-width: 350px; /* Limita la larghezza massima per estetica */
+            box-sizing: border-box; /* Include padding e border nella larghezza totale */
+        }
+
+        .outlook-button {
+            background-color: #0078d4; /* Blu Outlook */
+            color: white;
+        }
+
+        .outlook-button:hover {
+            background-color: #00569a;
+        }
+
+        .outlook-tooltip {
+            visibility: hidden;
+            opacity: 0;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 110%; /* Posiziona sopra il pulsante */
+            left: 0; /* Allinea a sinistra del contenitore */
+            width: 100%; /* Stessa larghezza del contenitore (e quindi del pulsante) */
+            white-space: normal; /* Permette al testo di andare a capo */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            font-size: 0.9em; /* Dimensione del testo del tooltip */
+            box-sizing: border-box; /* Include padding e border nella larghezza totale */
+        }
+
+        /* Mostra il tooltip al mouseover del contenitore del pulsante */
+        .outlook-button-container:hover .outlook-tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Language selector styles */
+        .language-selector-buttons {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+        }
+
+        .language-selector-buttons span {
+            cursor: pointer;
+            font-weight: 600;
+            color: #a0aec0; /* Colore predefinito */
+            transition: color 0.2s ease;
+        }
+
+        .language-selector-buttons span:hover {
+            color: #2d3748; /* Colore al passaggio del mouse */
+        }
+
+        .language-selector-buttons .active-lang {
+            color: #2a69ac; /* Colore per la lingua attiva */
+            text-decoration: underline;
+        }
+
+        /* Stili per la scritta "Registro" */
+        .registry-toggle {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            cursor: pointer;
+            font-weight: 600;
+            color: #2a69ac; /* Colore blu simile al titolo */
+            transition: color 0.2s ease;
+            text-decoration: underline; /* Sottolineato per indicare che è cliccabile */
+        }
+
+        .registry-toggle:hover {
+            color: #2c5282; /* Blu più scuro al passaggio del mouse */
+        }
+
+        /* Registered events section */
+        .registered-events-section {
+            margin-top: 40px;
+            padding: 25px;
+            background-color: #f0f4f8; /* Light gray-blue for section */
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: left;
+            /* Inizialmente nascosto */
+            display: none;
+        }
+
+        .registered-events-section h3 {
+            color: #2c5282;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .registered-events-list {
+            list-style: none;
+            padding: 0;
+            max-height: 200px; /* Limita l'altezza della lista */
+            overflow-y: auto; /* Aggiunge scroll se necessario */
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            background-color: #ffffff;
+        }
+
+        .registered-events-list li {
+            padding: 10px 15px;
+            border-bottom: 1px solid #ebf4ff;
+            color: #4a5568;
+            font-size: 0.95em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .registered-events-list li:last-child {
+            border-bottom: none;
+        }
+
+        .user-id-display {
+            margin-top: 15px;
+            font-size: 0.85em;
+            color: #718096;
+            word-break: break-all; /* Permette all'ID di andare a capo */
+        }
+
+        .registration-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Stili per il pulsante di eliminazione */
+        .delete-button {
+            background: none;
+            border: none;
+            color: #e53e3e; /* Rosso per indicare eliminazione */
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 5px;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        .delete-button:hover {
+            color: #c53030;
+            transform: scale(1.1);
+        }
+
+        /* Stili del modal per la password */
+        .password-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001; /* Superiore ad altri modal */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .password-modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .password-modal-content {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .password-modal-overlay.visible .password-modal-content {
+            transform: translateY(0);
+        }
+
+        .password-modal-content h3 {
+            color: #2a69ac;
+            font-size: 1.6em;
+            margin-bottom: 20px;
+        }
+
+        .password-modal-content input[type="password"] {
+            width: calc(100% - 24px); /* Sottrai il padding */
+            padding: 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            font-size: 1em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .password-modal-content .form-button-group {
+            justify-content: center; /* Centra i pulsanti nel modal */
+        }
+
+        .password-validation-message {
+            color: #e53e3e;
+            font-size: 0.9em;
+            margin-top: -5px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            min-height: 1.2em; /* Spazio riservato per il messaggio */
+        }
+
+
+        /* Modal Styles (esistenti, per il form di registrazione) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 500px;
+            text-align: left;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.visible .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-content h3 {
+            color: #2a69ac;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2d3748;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            font-size: 1em;
+            box-sizing: border-box; /* Per includere padding nel width */
+        }
+
+        .form-button-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .form-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+
+        .form-button.submit {
+            background-color: #48bb78;
+            color: white;
+        }
+
+        .form-button.submit:hover {
+            background-color: #38a169;
+            transform: translateY(-2px);
+        }
+
+        .form-button.cancel {
+            background-color: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .form-button.cancel:hover {
+            background-color: #cbd5e0;
+            transform: translateY(-2px);
+        }
+
+        .form-validation-message {
+            color: #e53e3e;
+            font-size: 0.9em;
+            margin-top: 10px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .success-message {
+            color: #48bb78;
+        }
+
+        /* Adattamenti responsive */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            .subtitle {
+                font-size: 0.9em;
+                margin-bottom: 20px;
+            }
+            .calendar-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .calendar-header h2 {
+                font-size: 1.5em;
+            }
+            .calendar-grid th, .calendar-grid td {
+                padding: 8px 0;
+                font-size: 0.9em;
+            }
+            .button-group {
+                flex-direction: column; /* Impila i pulsanti verticalmente su schermi piccoli */
+                gap: 15px; /* Spazio leggermente più piccolo su mobile */
+            }
+            .button-group a {
+                width: 100%; /* Occupano tutta la larghezza */
+                max-width: none; /* Rimuovi il limite massimo di larghezza */
+                flex-basis: auto; /* Resetta flex-basis per il layout a colonna */
+            }
+            .button-group button {
+                font-size: 1.2em;
+                padding: 15px 30px;
+            }
+            .outlook-tooltip {
+                width: 100%; /* Occupa tutta la larghezza su schermi piccoli */
+                bottom: 105%; /* Regola leggermente la posizione */
+            }
+            .language-selector-buttons {
+                top: 10px;
+                right: 10px;
+            }
+            .registry-toggle {
+                top: 10px;
+                left: 10px;
+            }
+            .registered-events-section {
+                padding: 15px;
+            }
+            .registered-events-section h3 {
+                font-size: 1.3em;
+            }
+            .modal-content {
+                padding: 20px;
+            }
+            .password-modal-content {
+                padding: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="language-switch">
-    <a href="en.html">🇬🇧 English</a>
-  </div>
+    <div class="container">
+        <!-- Language selector buttons -->
+        <div class="language-selector-buttons">
+            <span id="langIta" class="active-lang">ITA</span>
+            <span id="langEng">ENG</span>
+            <span id="langDeu">DEU</span>
+            <span id="langFra">FRA</span>
+            <span id="langEsp">ESP</span>
+        </div>
 
-  <header>
-    <h1>Locazione Turistica Gianna</h1>
-    <p>Lido delle Nazioni, Comacchio (FE), Italia</p>
-  </header>
+        <!-- Scritta "Registro" -->
+        <div id="toggleRegisteredEvents" class="registry-toggle">Registro</div>
 
-  <section>
-    <h2>Benvenuti</h2>
-    <p>Villetta d'angolo molto tranquilla e immersa nel verde, con due giardini, uno fronte e uno retro. Ideale per famiglie e coppie. A soli 200 metri dal mare (3 minuti a piedi), comoda al bagno Baia Thaiti.</p>
+        <div id="calendarView">
+            <h1 id="mainTitle">Prenota ora la tua vacanza!!</h1>
+            <p class="subtitle" id="mainSubtitle">Scorri tra i mesi, verifica la disponibilità, seleziona i giorni ed invia la richiesta</p>
 
-    <h2>Capacità</h2>
-    <p>Fino a 6 persone: due camere matrimoniali e un divano letto in salotto.</p>
+            <div class="calendar-section">
+                <div class="calendar-header">
+                    <button id="prevMonth"></button>
+                    <select id="monthSelect"></select>
+                    <button id="nextMonth"></button>
+                </div>
+                <table class="calendar-grid" id="calendarGrid">
+                    <thead>
+                        <tr id="calendarDaysOfWeek">
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- I giorni del calendario verranno inseriti qui da JavaScript -->
+                    </tbody>
+                </table>
+            </div>
 
-    <h2>Servizi</h2>
-    <ul>
-      <li>Wi-Fi</li>
-      <li>Aria condizionata</li>
-      <li>Giardino fronte e retro</li>
-      <li>Parcheggio privato</li>
-    </ul>
+            <div class="message" id="eventMessage"></div>
+            
+            <div class="button-group">
+                <a href="#" id="registerButtonLink">
+                    <button class="register-button" id="registerButton"></button>
+                </a>
+                <a href="#" id="addToOutlookButtonLink" class="outlook-button-container">
+                    <button class="outlook-button" id="outlookButton"></button>
+                    <span class="outlook-tooltip" id="outlookTooltip"></span>
+                </a>
+            </div>
 
-    <h2>Galleria</h2>
-    <div class="gallery">
-      <!-- Inserire qui le immagini -->
+            <!-- Sezione per visualizzare le registrazioni -->
+            <div class="registered-events-section" id="registeredEventsSection">
+                <h3 id="registeredEventsTitle"></h3>
+                <ul id="registeredEventsList" class="registered-events-list">
+                    <!-- Le registrazioni verranno popolate qui da JavaScript -->
+                </ul>
+                <div class="user-id-display" id="currentUserIdDisplay"></div>
+            </div>
+        </div>
+
+        <!-- Registration Form View -->
+        <div id="registrationFormView" style="display:none;">
+            <h1 id="registrationFormTitle"></h1>
+            <div class="event-info">
+                <span id="selectedEventDateDisplay"></span>
+            </div>
+            <form id="registrationForm">
+                <div class="form-group">
+                    <label for="firstNameInput" id="firstNameLabel"></label>
+                    <input type="text" id="firstNameInput" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="lastNameInput" id="lastNameLabel"></label>
+                    <input type="text" id="lastNameInput" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="countryInput" id="countryLabel"></label>
+                    <input type="text" id="countryInput" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="phoneNumberInput" id="phoneNumberLabel"></label>
+                    <input type="tel" id="phoneNumberInput" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="emailInput" id="emailLabel"></label>
+                    <input type="email" id="emailInput" class="form-input" required>
+                </div>
+                <p id="formMessage" class="form-validation-message"></p>
+                <div class="form-button-group">
+                    <button type="button" class="form-button cancel" id="cancelRegistrationButton"></button>
+                    <button type="submit" class="form-button submit" id="submitRegistrationButton"></button>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <h2>Contatti</h2>
-    <p>Email: <a href="mailto:giannasantececca@gmail.com">giannasantececca@gmail.com</a></p>
-    <p>Telefono: <a href="tel:+393388984269">+39 338 898 4269</a></p>
-  </section>
+    <!-- Password Modal -->
+    <div id="passwordModalOverlay" class="password-modal-overlay">
+        <div class="password-modal-content">
+            <h3 id="passwordModalTitle"></h3>
+            <input type="password" id="passwordInput" placeholder="Inserisci password">
+            <p id="passwordValidationMessage" class="password-validation-message"></p>
+            <div class="form-button-group">
+                <button type="button" class="form-button cancel" id="cancelPasswordButton"></button>
+                <button type="button" class="form-button submit" id="submitPasswordButton"></button>
+            </div>
+        </div>
+    </div>
 
-  <footer>
-    <p>&copy; 2025 Locazione Turistica Gianna</p>
-    <p>Disponibile in Italiano & English</p>
-  </footer>
+    <script type="module">
+        // Global variables for the application
+        let currentUserId = localStorage.getItem('currentUserId') || crypto.randomUUID(); // Utilizza un ID utente persistente in localStorage o ne genera uno nuovo
+        localStorage.setItem('currentUserId', currentUserId); // Salva l'ID utente nel localStorage
+
+        const calendarView = document.getElementById('calendarView');
+        const registrationFormView = document.getElementById('registrationFormView');
+
+        const eventMessageElement = document.getElementById('eventMessage');
+
+        const calendarGridBody = document.querySelector('#calendarGrid tbody');
+        const monthSelect = document.getElementById('monthSelect');
+        const calendarDaysOfWeekElements = document.querySelectorAll('#calendarDaysOfWeek th');
+
+        const prevMonthButton = document.getElementById('prevMonth');
+        const nextMonthButton = document.getElementById('nextMonth');
+
+        const registerButtonLink = document.getElementById('registerButtonLink');
+        const registerButton = document.getElementById('registerButton');
+        const outlookButton = document.getElementById('outlookButton');
+
+        const outlookButtonContainer = document.getElementById('addToOutlookButtonLink');
+        const outlookTooltip = document.getElementById('outlookTooltip');
+
+        const mainTitle = document.getElementById('mainTitle');
+        const mainSubtitle = document.getElementById('mainSubtitle');
+        const docTitle = document.getElementById('docTitle');
+        
+        const langIta = document.getElementById('langIta');
+        const langEng = document.getElementById('langEng');
+        const langDeu = document.getElementById('langDeu');
+        const langFra = document.getElementById('langFra');
+        const langEsp = document.getElementById('langEsp');
+
+        const registeredEventsTitle = document.getElementById('registeredEventsTitle');
+        const registeredEventsList = document.getElementById('registeredEventsList');
+        const currentUserIdDisplay = document.getElementById('currentUserIdDisplay');
+        const registeredEventsSection = document.getElementById('registeredEventsSection');
+        const toggleRegisteredEventsButton = document.getElementById('toggleRegisteredEvents');
+
+        const registrationFormTitle = document.getElementById('registrationFormTitle');
+        const registrationForm = document.getElementById('registrationForm');
+        const firstNameInput = document.getElementById('firstNameInput');
+        const lastNameInput = document.getElementById('lastNameInput');
+        const countryInput = document.getElementById('countryInput');
+        const phoneNumberInput = document.getElementById('phoneNumberInput');
+        const emailInput = document.getElementById('emailInput');
+        const formMessage = document.getElementById('formMessage');
+        const cancelRegistrationButton = document.getElementById('cancelRegistrationButton');
+        const submitRegistrationButton = document.getElementById('submitRegistrationButton');
+        const firstNameLabel = document.getElementById('firstNameLabel');
+        const lastNameLabel = document.getElementById('lastNameLabel');
+        const countryLabel = document.getElementById('countryLabel');
+        const phoneNumberLabel = document.getElementById('phoneNumberLabel');
+        const emailLabel = document.getElementById('emailLabel');
+        const selectedEventDateDisplay = document.getElementById('selectedEventDateDisplay');
+
+        const passwordModalOverlay = document.getElementById('passwordModalOverlay');
+        const passwordModalTitle = document.getElementById('passwordModalTitle');
+        const passwordInput = document.getElementById('passwordInput');
+        const passwordValidationMessage = document.getElementById('passwordValidationMessage');
+        const cancelPasswordButton = document.getElementById('cancelPasswordButton');
+        const submitPasswordButton = document.getElementById('submitPasswordButton');
+
+        const CORRECT_PASSWORD = "imagroup";
+
+        let countdownInterval;
+        let eventDate = null;
+
+        let currentCalendarDate = new Date();
+        let selectedDates = new Set();
+        let isDragging = false; // Nuovo stato per il trascinamento
+
+        const eventHour = 10;
+        const eventMinute = 0;
+
+        const translations = {
+            it: {
+                docTitle: "Prenota ora la tua vacanza!!",
+                title: "Prenota ora la tua vacanza!!",
+                subtitle: "Scorri tra i mesi, verifica la disponibilità, seleziona i giorni ed invia la richiesta",
+                prevMonth: "Mese Precedente",
+                nextMonth: "Mese Successivo",
+                daysOfWeek: ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"],
+                monthNames: [
+                    "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
+                    "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"
+                ],
+                eventStarted: "L'evento è iniziato o è terminato!",
+                dateInPast: "La data selezionata è nel passato!",
+                noSecondWednesday: "Nessun secondo mercoledì disponibile nei prossimi mesi.",
+                selectValidFutureDate: "Seleziona prima una o più date future valide per l'evento.",
+                registerButton: "Prenota la tua vacanza",
+                outlookButton: "Aggiungi al calendario",
+                outlookTooltip: "Un file ICS è stato generato. Se non si apre automaticamente, controlla i tuoi download e aprilo manualmente per aggiungere l'evento al tuo calendario.",
+                registrationSuccess: "Registrazione avvenuta con successo!",
+                registrationFailed: "Errore durante la registrazione.",
+                registeredEventsTitle: "Eventi Registrati",
+                currentUserIdLabel: "Il tuo ID Utente (locale): ",
+                registrationTimestampLabel: "Data e Ora Registrazione: ",
+                noRegistrations: "Nessuna registrazione presente.",
+                errorLoadingRegistrations: "Errore nel caricare le registrazioni.",
+                registryToggle: "Registro",
+                registrationFormTitle: "Registrazione Evento",
+                eventDatePrefix: "Stai registrando per gli eventi del: ",
+                firstNameLabel: "Nome:",
+                lastNameLabel: "Cognome:",
+                countryLabel: "Nazione:",
+                phoneNumberLabel: "Numero di telefono:",
+                emailLabel: "Email:",
+                formRequiredFields: "Tutti i campi sono obbligatori!",
+                formInvalidEmail: "Inserisci un'email valida!",
+                cancelButton: "Annulla",
+                submitButton: "Registra",
+                passwordModalTitle: "Inserisci Password",
+                passwordPlaceholder: "Password",
+                passwordRequired: "La password è richiesta.",
+                passwordIncorrect: "Password errata!",
+                passwordConfirm: "Conferma",
+                disableDateLabel: "Disabilita data nel calendario",
+                deleteButton: "Elimina",
+                emailSubject: "La tua vacanza è stata prenotata!",
+                emailBody: "Gentile {firstName} {lastName}, ti confermiamo che la tua prenotazione è confermata, cordialmente"
+            },
+            en: {
+                docTitle: "Book your vacation now!!",
+                title: "Book your vacation now!!",
+                subtitle: "Scroll through the months, check availability, select days and send your request",
+                prevMonth: "Previous Month",
+                nextMonth: "Next Month",
+                daysOfWeek: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+                monthNames: [
+                    "January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"
+                ],
+                eventStarted: "The event has started or ended!",
+                dateInPast: "The selected date is in the past!",
+                noSecondWednesday: "No second Wednesday available in the coming months.",
+                selectValidFutureDate: "Please select one or more valid future event dates first.",
+                registerButton: "Book your vacation",
+                outlookButton: "Add to Calendar",
+                outlookTooltip: "An ICS file has been generated. If it doesn't open automatically, please check your downloads and open it manually to add the event to your calendar.",
+                registrationSuccess: "Registration successful!",
+                registrationFailed: "Error during registration.",
+                registeredEventsTitle: "Registered Events",
+                currentUserIdLabel: "Your User ID (local): ",
+                registrationTimestampLabel: "Registration Date and Time: ",
+                noRegistrations: "No registrations found.",
+                errorLoadingRegistrations: "Error loading registrations.",
+                registryToggle: "Registry",
+                registrationFormTitle: "Event Registration",
+                eventDatePrefix: "You are registering for events on: ",
+                firstNameLabel: "First Name:",
+                lastNameLabel: "Last Name:",
+                countryLabel: "Country:",
+                phoneNumberLabel: "Phone Number:",
+                emailLabel: "Email:",
+                formRequiredFields: "All fields are required!",
+                formInvalidEmail: "Please enter a valid email address!",
+                cancelButton: "Cancel",
+                submitButton: "Register",
+                passwordModalTitle: "Enter Password",
+                passwordPlaceholder: "Password",
+                passwordRequired: "Password is required.",
+                passwordIncorrect: "Incorrect password!",
+                passwordConfirm: "Confirm",
+                disableDateLabel: "Disable date in calendar",
+                deleteButton: "Delete",
+                emailSubject: "Your vacation has been booked!",
+                emailBody: "Dear {firstName} {lastName}, we confirm that your booking is confirmed, best regards"
+            },
+            de: {
+                docTitle: "Buche jetzt deinen Urlaub!!",
+                title: "Buche jetzt deinen Urlaub!!",
+                subtitle: "Scrolle durch die Monate, überprüfe die Verfügbarkeit, wähle Tage aus und sende deine Anfrage",
+                prevMonth: "Vorheriger Monat",
+                nextMonth: "Nächster Monat",
+                daysOfWeek: ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"],
+                monthNames: [
+                    "Januar", "Februar", "März", "April", "Mai", "Juni",
+                    "Juli", "August", "September", "Oktober", "November", "Dezember"
+                ],
+                eventStarted: "Die Veranstaltung hat begonnen oder ist beendet!",
+                dateInPast: "Das ausgewählte Datum liegt in der Vergangenheit!",
+                noSecondWednesday: "Kein zweiter Mittwoch in den kommenden Monaten verfügbar.",
+                selectValidFutureDate: "Bitte wählen Sie zuerst ein oder mehrere gültige zukünftige Veranstaltungsdaten aus.",
+                registerButton: "Buche deinen Urlaub",
+                outlookButton: "Zum Kalender hinzufügen",
+                outlookTooltip: "Eine ICS-Datei wurde generiert. Wenn sie sich nicht automatisch öffnet, überprüfen Sie Ihre Downloads und öffnen Sie sie manuell, um das Ereignis zu Ihrem Kalender hinzuzufügen.",
+                registrationSuccess: "Registrierung erfolgreich!",
+                registrationFailed: "Fehler bei der Registrierung.",
+                registeredEventsTitle: "Registrierte Veranstaltungen",
+                currentUserIdLabel: "Ihre Benutzer-ID (lokal): ",
+                registrationTimestampLabel: "Registrierungsdatum und -zeit: ",
+                noRegistrations: "Keine Registrierungen gefunden.",
+                errorLoadingRegistrations: "Fehler beim Laden der Registrierungen.",
+                registryToggle: "Register",
+                registrationFormTitle: "Veranstaltungsregistrierung",
+                eventDatePrefix: "Sie registrieren sich für Veranstaltungen am: ",
+                firstNameLabel: "Vorname:",
+                lastNameLabel: "Nachname:",
+                countryLabel: "Land:",
+                phoneNumberLabel: "Telefonnummer:",
+                emailLabel: "E-Mail:",
+                formRequiredFields: "Alle Felder sind erforderlich!",
+                formInvalidEmail: "Bitte geben Sie eine gültige E-Mail-Adresse ein!",
+                cancelButton: "Abbrechen",
+                submitButton: "Registrieren",
+                passwordModalTitle: "Passwort eingeben",
+                passwordPlaceholder: "Passwort",
+                passwordRequired: "Passwort ist erforderlich.",
+                passwordIncorrect: "Falsches Passwort!",
+                passwordConfirm: "Bestätigen",
+                disableDateLabel: "Datum im Kalender deaktivieren",
+                deleteButton: "Löschen",
+                emailSubject: "Ihr Urlaub wurde gebucht!",
+                emailBody: "Sehr geehrte/r {firstName} {lastName}, wir bestätigen, dass Ihre Buchung bestätigt ist, mit freundlichen Grüßen"
+            },
+            fr: {
+                docTitle: "Réservez vos vacances maintenant !!",
+                title: "Réservez vos vacances maintenant !!",
+                subtitle: "Faites défiler les mois, vérifiez la disponibilité, sélectionnez les jours et envoyez votre demande",
+                prevMonth: "Mois précédent",
+                nextMonth: "Mois suivant",
+                daysOfWeek: ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"],
+                monthNames: [
+                    "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
+                    "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
+                ],
+                eventStarted: "L'événement a commencé ou est terminé !",
+                dateInPast: "La date sélectionnée est dans le passé !",
+                noSecondWednesday: "Aucun deuxième mercredi disponible dans les mois à venir.",
+                selectValidFutureDate: "Veuillez d'abord sélectionner une ou plusieurs dates d'événement futures valides.",
+                registerButton: "Réservez vos vacances",
+                outlookButton: "Ajouter au calendrier",
+                outlookTooltip: "Un fichier ICS a été généré. S'il ne s'ouvre pas automatiquement, veuillez vérifier vos téléchargements et l'ouvrir manuellement pour ajouter l'événement à votre calendrier.",
+                registrationSuccess: "Inscription réussie !",
+                registrationFailed: "Erreur lors de l'inscription.",
+                registeredEventsTitle: "Événements enregistrés",
+                currentUserIdLabel: "Votre ID utilisateur (local) : ",
+                registrationTimestampLabel: "Date et heure d'inscription : ",
+                noRegistrations: "Aucune inscription trouvée.",
+                errorLoadingRegistrations: "Erreur lors du chargement des inscriptions.",
+                registryToggle: "Registre",
+                registrationFormTitle: "Inscription à l'événement",
+                eventDatePrefix: "Vous vous inscrivez aux événements du : ",
+                firstNameLabel: "Prénom :",
+                lastNameLabel: "Nom :",
+                countryLabel: "Pays :",
+                phoneNumberLabel: "Numéro de téléphone :",
+                emailLabel: "E-mail :",
+                formRequiredFields: "Tous les champs sont obligatoires !",
+                formInvalidEmail: "Veuillez entrer une adresse e-mail valide !",
+                cancelButton: "Annuler",
+                submitButton: "S'inscrire",
+                passwordModalTitle: "Entrer le mot de passe",
+                passwordPlaceholder: "Mot de passe",
+                passwordRequired: "Le mot de passe est requis.",
+                passwordIncorrect: "Mot de passe incorrect !",
+                passwordConfirm: "Confirmer",
+                disableDateLabel: "Désactiver la date dans le calendrier",
+                deleteButton: "Supprimer",
+                emailSubject: "Vos vacances ont été réservées !",
+                emailBody: "Cher/Chère {firstName} {lastName}, nous confirmons que votre réservation est confirmée, cordialement"
+            },
+            es: {
+                docTitle: "¡¡Reserva tus vacaciones ahora!!",
+                title: "¡¡Reserva tus vacaciones ahora!!",
+                subtitle: "Desplázate por los meses, verifica la disponibilidad, selecciona los días y envía tu solicitud",
+                prevMonth: "Mes anterior",
+                nextMonth: "Mes siguiente",
+                daysOfWeek: ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"],
+                monthNames: [
+                    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+                ],
+                eventStarted: "¡El evento ha comenzado o ha terminado!",
+                dateInPast: "¡La fecha seleccionada está en el pasado!",
+                noSecondWednesday: "No hay segundo miércoles disponible en los próximos meses.",
+                selectValidFutureDate: "Por favor, seleccione una o más fechas de evento futuras válidas primero.",
+                registerButton: "Reserva tus vacaciones",
+                outlookButton: "Añadir al calendario",
+                outlookTooltip: "Se ha generado un archivo ICS. Si no se abre automáticamente, por favor, revise sus descargas y ábralo manualmente para añadir el evento a su calendario.",
+                registrationSuccess: "¡Registro exitoso!",
+                registrationFailed: "Error durante el registro.",
+                registeredEventsTitle: "Eventos registrados",
+                currentUserIdLabel: "Su ID de usuario (local): ",
+                registrationTimestampLabel: "Fecha y hora de registro: ",
+                noRegistrations: "No se encontraron registros.",
+                errorLoadingRegistrations: "Error al cargar los registros.",
+                registryToggle: "Registro",
+                registrationFormTitle: "Registro de evento",
+                eventDatePrefix: "Se está registrando para los eventos del: ",
+                firstNameLabel: "Nombre:",
+                lastNameLabel: "Apellido:",
+                countryLabel: "País:",
+                phoneNumberLabel: "Número de teléfono:",
+                emailLabel: "Correo electrónico:",
+                formRequiredFields: "¡Todos los campos son obligatorios!",
+                formInvalidEmail: "¡Por favor, introduzca una dirección de correo electrónico válida!",
+                cancelButton: "Cancelar",
+                submitButton: "Registrar",
+                passwordModalTitle: "Introducir contraseña",
+                passwordPlaceholder: "Contraseña",
+                passwordRequired: "La contraseña es obligatoria.",
+                passwordIncorrect: "¡Contraseña incorrecta!",
+                passwordConfirm: "Confirmar",
+                disableDateLabel: "Deshabilitar fecha en el calendario",
+                deleteButton: "Eliminar",
+                emailSubject: "¡Tus vacaciones han sido reservadas!",
+                emailBody: "Estimado/a {firstName} {lastName}, le confirmamos que su reserva está confirmata, atentamente"
+            }
+        };
+
+        let currentLanguage = 'it'; // Lingua di default
+
+        /**
+         * Aggiorna tutti gli elementi testuali della UI alla lingua selezionata.
+         * @param {string} lang - Il codice della lingua ('it' o 'en').
+         */
+        function updateLanguage(lang) {
+            currentLanguage = lang;
+            const t = translations[currentLanguage];
+
+            docTitle.textContent = t.docTitle;
+            mainTitle.textContent = t.title;
+            mainSubtitle.textContent = t.subtitle;
+            prevMonthButton.textContent = t.prevMonth;
+            nextMonthButton.textContent = t.nextMonth;
+            registerButton.textContent = t.registerButton;
+            outlookButton.textContent = t.outlookButton;
+            outlookTooltip.textContent = t.outlookTooltip;
+            registeredEventsTitle.textContent = t.registeredEventsTitle;
+            toggleRegisteredEventsButton.textContent = t.registryToggle;
+
+            registrationFormTitle.textContent = t.registrationFormTitle;
+            firstNameLabel.textContent = t.firstNameLabel;
+            lastNameLabel.textContent = t.lastNameLabel;
+            countryLabel.textContent = t.countryLabel;
+            phoneNumberLabel.textContent = t.phoneNumberLabel;
+            emailLabel.textContent = t.emailLabel;
+            cancelRegistrationButton.textContent = t.cancelButton;
+            submitRegistrationButton.textContent = t.submitButton;
+
+            if (selectedDates.size > 0) {
+                const dateOptions = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+                const sortedDates = Array.from(selectedDates).sort();
+                const datesText = sortedDates.map(dateString => {
+                    const [year, month, day] = dateString.split('-').map(Number);
+                    return new Date(year, month - 1, day).toLocaleDateString(currentLanguage, dateOptions);
+                }).join(', ');
+                selectedEventDateDisplay.textContent = `${t.eventDatePrefix} ${datesText}`;
+            } else {
+                selectedEventDateDisplay.textContent = '';
+            }
+
+            calendarDaysOfWeekElements.forEach((th, index) => {
+                th.textContent = t.daysOfWeek[index];
+            });
+
+            generateCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
+            populateMonthDropdown();
+
+            const currentMessage = eventMessageElement.textContent;
+            if (currentMessage.includes(translations['it'].eventStarted) || currentMessage.includes(translations['en'].eventStarted) || currentMessage.includes(translations['de'].eventStarted) || currentMessage.includes(translations['fr'].eventStarted) || currentMessage.includes(translations['es'].eventStarted)) {
+                eventMessageElement.textContent = t.eventStarted;
+            } else if (currentMessage.includes(translations['it'].dateInPast) || currentMessage.includes(translations['en'].dateInPast) || currentMessage.includes(translations['de'].dateInPast) || currentMessage.includes(translations['fr'].dateInPast) || currentMessage.includes(translations['es'].dateInPast)) {
+                eventMessageElement.textContent = t.dateInPast;
+            } else if (currentMessage.includes(translations['it'].noSecondWednesday) || currentMessage.includes(translations['en'].noSecondWednesday) || currentMessage.includes(translations['de'].noSecondWednesday) || currentMessage.includes(translations['fr'].noSecondWednesday) || currentMessage.includes(translations['es'].noSecondWednesday)) {
+                eventMessageElement.textContent = t.noSecondWednesday;
+            } else if (currentMessage.includes(translations['it'].selectValidFutureDate) || currentMessage.includes(translations['en'].selectValidFutureDate) || currentMessage.includes(translations['de'].selectValidFutureDate) || currentMessage.includes(translations['fr'].selectValidFutureDate) || currentMessage.includes(translations['es'].selectValidFutureDate)) {
+                eventMessageElement.textContent = t.selectValidFutureDate;
+            } else if (currentMessage.includes(translations['it'].registrationSuccess) || currentMessage.includes(translations['en'].registrationSuccess) || currentMessage.includes(translations['de'].registrationSuccess) || currentMessage.includes(translations['fr'].registrationSuccess) || currentMessage.includes(translations['es'].registrationSuccess)) {
+                eventMessageElement.textContent = t.registrationSuccess;
+            } else if (currentMessage.includes(translations['it'].registrationFailed) || currentMessage.includes(translations['en'].registrationFailed) || currentMessage.includes(translations['de'].registrationFailed) || currentMessage.includes(translations['fr'].registrationFailed) || currentMessage.includes(translations['es'].registrationFailed)) {
+                if (currentMessage.includes(translations['it'].registrationFailed)) {
+                    eventMessageElement.textContent = `${t.registrationFailed}`;
+                } else {
+                    eventMessageElement.textContent = `${t.registrationFailed}`;
+                }
+            } else if (currentMessage.includes(translations['it'].noRegistrations) || currentMessage.includes(translations['en'].noRegistrations) || currentMessage.includes(translations['de'].noRegistrations) || currentMessage.includes(translations['fr'].noRegistrations) || currentMessage.includes(translations['es'].noRegistrations)) {
+                eventMessageElement.textContent = t.noRegistrations;
+            } else {
+                eventMessageElement.textContent = '';
+            }
+
+            const currentFormMessage = formMessage.textContent;
+            if (currentFormMessage.includes(translations['it'].formRequiredFields) || currentFormMessage.includes(translations['en'].formRequiredFields) || currentFormMessage.includes(translations['de'].formRequiredFields) || currentFormMessage.includes(translations['fr'].formRequiredFields) || currentFormMessage.includes(translations['es'].formRequiredFields)) {
+                formMessage.textContent = t.formRequiredFields;
+            } else if (currentFormMessage.includes(translations['it'].formInvalidEmail) || currentFormMessage.includes(translations['en'].formInvalidEmail) || currentFormMessage.includes(translations['de'].formInvalidEmail) || currentFormMessage.includes(translations['fr'].formInvalidEmail) || currentFormMessage.includes(translations['es'].formInvalidEmail)) {
+                formMessage.textContent = t.formInvalidEmail;
+            } else if (currentFormMessage.includes(translations['it'].registrationSuccess) || currentFormMessage.includes(translations['en'].registrationSuccess) || currentFormMessage.includes(translations['de'].registrationSuccess) || currentFormMessage.includes(translations['fr'].registrationSuccess) || currentFormMessage.includes(translations['es'].registrationSuccess)) {
+                formMessage.textContent = t.registrationSuccess;
+            } else if (currentFormMessage.includes(translations['it'].registrationFailed) || currentFormMessage.includes(translations['en'].registrationFailed) || currentFormMessage.includes(translations['de'].registrationFailed) || currentFormMessage.includes(translations['fr'].registrationFailed) || currentFormMessage.includes(translations['es'].registrationFailed)) {
+                if (currentFormMessage.includes(translations['it'].registrationFailed)) {
+                    formMessage.textContent = `${t.registrationFailed}`;
+                } else {
+                    formMessage.textContent = `${t.registrationFailed}`;
+                }
+            }
+
+            document.querySelectorAll('.language-selector-buttons span').forEach(span => {
+                span.classList.remove('active-lang');
+            });
+
+            const langIdMap = {
+                it: 'Ita',
+                en: 'Eng',
+                de: 'Deu',
+                fr: 'Fra',
+                es: 'Esp'
+            };
+            const targetLangId = `lang${langIdMap[lang]}`;
+            const targetElement = document.getElementById(targetLangId);
+            if (targetElement) {
+                targetElement.classList.add('active-lang');
+            } else {
+                console.error(`Element with ID ${targetLangId} not found.`);
+            }
+
+            if (currentUserId) {
+                currentUserIdDisplay.textContent = `${t.currentUserIdLabel}${currentUserId}`;
+            }
+            localStorage.setItem('preferredLang', lang);
+
+            passwordModalTitle.textContent = t.passwordModalTitle;
+            passwordInput.placeholder = t.passwordPlaceholder;
+            cancelPasswordButton.textContent = t.cancelButton;
+            submitPasswordButton.textContent = t.passwordConfirm;
+
+            passwordValidationMessage.textContent = '';
+        }
+
+        /**
+         * Popola il menu a tendina con i prossimi 12 mesi.
+         */
+        function populateMonthDropdown() {
+            monthSelect.innerHTML = ''; // Pulisci le opzioni esistenti
+            const today = new Date();
+            const currentMonth = today.getMonth();
+            const currentYear = today.getFullYear();
+
+            for (let i = 0; i < 12; i++) {
+                const futureDate = new Date(currentYear, currentMonth + i, 1);
+                const option = document.createElement('option');
+                const valueMonth = futureDate.getMonth();
+                const valueYear = futureDate.getFullYear();
+                
+                // Il valore dell'opzione sarà "YYYY-MM"
+                option.value = `${valueYear}-${String(valueMonth + 1).padStart(2, '0')}`;
+                option.textContent = `${translations[currentLanguage].monthNames[valueMonth]} ${valueYear}`;
+                monthSelect.appendChild(option);
+            }
+
+            // Seleziona il mese corrente nel dropdown
+            const selectedMonthValue = `${currentCalendarDate.getFullYear()}-${String(currentCalendarDate.getMonth() + 1).padStart(2, '0')}`;
+            monthSelect.value = selectedMonthValue;
+        }
+
+        /**
+         * Trova la data della N-esima occorrenza di un giorno specifico della settimana in un dato mese.
+         * @param {number} year - L'anno (es. 2025).
+         * @param {number} month - Il mese con indice 0 (0-11).
+         * @param {number} dayOfWeek - Il giorno della settimana con indice 0 (0=Domenica, 1=Lunedì, ..., 6=Sabato).
+         * @param {number} occurrence - La N-esima occorrenza (es. 2 per la seconda).
+         * @returns {Date|null} L'oggetto Date per il giorno specificato, o null se non trovato.
+         */
+        function findNthDayOfWeek(year, month, dayOfWeek, occurrence) {
+            let count = 0;
+            for (let i = 1; i <= 31; i++) {
+                const d = new Date(year, month, i);
+                if (d.getMonth() !== month) break;
+                if (d.getDay() === dayOfWeek) {
+                    count++;
+                    if (count === occurrence) {
+                        return d;
+                    }
+                }
+            }
+            return null;
+        }
+
+        // --- Generazione Calendario ---
+
+        /**
+         * Genera la griglia del calendario per un dato anno e mese.
+         * Rende tutte le date future selezionabili, escludendo quelle disabilitate manualmente.
+         * @param {number} year - L'anno.
+         * @param {number} month - Il mese con indice 0.
+         */
+        function generateCalendar(year, month) {
+            calendarGridBody.innerHTML = '';
+
+            const firstDayOfMonth = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            const registeredEvents = JSON.parse(localStorage.getItem('eventRegistrations')) || [];
+            const disabledDatesMap = new Map();
+            registeredEvents.forEach(event => {
+                if (event.isCalendarDisabled) {
+                    disabledDatesMap.set(event.eventDate, true);
+                }
+            });
+
+            let date = 1;
+            for (let i = 0; i < 6; i++) {
+                const row = document.createElement('tr');
+
+                for (let j = 0; j < 7; j++) {
+                    const cell = document.createElement('td');
+
+                    if (i === 0 && j < firstDayOfMonth) {
+                        cell.textContent = '';
+                        cell.classList.add('disabled-date');
+                    } else if (date > daysInMonth) {
+                        cell.textContent = '';
+                        cell.classList.add('disabled-date');
+                    } else {
+                        cell.textContent = date;
+                        const currentDate = new Date(year, month, date);
+                        
+                        const formattedCurrentDate = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
+
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+
+                        if (currentDate.setHours(0, 0, 0, 0) >= today.getTime() && 
+                            !disabledDatesMap.has(formattedCurrentDate)) {
+                            
+                            cell.classList.add('selectable-date');
+
+                            if (currentDate.getDay() === 0) {
+                                cell.classList.add('sunday-date');
+                            }
+
+                            if (selectedDates.has(formattedCurrentDate)) {
+                                cell.classList.add('selected-date');
+                            }
+
+                            // Event listener per il trascinamento e la selezione
+                            cell.addEventListener('mousedown', (e) => {
+                                if (e.button === 0) { // Solo tasto sinistro del mouse
+                                    isDragging = true;
+                                    // Deseleziona tutte le date se si inizia un nuovo trascinamento
+                                    selectedDates.forEach(date => {
+                                        const prevSelectedCell = document.querySelector(`td[data-date="${date}"]`);
+                                        if (prevSelectedCell) {
+                                            prevSelectedCell.classList.remove('selected-date');
+                                        }
+                                    });
+                                    selectedDates.clear();
+
+                                    selectedDates.add(formattedCurrentDate);
+                                    cell.classList.add('selected-date');
+                                    updateEventDateAndCountdown();
+                                }
+                            });
+
+                            cell.addEventListener('mouseover', () => {
+                                if (isDragging) {
+                                    selectedDates.add(formattedCurrentDate);
+                                    cell.classList.add('selected-date');
+                                    updateEventDateAndCountdown(); // Aggiorna i pulsanti durante il trascinamento
+                                }
+                            });
+
+                        } else {
+                            cell.textContent = date; // Assicurati che il numero del giorno sia visibile anche se disabilitato
+                            cell.classList.add('disabled-date');
+                            // Rimuovi eventuali listener ereditati
+                            cell.removeEventListener('mousedown', () => {});
+                            cell.removeEventListener('mouseover', () => {});
+                        }
+                        cell.dataset.date = formattedCurrentDate; // Aggiungi data come attributo per un facile recupero
+                        date++;
+                    }
+                    row.appendChild(cell);
+                }
+                calendarGridBody.appendChild(row);
+                if (date > daysInMonth) break;
+            }
+        }
+
+        // Aggiungi un listener globale per `mouseup` per terminare il trascinamento ovunque sul documento
+        document.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                updateEventDateAndCountdown(); // Aggiorna lo stato finale dei pulsanti
+                console.log('Dragging ended. Final selected dates:', Array.from(selectedDates));
+            }
+        });
+
+
+        /**
+         * Imposta la data finale dell'evento con la data del calendario selezionata e l'ora fissa,
+         * quindi avvia/riavvia il conto alla rovescia (solo logica interna per abilitare/disabilitare pulsanti).
+         */
+        function updateEventDateAndCountdown() {
+            console.log('updateEventDateAndCountdown called. Current selectedDates:', Array.from(selectedDates));
+            clearInterval(countdownInterval);
+
+            if (selectedDates.size === 0) {
+                eventMessageElement.textContent = '';
+                registerButton.disabled = true;
+                outlookButton.disabled = true;
+                registerButtonLink.style.pointerEvents = 'none';
+                outlookButtonContainer.style.pointerEvents = 'none';
+                eventDate = null;
+                console.log('No dates selected or all in past. Buttons disabled.');
+                return;
+            }
+
+            let earliestFutureDate = null;
+            const now = new Date();
+            now.setSeconds(0, 0);
+
+            for (const dateString of selectedDates) {
+                const [year, month, day] = dateString.split('-').map(Number);
+                const currentSelectedEventDate = new Date(year, month - 1, day, eventHour, eventMinute, 0);
+
+                if (currentSelectedEventDate.getTime() >= now.getTime()) {
+                    if (!earliestFutureDate || currentSelectedEventDate.getTime() < earliestFutureDate.getTime()) {
+                        earliestFutureDate = currentSelectedEventDate;
+                    }
+                }
+            }
+
+            if (earliestFutureDate) {
+                eventDate = earliestFutureDate;
+                eventMessageElement.textContent = '';
+                registerButton.disabled = false;
+                outlookButton.disabled = false;
+                registerButtonLink.style.pointerEvents = 'auto';
+                outlookButtonContainer.style.pointerEvents = 'auto';
+                console.log('Valid future date selected. Buttons enabled. Earliest future date:', eventDate.toLocaleDateString());
+            } else {
+                eventMessageElement.textContent = translations[currentLanguage].dateInPast;
+                registerButton.disabled = true;
+                outlookButton.disabled = true;
+                registerButtonLink.style.pointerEvents = 'none';
+                outlookButtonContainer.style.pointerEvents = 'none';
+                eventDate = null;
+                console.log('All selected dates are in the past. Buttons disabled.');
+            }
+        }
+
+        /**
+         * Formatta una data per iCalendar (YYYYMMDDTHHMMSS).
+         * @param {Date} date - L'oggetto data da formattare.
+         * @returns {string} La stringa data formattata.
+         */
+        function formatICSDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hour = String(date.getHours()).padStart(2, '0');
+            const minute = String(date.getMinutes()).padStart(2, '0');
+            const second = String(date.getSeconds()).padStart(2, '0');
+            return `${year}${month}${day}T${hour}${minute}${second}`;
+        }
+
+        /**
+         * Formatta una data per iCalendar (YYYYMMDD) per eventi di tutto il giorno.
+         * @param {Date} date - L'oggetto data da formattare.
+         * @returns {string} La stringa data formattata.
+         */
+        function formatICSDateOnly(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}${month}${day}`;
+        }
+
+        /**
+         * Genera un file ICS e tenta di aprirlo con l'applicazione calendario predefinita.
+         */
+        function addEventToOutlook() {
+            if (selectedDates.size === 0) {
+                eventMessageElement.textContent = translations[currentLanguage].selectValidFutureDate;
+                return;
+            }
+
+            const eventTitle = "La tua vacanza prenotata";
+            const eventDescription = "La tua prenotazione è stata confermata. Goditi la tua vacanza!";
+            const eventLocation = "La tua destinazione";
+
+            let icsEvents = [];
+            const sortedSelectedDates = Array.from(selectedDates).sort();
+
+            sortedSelectedDates.forEach(dateString => {
+                const [year, month, day] = dateString.split('-').map(Number);
+                const eventStartDate = new Date(year, month - 1, day);
+                const eventEndDate = new Date(year, month - 1, day + 1);
+
+                if (eventStartDate.getTime() >= new Date().setHours(0,0,0,0)) {
+                    const dtStart = formatICSDateOnly(eventStartDate);
+                    const dtEnd = formatICSDateOnly(eventEndDate);
+
+                    icsEvents.push(`BEGIN:VEVENT
+UID:${Date.now()}-${dateString}@PrenotazioneVacanza
+DTSTAMP:${formatICSDate(new Date())}
+DTSTART;VALUE=DATE:${dtStart}
+DTEND;VALUE=DATE:${dtEnd}
+SUMMARY:${eventTitle} - ${dateString}
+DESCRIPTION:${eventDescription}
+LOCATION:${eventLocation}
+END:VEVENT`);
+                }
+            });
+
+            if (icsEvents.length === 0) {
+                eventMessageElement.textContent = translations[currentLanguage].selectValidFutureDate;
+                return;
+            }
+
+            const icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//PrenotazioneVacanza//IT
+${icsEvents.join('\n')}
+END:VCALENDAR`;
+
+            const blob = new Blob([icsContent], { type: 'text/calendar' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        let clickTimeout;
+
+        prevMonthButton.addEventListener('click', () => {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+            generateCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
+            populateMonthDropdown();
+            updateEventDateAndCountdown(); 
+        });
+
+        nextMonthButton.addEventListener('click', () => {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+            generateCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
+            populateMonthDropdown();
+            updateEventDateAndCountdown();
+        });
+
+        outlookButtonContainer.addEventListener('click', (e) => {
+            e.preventDefault();
+            addEventToOutlook();
+
+            clearInterval(clickTimeout);
+
+            outlookTooltip.style.visibility = 'visible';
+            outlookTooltip.style.opacity = '1';
+
+            clickTimeout = setTimeout(() => {
+                outlookTooltip.style.opacity = '0';
+                outlookTooltip.style.visibility = 'hidden';
+            }, 3000);
+        });
+
+        outlookButton.addEventListener('mouseover', () => {
+            clearInterval(clickTimeout);
+            outlookTooltip.style.visibility = 'visible';
+            outlookTooltip.style.opacity = '1';
+        });
+
+        outlookButton.addEventListener('mouseout', () => {
+            outlookTooltip.style.opacity = '0';
+            outlookTooltip.style.visibility = 'hidden';
+            clearInterval(clickTimeout);
+        });
+
+        langIta.addEventListener('click', () => updateLanguage('it'));
+        langEng.addEventListener('click', () => updateLanguage('en'));
+        langDeu.addEventListener('click', () => updateLanguage('de'));
+        langFra.addEventListener('click', () => updateLanguage('fr'));
+        langEsp.addEventListener('click', () => updateLanguage('es'));
+
+        monthSelect.addEventListener('change', (event) => {
+            const [year, month] = event.target.value.split('-').map(Number);
+            currentCalendarDate = new Date(year, month - 1, 1);
+            generateCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
+            updateEventDateAndCountdown();
+        });
+
+        toggleRegisteredEventsButton.addEventListener('click', () => {
+            if (registeredEventsSection.style.display === 'block') {
+                registeredEventsSection.style.display = 'none';
+            } else {
+                showPasswordModal();
+            }
+        });
+
+        function toggleRegisteredEventsSectionVisibility(show) {
+            if (show) {
+                registeredEventsSection.style.display = 'block';
+                loadRegistrations();
+            } else {
+                registeredEventsSection.style.display = 'none';
+            }
+        }
+
+        function showRegistrationForm() {
+            console.log('showRegistrationForm called. Selected Dates:', Array.from(selectedDates));
+            if (selectedDates.size === 0) {
+                eventMessageElement.textContent = translations[currentLanguage].selectValidFutureDate;
+                return;
+            }
+            calendarView.style.display = 'none';
+            registrationFormView.style.display = 'block';
+            registeredEventsSection.style.display = 'none';
+            formMessage.textContent = '';
+            registrationForm.reset();
+            if (selectedDates.size > 0) {
+                const dateOptions = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+                const sortedDates = Array.from(selectedDates).sort();
+                const datesText = sortedDates.map(dateString => {
+                    const [year, month, day] = dateString.split('-').map(Number);
+                    return new Date(year, month - 1, day).toLocaleDateString(currentLanguage, dateOptions);
+                }).join(', ');
+                selectedEventDateDisplay.textContent = `${translations[currentLanguage].eventDatePrefix} ${datesText}`;
+            }
+        }
+
+        function showCalendarView() {
+            calendarView.style.display = 'block';
+            registrationFormView.style.display = 'none';
+        }
+
+        async function addRegistrationToLocalStorage(formData) {
+            try {
+                submitRegistrationButton.disabled = true;
+                formMessage.textContent = "Registrazione in corso...";
+
+                const existingRegistrations = JSON.parse(localStorage.getItem('eventRegistrations')) || [];
+                
+                if (selectedDates.size === 0) {
+                    formMessage.textContent = translations[currentLanguage].selectValidFutureDate;
+                    formMessage.classList.remove('success-message');
+                    return;
+                }
+
+                const registrationsToAdd = [];
+                for (const dateString of selectedDates) {
+                    const newRegistration = {
+                        id: crypto.randomUUID(),
+                        userId: currentUserId,
+                        eventDate: dateString,
+                        eventTime: `${String(eventHour).padStart(2, '0')}:${String(eventMinute).padStart(2, '0')}`,
+                        firstName: formData.firstName,
+                        lastName: formData.lastName,
+                        country: formData.country,
+                        phoneNumber: formData.phoneNumber,
+                        email: formData.email,
+                        timestamp: new Date().toISOString(),
+                        isCalendarDisabled: false
+                    };
+                    registrationsToAdd.push(newRegistration);
+                }
+
+                existingRegistrations.push(...registrationsToAdd);
+                localStorage.setItem('eventRegistrations', JSON.stringify(existingRegistrations));
+
+                formMessage.textContent = translations[currentLanguage].registrationSuccess;
+                formMessage.classList.add('success-message');
+                eventMessageElement.textContent = translations[currentLanguage].registrationSuccess;
+                
+                selectedDates.clear();
+                
+                loadRegistrations();
+                generateCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
+                updateEventDateAndCountdown();
+
+                setTimeout(() => {
+                    registrationForm.reset();
+                    showCalendarView();
+                }, 1500);
+                
+            } catch (e) {
+                console.error("Errore durante l'aggiunta della registrazione: ", e);
+                formMessage.textContent = `${translations[currentLanguage].registrationFailed}`;
+                formMessage.classList.remove('success-message');
+                eventMessageElement.textContent = `${translations[currentLanguage].registrationFailed}`;
+            } finally {
+                submitRegistrationButton.disabled = false;
+            }
+        }
+
+        function handleRegistrationSubmit(event) {
+            event.preventDefault();
+
+            const firstName = firstNameInput.value.trim();
+            const lastName = lastNameInput.value.trim();
+            const country = countryInput.value.trim();
+            const phoneNumber = phoneNumberInput.value.trim();
+            const email = emailInput.value.trim();
+
+            if (!firstName || !lastName || !country || !phoneNumber || !email) {
+                formMessage.textContent = translations[currentLanguage].formRequiredFields;
+                formMessage.classList.remove('success-message');
+                return;
+            }
+
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(email)) {
+                formMessage.textContent = translations[currentLanguage].formInvalidEmail;
+                formMessage.classList.remove('success-message');
+                return;
+            }
+
+            formMessage.textContent = '';
+            formMessage.classList.remove('success-message');
+
+            const formData = {
+                firstName,
+                lastName,
+                country,
+                phoneNumber,
+                email
+            };
+
+            addRegistrationToLocalStorage(formData);
+        }
+
+        function handleRegistrationCheckboxChange(event) {
+            const registrationId = event.target.dataset.id;
+            const isChecked = event.target.checked;
+
+            let registrations = JSON.parse(localStorage.getItem('eventRegistrations')) || [];
+            const registrationIndex = registrations.findIndex(reg => reg.id === registrationId);
+
+            if (registrationIndex !== -1) {
+                registrations[registrationIndex].isCalendarDisabled = isChecked;
+                localStorage.setItem('eventRegistrations', JSON.stringify(registrations));
+                
+                generateCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
+            }
+        }
+
+        function deleteRegistration(id) {
+            let registrations = JSON.parse(localStorage.getItem('eventRegistrations')) || [];
+            const updatedRegistrations = registrations.filter(reg => reg.id !== id);
+            localStorage.setItem('eventRegistrations', JSON.stringify(updatedRegistrations));
+            
+            loadRegistrations();
+            generateCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
+        }
+
+        function loadRegistrations() {
+            registeredEventsList.innerHTML = '';
+            const registrations = JSON.parse(localStorage.getItem('eventRegistrations')) || [];
+
+            if (registrations.length === 0) {
+                const li = document.createElement('li');
+                li.textContent = translations[currentLanguage].noRegistrations;
+                registeredEventsList.appendChild(li);
+            } else {
+                registrations.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+                registrations.forEach((data) => {
+                    const li = document.createElement('li');
+                    
+                    const emailSubject = encodeURIComponent(translations[currentLanguage].emailSubject);
+                    const emailBodyContent = translations[currentLanguage].emailBody
+                        .replace('{firstName}', data.firstName)
+                        .replace('{lastName}', data.lastName);
+                    const emailBody = encodeURIComponent(emailBodyContent);
+
+                    li.innerHTML = `
+                        <span>
+                            ${data.firstName} ${data.lastName} (${data.phoneNumber}, ${data.country}) - ${data.eventDate} ${data.eventTime} - 
+                            <a href="mailto:${data.email}?subject=${emailSubject}&body=${emailBody}">${data.email}</a> - 
+                            ${translations[currentLanguage].registrationTimestampLabel}${new Date(data.timestamp).toLocaleString(currentLanguage)}
+                        </span>
+                        <div class="registration-item-controls">
+                            <label>
+                                <input type="checkbox" data-id="${data.id}" ${data.isCalendarDisabled ? 'checked' : ''}>
+                                ${translations[currentLanguage].disableDateLabel}
+                            </label>
+                            <button class="delete-button" data-id="${data.id}" title="${translations[currentLanguage].deleteButton}">
+                                &#x1F5D1;
+                            </button>
+                        </div>
+                    `;
+                    const checkbox = li.querySelector(`input[type="checkbox"][data-id="${data.id}"]`);
+                    if (checkbox) {
+                        checkbox.addEventListener('change', handleRegistrationCheckboxChange);
+                    }
+                    const deleteBtn = li.querySelector(`.delete-button[data-id="${data.id}"]`);
+                    if (deleteBtn) {
+                        deleteBtn.addEventListener('click', () => deleteRegistration(data.id));
+                    }
+                    registeredEventsList.appendChild(li);
+                });
+            }
+        }
+
+        registerButtonLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showRegistrationForm();
+        });
+
+        cancelRegistrationButton.addEventListener('click', showCalendarView);
+        registrationForm.addEventListener('submit', handleRegistrationSubmit);
+
+        function showPasswordModal() {
+            passwordModalOverlay.classList.add('visible');
+            passwordInput.value = '';
+            passwordValidationMessage.textContent = '';
+            passwordInput.focus();
+        }
+
+        function hidePasswordModal() {
+            passwordModalOverlay.classList.remove('visible');
+            passwordValidationMessage.textContent = '';
+        }
+
+        function handlePasswordSubmit() {
+            const enteredPassword = passwordInput.value;
+            if (enteredPassword.trim() === '') {
+                passwordValidationMessage.textContent = translations[currentLanguage].passwordRequired;
+                return;
+            }
+
+            if (enteredPassword === CORRECT_PASSWORD) {
+                hidePasswordModal();
+                toggleRegisteredEventsSectionVisibility(true);
+            } else {
+                passwordValidationMessage.textContent = translations[currentLanguage].passwordIncorrect;
+            }
+        }
+
+        cancelPasswordButton.addEventListener('click', hidePasswordModal);
+        submitPasswordButton.addEventListener('click', handlePasswordSubmit);
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handlePasswordSubmit();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            let initialLang = localStorage.getItem('preferredLang') || 'it';
+            updateLanguage(initialLang);
+            
+            currentUserIdDisplay.textContent = `${translations[currentLanguage].currentUserIdLabel}${currentUserId}`;
+
+            generateCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
+            populateMonthDropdown();
+
+            registerButton.disabled = true;
+            outlookButton.disabled = true;
+            registerButtonLink.style.pointerEvents = 'none';
+            outlookButtonContainer.style.pointerEvents = 'none';
+
+            updateEventDateAndCountdown();
+        });
+    </script>
 </body>
 </html>
