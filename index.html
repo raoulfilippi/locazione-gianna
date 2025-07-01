@@ -760,9 +760,16 @@
     </div>
 
     <script type="module">
-        // Global variables for the application
-        let currentUserId = localStorage.getItem('currentUserId') || crypto.randomUUID(); // Utilizza un ID utente persistente in localStorage o ne genera uno nuovo
-        localStorage.setItem('currentUserId', currentUserId); // Salva l'ID utente nel localStorage
+        // Importa i moduli Firebase necessari
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, onSnapshot, doc, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Variabili globali per l'applicazione
+        let db;
+        let auth;
+        let currentUserId; // Questo verrà popolato dall'autenticazione Firebase
+        let registrationsCollection; // Riferimento alla collezione Firestore
 
         const calendarView = document.getElementById('calendarView');
         const registrationFormView = document.getElementById('registrationFormView');
@@ -825,7 +832,6 @@
 
         const CORRECT_PASSWORD = "imagroup";
         const WHATSAPP_PHONE_NUMBER = "393356259151"; // Numero di telefono per WhatsApp (con prefisso internazionale)
-        // Messaggio WhatsApp aggiornato
         const WHATSAPP_MESSAGE = "Hey, ho prenotato, controlla il calendario al seguente link: https://raoulfilippi.github.io/locazione-gianna/index.html"; 
 
         let countdownInterval;
@@ -837,6 +843,9 @@
 
         const eventHour = 10;
         const eventMinute = 0;
+
+        // Variabile per memorizzare le registrazioni da Firestore
+        let allRegistrations = [];
 
         const translations = {
             it: {
@@ -1258,9 +1267,9 @@
             const firstDayOfMonth = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-            const registeredEvents = JSON.parse(localStorage.getItem('eventRegistrations')) || [];
+            // Usa le registrazioni caricate da Firestore
             const disabledDatesMap = new Map();
-            registeredEvents.forEach(event => {
+            allRegistrations.forEach(event => {
                 if (event.isCalendarDisabled) {
                     disabledDatesMap.set(event.eventDate, true);
                 }
@@ -1567,10 +1576,14 @@ END:VCALENDAR`;
             }
         });
 
+        /**
+         * Mostra/nasconde la sezione degli eventi registrati.
+         * Questa funzione ora viene chiamata solo dopo la verifica della password.
+         */
         function toggleRegisteredEventsSectionVisibility(show) {
             if (show) {
                 registeredEventsSection.style.display = 'block';
-                loadRegistrations();
+                // loadRegistrations è ora gestito da onSnapshot direttamente
             } else {
                 registeredEventsSection.style.display = 'none';
             }
@@ -1603,24 +1616,24 @@ END:VCALENDAR`;
             registrationFormView.style.display = 'none';
         }
 
-        async function addRegistrationToLocalStorage(formData) {
+        /**
+         * Aggiunge una nuova registrazione evento a Firestore.
+         * @param {object} formData - Oggetto contenente i dati del modulo (nome, cognome, nazione, numero di telefono, email).
+         */
+        async function addRegistrationToFirestore(formData) {
             try {
                 submitRegistrationButton.disabled = true;
                 formMessage.textContent = "Registrazione in corso...";
 
-                const existingRegistrations = JSON.parse(localStorage.getItem('eventRegistrations')) || [];
-                
                 if (selectedDates.size === 0) {
                     formMessage.textContent = translations[currentLanguage].selectValidFutureDate;
                     formMessage.classList.remove('success-message');
                     return;
                 }
 
-                const registrationsToAdd = [];
                 for (const dateString of selectedDates) {
                     const newRegistration = {
-                        id: crypto.randomUUID(),
-                        userId: currentUserId,
+                        userId: currentUserId, // L'ID utente di Firebase Auth
                         eventDate: dateString,
                         eventTime: `${String(eventHour).padStart(2, '0')}:${String(eventMinute).padStart(2, '0')}`,
                         firstName: formData.firstName,
@@ -1629,22 +1642,18 @@ END:VCALENDAR`;
                         phoneNumber: formData.phoneNumber,
                         email: formData.email,
                         timestamp: new Date().toISOString(),
-                        isCalendarDisabled: false
+                        isCalendarDisabled: false // Default a false, può essere modificato dal registro
                     };
-                    registrationsToAdd.push(newRegistration);
+                    await addDoc(registrationsCollection, newRegistration);
                 }
-
-                existingRegistrations.push(...registrationsToAdd);
-                localStorage.setItem('eventRegistrations', JSON.stringify(existingRegistrations));
 
                 formMessage.textContent = translations[currentLanguage].registrationSuccess;
                 formMessage.classList.add('success-message');
                 eventMessageElement.textContent = translations[currentLanguage].registrationSuccess;
                 
-                selectedDates.clear();
+                selectedDates.clear(); // Pulisce le date selezionate dopo la registrazione
                 
-                loadRegistrations();
-                generateCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
+                // loadRegistrations() e generateCalendar() saranno chiamati automaticamente da onSnapshot
                 updateEventDateAndCountdown();
 
                 // Invia il messaggio WhatsApp dopo la registrazione riuscita
@@ -1656,7 +1665,7 @@ END:VCALENDAR`;
                 }, 1500);
                 
             } catch (e) {
-                console.error("Errore durante l'aggiunta della registrazione: ", e);
+                console.error("Errore durante l'aggiunta della registrazione a Firestore: ", e);
                 formMessage.textContent = `${translations[currentLanguage].registrationFailed}`;
                 formMessage.classList.remove('success-message');
                 eventMessageElement.textContent = `${translations[currentLanguage].registrationFailed}`;
@@ -1698,81 +1707,110 @@ END:VCALENDAR`;
                 email
             };
 
-            addRegistrationToLocalStorage(formData);
+            addRegistrationToFirestore(formData); // Chiama la funzione Firestore
         }
 
-        function handleRegistrationCheckboxChange(event) {
+        /**
+         * Gestisce il cambio di stato della checkbox di una registrazione in Firestore.
+         * @param {Event} event - L'evento di cambio della checkbox.
+         */
+        async function handleRegistrationCheckboxChange(event) {
             const registrationId = event.target.dataset.id;
             const isChecked = event.target.checked;
 
-            let registrations = JSON.parse(localStorage.getItem('eventRegistrations')) || [];
-            const registrationIndex = registrations.findIndex(reg => reg.id === registrationId);
-
-            if (registrationIndex !== -1) {
-                registrations[registrationIndex].isCalendarDisabled = isChecked;
-                localStorage.setItem('eventRegistrations', JSON.stringify(registrations));
-                
-                generateCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
-            }
-        }
-
-        function deleteRegistration(id) {
-            let registrations = JSON.parse(localStorage.getItem('eventRegistrations')) || [];
-            const updatedRegistrations = registrations.filter(reg => reg.id !== id);
-            localStorage.setItem('eventRegistrations', JSON.stringify(updatedRegistrations));
-            
-            loadRegistrations();
-            generateCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
-        }
-
-        function loadRegistrations() {
-            registeredEventsList.innerHTML = '';
-            const registrations = JSON.parse(localStorage.getItem('eventRegistrations')) || [];
-
-            if (registrations.length === 0) {
-                const li = document.createElement('li');
-                li.textContent = translations[currentLanguage].noRegistrations;
-                registeredEventsList.appendChild(li);
-            } else {
-                registrations.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-
-                registrations.forEach((data) => {
-                    const li = document.createElement('li');
-                    
-                    const emailSubject = encodeURIComponent(translations[currentLanguage].emailSubject);
-                    const emailBodyContent = translations[currentLanguage].emailBody
-                        .replace('{firstName}', data.firstName)
-                        .replace('{lastName}', data.lastName);
-                    const emailBody = encodeURIComponent(emailBodyContent);
-
-                    li.innerHTML = `
-                        <span>
-                            ${data.firstName} ${data.lastName} (${data.phoneNumber}, ${data.country}) - ${data.eventDate} ${data.eventTime} - 
-                            <a href="mailto:${data.email}?subject=${emailSubject}&body=${emailBody}">${data.email}</a> - 
-                            ${translations[currentLanguage].registrationTimestampLabel}${new Date(data.timestamp).toLocaleString(currentLanguage)}
-                        </span>
-                        <div class="registration-item-controls">
-                            <label>
-                                <input type="checkbox" data-id="${data.id}" ${data.isCalendarDisabled ? 'checked' : ''}>
-                                ${translations[currentLanguage].disableDateLabel}
-                            </label>
-                            <button class="delete-button" data-id="${data.id}" title="${translations[currentLanguage].deleteButton}">
-                                &#x1F5D1;
-                            </button>
-                        </div>
-                    `;
-                    const checkbox = li.querySelector(`input[type="checkbox"][data-id="${data.id}"]`);
-                    if (checkbox) {
-                        checkbox.addEventListener('change', handleRegistrationCheckboxChange);
-                    }
-                    const deleteBtn = li.querySelector(`.delete-button[data-id="${data.id}"]`);
-                    if (deleteBtn) {
-                        deleteBtn.addEventListener('click', () => deleteRegistration(data.id));
-                    }
-                    registeredEventsList.appendChild(li);
+            try {
+                await updateDoc(doc(db, registrationsCollection.path, registrationId), {
+                    isCalendarDisabled: isChecked
                 });
+                // generateCalendar() sarà chiamato da onSnapshot
+            } catch (e) {
+                console.error("Errore durante l'aggiornamento della registrazione in Firestore: ", e);
             }
         }
+
+        /**
+         * Elimina una registrazione da Firestore.
+         * @param {string} id - L'ID del documento da eliminare.
+         */
+        async function deleteRegistration(id) {
+            try {
+                await deleteDoc(doc(db, registrationsCollection.path, id));
+                // loadRegistrations() e generateCalendar() saranno chiamati da onSnapshot
+            } catch (e) {
+                console.error("Errore durante l'eliminazione della registrazione da Firestore: ", e);
+            }
+        }
+
+        /**
+         * Carica e visualizza le registrazioni da Firestore in tempo reale.
+         */
+        function setupRealtimeRegistrationsListener() {
+            // Assicurati che db e registrationsCollection siano stati inizializzati
+            if (!db || !registrationsCollection) {
+                console.warn("Firestore non è ancora inizializzato. Riprovo tra poco.");
+                setTimeout(setupRealtimeRegistrationsListener, 500); // Riprova dopo un breve ritardo
+                return;
+            }
+
+            onSnapshot(query(registrationsCollection), (snapshot) => {
+                allRegistrations = [];
+                snapshot.forEach((doc) => {
+                    allRegistrations.push({ id: doc.id, ...doc.data() });
+                });
+                
+                registeredEventsList.innerHTML = ''; // Pulisci la lista corrente
+
+                if (allRegistrations.length === 0) {
+                    const li = document.createElement('li');
+                    li.textContent = translations[currentLanguage].noRegistrations;
+                    registeredEventsList.appendChild(li);
+                } else {
+                    allRegistrations.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+                    allRegistrations.forEach((data) => {
+                        const li = document.createElement('li');
+                        
+                        const emailSubject = encodeURIComponent(translations[currentLanguage].emailSubject);
+                        const emailBodyContent = translations[currentLanguage].emailBody
+                            .replace('{firstName}', data.firstName)
+                            .replace('{lastName}', data.lastName);
+                        const emailBody = encodeURIComponent(emailBodyContent);
+
+                        li.innerHTML = `
+                            <span>
+                                ${data.firstName} ${data.lastName} (${data.phoneNumber}, ${data.country}) - ${data.eventDate} ${data.eventTime} - 
+                                <a href="mailto:${data.email}?subject=${emailSubject}&body=${emailBody}">${data.email}</a> - 
+                                ${translations[currentLanguage].registrationTimestampLabel}${new Date(data.timestamp).toLocaleString(currentLanguage)}
+                            </span>
+                            <div class="registration-item-controls">
+                                <label>
+                                    <input type="checkbox" data-id="${data.id}" ${data.isCalendarDisabled ? 'checked' : ''}>
+                                    ${translations[currentLanguage].disableDateLabel}
+                                </label>
+                                <button class="delete-button" data-id="${data.id}" title="${translations[currentLanguage].deleteButton}">
+                                    &#x1F5D1;
+                                </button>
+                            </div>
+                        `;
+                        const checkbox = li.querySelector(`input[type="checkbox"][data-id="${data.id}"]`);
+                        if (checkbox) {
+                            checkbox.addEventListener('change', handleRegistrationCheckboxChange);
+                        }
+                        const deleteBtn = li.querySelector(`.delete-button[data-id="${data.id}"]`);
+                        if (deleteBtn) {
+                            deleteBtn.addEventListener('click', () => deleteRegistration(data.id));
+                        }
+                        registeredEventsList.appendChild(li);
+                    });
+                }
+                // Rigenera il calendario ogni volta che le registrazioni cambiano
+                generateCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
+            }, (error) => {
+                console.error("Errore nell'ascolto delle registrazioni da Firestore: ", error);
+                registeredEventsList.innerHTML = `<li>${translations[currentLanguage].errorLoadingRegistrations}</li>`;
+            });
+        }
+
 
         registerButtonLink.addEventListener('click', (e) => {
             e.preventDefault();
@@ -1818,11 +1856,43 @@ END:VCALENDAR`;
         });
 
         document.addEventListener('DOMContentLoaded', async () => {
+            // Inizializza Firebase
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+            const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+
+            // Definisci il percorso della collezione per i dati pubblici
+            registrationsCollection = collection(db, `artifacts/${appId}/public/data/eventRegistrations`);
+
+            // Autenticazione
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    currentUserId = user.uid;
+                } else {
+                    try {
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                            currentUserId = auth.currentUser.uid;
+                        } else {
+                            await signInAnonymously(auth);
+                            currentUserId = auth.currentUser.uid;
+                        }
+                    } catch (error) {
+                        console.error("Errore nell'autenticazione Firebase:", error);
+                        currentUserId = crypto.randomUUID(); // Fallback a un ID locale se l'autenticazione fallisce
+                    }
+                }
+                console.log("Firebase Auth Ready. User ID:", currentUserId);
+                currentUserIdDisplay.textContent = `${translations[currentLanguage].currentUserIdLabel}${currentUserId}`;
+                setupRealtimeRegistrationsListener(); // Avvia l'ascolto di Firestore solo dopo l'autenticazione
+            });
+
             let initialLang = localStorage.getItem('preferredLang') || 'it';
             updateLanguage(initialLang);
             
-            currentUserIdDisplay.textContent = `${translations[currentLanguage].currentUserIdLabel}${currentUserId}`;
-
             generateCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
             populateMonthDropdown();
 
