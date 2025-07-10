@@ -1,1917 +1,997 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="docTitle">Prenota ora la tua vacanza!!</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* Stili base */
-        body {
-            font-family: 'Inter', sans-serif;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #e2e8f0; /* Sfondo grigio-blu chiaro */
-            color: #2d3748; /* Testo grigio scuro */
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-            line-height: 1.6;
-        }
-
-        .container {
-            background-color: #ffffff;
-            padding: 30px 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-            text-align: center;
-            width: 100%;
-            max-width: 1000px; /* Larghezza massima aumentata per il calendario */
-            box-sizing: border-box;
-            margin-bottom: 20px; /* Spazio dal basso */
-            position: relative; /* Necessario per posizionare gli elementi lingua e registro assolutamente */
-        }
-
-        h1 {
-            color: #2a69ac; /* Blu leggermente più scuro per il titolo */
-            margin-bottom: 5px; /* Riduci il margine inferiore per avvicinare la didascalia */
-            font-size: 2.8em; /* Titolo più grande */
-            font-weight: 700;
-        }
-
-        .subtitle {
-            color: #4a5568; /* Colore più tenue per la didascalia */
-            font-size: 1.1em; /* Dimensione leggermente più grande per la leggibilità */
-            margin-bottom: 25px; /* Spazio sotto la didascalia */
-            margin-top: 0;
-            line-height: 1.4;
-        }
-
-        /* Sezione calendario */
-        .calendar-section {
-            margin-bottom: 30px;
-            background-color: #edf2f7; /* Sfondo più chiaro per l'area del calendario */
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
-            position: sticky; /* Rende il calendario sticky */
-            top: 20px; /* Distanza dal top della viewport */
-            z-index: 10; /* Assicura che sia sopra il contenuto che scorre */
-        }
-
-        .calendar-header {
-            display: flex;
-            justify-content: space-between; /* Distribuisce gli elementi */
-            align-items: center;
-            margin-bottom: 20px;
-            gap: 15px; /* Spazio tra gli elementi */
-        }
-
-        .calendar-header h2 {
-            font-size: 1.8em;
-            color: #2c5282; /* Blu più scuro */
-            margin: 0;
-            /* Rimuovi flex-grow: 1; per non far occupare tutto lo spazio disponibile al titolo */
-        }
-
-        .calendar-header select {
-            padding: 10px 15px;
-            border: 1px solid #cbd5e0;
-            border-radius: 6px;
-            font-size: 1em;
-            background-color: #f7fafc;
-            color: #2d3748;
-            cursor: pointer;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-            flex-grow: 1; /* Permette al select di occupare lo spazio centrale */
-            max-width: 300px; /* Limita la larghezza del select */
-            text-align: center; /* Centra il testo nel dropdown */
-            text-align-last: center; /* Per compatibilità con IE/Edge */
-        }
-
-        .calendar-header select:hover {
-            border-color: #a0aec0;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .calendar-header button {
-            background-color: #4299e1; /* Pulsante blu per la navigazione */
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 6px;
-            font-size: 1em;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.1s ease;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .calendar-header button:hover {
-            background-color: #3182ce;
-            transform: translateY(-2px);
-        }
-
-        .calendar-grid {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed; /* Assicura larghezza colonna uguale */
-        }
-
-        .calendar-grid th, .calendar-grid td {
-            padding: 12px 0; /* Padding verticale */
-            text-align: center;
-            border: 1px solid #e2e8f0; /* Bordo chiaro per le celle */
-            font-size: 1.1em;
-        }
-
-        .calendar-grid th {
-            background-color: #a0aec0; /* Intestazione grigia per i giorni */
-            color: white;
-            font-weight: 600;
-            padding: 15px 0;
-            border-bottom: 2px solid #718096;
-        }
-
-        .calendar-grid td {
-            background-color: #f7fafc; /* Sfondo molto chiaro per i giorni */
-            cursor: default; /* Cursore predefinito per tutte le celle */
-            transition: background-color 0.2s ease, transform 0.1s ease;
-        }
-
-        .calendar-grid td.disabled-date {
-            color: #cbd5e0; /* Colore più chiaro per le date disabilitate */
-            background-color: #e2e8f0; /* Sfondo leggermente più scuro per le disabilitate */
-            cursor: not-allowed;
-        }
-
-        .calendar-grid td.selectable-date {
-            color: #2b6cb0; /* Colore distinto per le date selezionabili */
-            font-weight: 600;
-            cursor: pointer;
-            background-color: #bee3f8; /* Sfondo azzurro chiaro per selezionabili */
-        }
-
-        .calendar-grid td.selectable-date:hover {
-            background-color: #90cdf4; /* Blu più scuro al passaggio del mouse */
-            transform: translateY(-2px);
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .calendar-grid td.selected-date {
-            background-color: #3182ce; /* La data selezionata è blu */
-            color: white;
-            border: 2px solid #2b6cb0;
-            font-weight: 700;
-            transform: scale(1.05); /* Leggermente più grande quando selezionata */
-        }
-
-        /* Nuovo stile per le domeniche selezionabili */
-        .calendar-grid td.sunday-date {
-            background-color: #ffe0b2; /* Arancione chiaro per le domeniche */
-            color: #e65100; /* Testo arancione scuro */
-            font-weight: 600;
-        }
-
-        .calendar-grid td.sunday-date.selected-date {
-            background-color: #ff9800; /* Arancione più scuro quando selezionata */
-            color: white;
-            border: 2px solid #e65100;
-        }
-
-
-        /* Visualizzazione messaggi */
-        .message {
-            margin-top: 20px;
-            font-size: 1.3em;
-            color: #e53e3e; /* Rosso per messaggi di errore/info */
-            font-weight: 700;
-        }
-
-        /* Pulsanti di registrazione evento e aggiungi al calendario */
-        .button-group {
-            margin-top: 35px;
-            display: flex;
-            flex-direction: row; /* Imposta i pulsanti in riga */
-            justify-content: center; /* Centra i pulsanti */
-            gap: 20px; /* Spazio tra i pulsanti */
-            align-items: stretch; /* cruciale: allunga gli elementi per avere la stessa altezza */
-            flex-wrap: wrap; /* Permette agli elementi di andare a capo su schermi piccoli */
-        }
-
-        .button-group a {
-            text-decoration: none;
-            /* Flex properties to ensure equal sizing */
-            flex: 1; /* Permette ai link di occupare spazio uguale */
-            min-width: 250px; /* Assicura una larghezza minima per evitare che si comprimano troppo */
-            max-width: 350px; /* Limita la larghezza massima per estetica */
-            box-sizing: border-box; /* Include padding e border nella larghezza totale */
-            display: flex; /* Rende il link un contenitore flex */
-        }
-
-        .button-group button {
-            width: 100%; /* Il pulsante occupa tutta la larghezza del suo contenitore <a> */
-            height: 100%; /* Il pulsante occupa tutta l'altezza del suo contenitore <a> (grazie ad align-items: stretch sul genitore) */
-            padding: 18px 40px;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.4em;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            font-weight: 600;
-            display: flex; /* Rende il pulsante un contenitore flex per centrare il testo */
-            align-items: center;
-            justify-content: center;
-            text-align: center; /* Assicura che il testo sia centrato */
-        }
-
-        .button-group button:hover {
-            transform: translateY(-3px);
-        }
-
-        .button-group .register-button {
-            background-color: #48bb78; /* Pulsante verde */
-            color: white;
-        }
-
-        .button-group .register-button:hover {
-            background-color: #38a169;
-        }
-
-        /* Stili specifici per il contenitore del pulsante Outlook e il tooltip */
-        .outlook-button-container {
-            position: relative; /* Per posizionare il tooltip relativamente a questo */
-            display: flex; /* Mantiene il comportamento flex esistente */
-            flex: 1; /* Permette ai link di occupare spazio uguale */
-            min-width: 250px; /* Assicura una larghezza minima per evitare che si comprimano troppo */
-            max-width: 350px; /* Limita la larghezza massima per estetica */
-            box-sizing: border-box; /* Include padding e border nella larghezza totale */
-        }
-
-        .outlook-button {
-            background-color: #0078d4; /* Blu Outlook */
-            color: white;
-        }
-
-        .outlook-button:hover {
-            background-color: #00569a;
-        }
-
-        .outlook-tooltip {
-            visibility: hidden;
-            opacity: 0;
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            border-radius: 6px;
-            padding: 10px;
-            position: absolute;
-            z-index: 1;
-            bottom: 110%; /* Posiziona sopra il pulsante */
-            left: 0; /* Allinea a sinistra del contenitore */
-            width: 100%; /* Stessa larghezza del contenitore (e quindi del pulsante) */
-            white-space: normal; /* Permette al testo di andare a capo */
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-            font-size: 0.9em; /* Dimensione del testo del tooltip */
-            box-sizing: border-box; /* Include padding e border nella larghezza totale */
-        }
-
-        /* Mostra il tooltip al mouseover del contenitore del pulsante */
-        .outlook-button-container:hover .outlook-tooltip {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        /* Language selector styles */
-        .language-selector-buttons {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            display: flex;
-            gap: 10px;
-        }
-
-        .language-selector-buttons span {
-            cursor: pointer;
-            font-weight: 600;
-            color: #a0aec0; /* Colore predefinito */
-            transition: color 0.2s ease;
-        }
-
-        .language-selector-buttons span:hover {
-            color: #2d3748; /* Colore al passaggio del mouse */
-        }
-
-        .language-selector-buttons .active-lang {
-            color: #2a69ac; /* Colore per la lingua attiva */
-            text-decoration: underline;
-        }
-
-        /* Stili per la scritta "Registro" */
-        .registry-toggle {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            z-index: 1000;
-            cursor: pointer;
-            font-weight: 600;
-            color: #2a69ac; /* Colore blu simile al titolo */
-            transition: color 0.2s ease;
-            text-decoration: underline; /* Sottolineato per indicare che è cliccabile */
-        }
-
-        .registry-toggle:hover {
-            color: #2c5282; /* Blu più scuro al passaggio del mouse */
-        }
-
-        /* Registered events section */
-        .registered-events-section {
-            margin-top: 40px;
-            padding: 25px;
-            background-color: #f0f4f8; /* Light gray-blue for section */
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            text-align: left;
-            /* Inizialmente nascosto */
-            display: none;
-        }
-
-        .registered-events-section h3 {
-            color: #2c5282;
-            font-size: 1.5em;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .registered-events-list {
-            list-style: none;
-            padding: 0;
-            max-height: 200px; /* Limita l'altezza della lista */
-            overflow-y: auto; /* Aggiunge scroll se necessario */
-            border: 1px solid #e2e8f0;
-            border-radius: 5px;
-            background-color: #ffffff;
-        }
-
-        .registered-events-list li {
-            padding: 10px 15px;
-            border-bottom: 1px solid #ebf4ff;
-            color: #4a5568;
-            font-size: 0.95em;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .registered-events-list li:last-child {
-            border-bottom: none;
-        }
-
-        .user-id-display {
-            margin-top: 15px;
-            font-size: 0.85em;
-            color: #718096;
-            word-break: break-all; /* Permette all'ID di andare a capo */
-        }
-
-        .registration-item-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* Stili per il pulsante di eliminazione */
-        .delete-button {
-            background: none;
-            border: none;
-            color: #e53e3e; /* Rosso per indicare eliminazione */
-            cursor: pointer;
-            font-size: 1.2em;
-            padding: 5px;
-            transition: color 0.2s ease, transform 0.2s ease;
-        }
-
-        .delete-button:hover {
-            color: #c53030;
-            transform: scale(1.1);
-        }
-
-        /* Stili del modal per la password */
-        .password-modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1001; /* Superiore ad altri modal */
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-
-        .password-modal-overlay.visible {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .password-modal-content {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-            transform: translateY(20px);
-            transition: transform 0.3s ease;
-        }
-
-        .password-modal-overlay.visible .password-modal-content {
-            transform: translateY(0);
-        }
-
-        .password-modal-content h3 {
-            color: #2a69ac;
-            font-size: 1.6em;
-            margin-bottom: 20px;
-        }
-
-        .password-modal-content input[type="password"] {
-            width: calc(100% - 24px); /* Sottrai il padding */
-            padding: 12px;
-            border: 1px solid #cbd5e0;
-            border-radius: 8px;
-            font-size: 1em;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .password-modal-content .form-button-group {
-            justify-content: center; /* Centra i pulsanti nel modal */
-        }
-
-        .password-validation-message {
-            color: #e53e3e;
-            font-size: 0.9em;
-            margin-top: -5px;
-            margin-bottom: 15px;
-            font-weight: 600;
-            min-height: 1.2em; /* Spazio riservato per il messaggio */
-        }
-
-
-        /* Modal Styles (esistenti, per il form di registrazione) */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-
-        .modal-overlay.visible {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal-content {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            width: 90%;
-            max-width: 500px;
-            text-align: left;
-            transform: translateY(20px);
-            transition: transform 0.3s ease;
-        }
-
-        .modal-overlay.visible .modal-content {
-            transform: translateY(0);
-        }
-
-        .modal-content h3 {
-            color: #2a69ac;
-            font-size: 1.8em;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #2d3748;
-            font-weight: 600;
-            font-size: 0.95em;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #cbd5e0;
-            border-radius: 8px;
-            font-size: 1em;
-            box-sizing: border-box; /* Per includere padding nel width */
-        }
-
-        .form-button-group {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 25px;
-        }
-
-        .form-button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1em;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.1s ease;
-        }
-
-        .form-button.submit {
-            background-color: #48bb78;
-            color: white;
-        }
-
-        .form-button.submit:hover {
-            background-color: #38a169;
-            transform: translateY(-2px);
-        }
-
-        .form-button.cancel {
-            background-color: #e2e8f0;
-            color: #2d3748;
-        }
-
-        .form-button.cancel:hover {
-            background-color: #cbd5e0;
-            transform: translateY(-2px);
-        }
-
-        .form-validation-message {
-            color: #e53e3e;
-            font-size: 0.9em;
-            margin-top: 10px;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .success-message {
-            color: #48bb78;
-        }
-
-        /* Adattamenti responsive */
-        @media (max-width: 600px) {
-            .container {
-                padding: 20px;
-            }
-            h1 {
-                font-size: 2em;
-            }
-            .subtitle {
-                font-size: 0.9em;
-                margin-bottom: 20px;
-            }
-            .calendar-header {
-                flex-direction: column;
-                gap: 10px;
-            }
-            .calendar-header h2 {
-                font-size: 1.5em;
-            }
-            .calendar-grid th, .calendar-grid td {
-                padding: 8px 0;
-                font-size: 0.9em;
-            }
-            .button-group {
-                flex-direction: column; /* Impila i pulsanti verticalmente su schermi piccoli */
-                gap: 15px; /* Spazio leggermente più piccolo su mobile */
-            }
-            .button-group a {
-                width: 100%; /* Occupano tutta la larghezza */
-                max-width: none; /* Rimuovi il limite massimo di larghezza */
-                flex-basis: auto; /* Resetta flex-basis per il layout a colonna */
-            }
-            .button-group button {
-                font-size: 1.2em;
-                padding: 15px 30px;
-            }
-            .outlook-tooltip {
-                width: 100%; /* Occupa tutta la larghezza su schermi piccoli */
-                bottom: 105%; /* Regola leggermente la posizione */
-            }
-            .language-selector-buttons {
-                top: 10px;
-                right: 10px;
-            }
-            .registry-toggle {
-                top: 10px;
-                left: 10px;
-            }
-            .registered-events-section {
-                padding: 15px;
-            }
-            .registered-events-section h3 {
-                font-size: 1.3em;
-            }
-            .modal-content {
-                padding: 20px;
-            }
-            .password-modal-content {
-                padding: 20px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Galleria - Casa Vacanze Gianna</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-blue: #1e40af;
+      --secondary-blue: #3b82f6;
+      --accent-gold: #f59e0b;
+      --warm-white: #fefcfb;
+      --soft-gray: #f8fafc;
+      --text-dark: #1f2937;
+      --text-light: #6b7280;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      color: var(--text-dark);
+    }
+
+    /* Stile per disabilitare lo scroll del body quando il modale è aperto */
+    body.no-scroll {
+      overflow: hidden;
+    }
+
+    .heading-font {
+      font-family: 'Playfair Display', serif;
+    }
+
+    .hero-gradient {
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #06b6d4 100%);
+    }
+
+    .glass-effect {
+      backdrop-filter: blur(20px);
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .card-hover {
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card-hover:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    .gallery-item {
+      position: relative;
+      overflow: hidden;
+      border-radius: 1rem;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .gallery-item:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.3);
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .gallery-item:hover img {
+      transform: scale(1.1);
+    }
+
+    .gallery-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, rgba(30, 58, 138, 0.7), rgba(6, 182, 212, 0.7));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .gallery-item:hover .gallery-overlay {
+      opacity: 1;
+    }
+
+    .lightbox {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.95);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      backdrop-filter: blur(10px);
+    }
+
+    .lightbox.show {
+      display: flex;
+    }
+
+    .lightbox-content {
+      position: relative;
+      max-width: 90vw; /* Contenitore del lightbox più grande per permettere lo scroll */
+      max-height: 90vh; /* Contenitore del lightbox più grande per permettere lo scroll */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: auto; /* Abilita lo scorrimento all'interno del lightbox se l'immagine è più grande */
+      background-color: transparent;
+    }
+
+    .lightbox-content img {
+      max-width: 70vw; /* L'immagine si adatta inizialmente al 70% della larghezza del viewport */
+      max-height: 70vh; /* L'immagine si adatta inizialmente al 70% dell'altezza del viewport */
+      object-fit: contain; /* Ridimensiona l'immagine per adattarsi al contenitore mantenendo le proporzioni */
+      display: block;
+      border-radius: 0.5rem;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+      transition: transform 0.1s ease-out; /* Transizione fluida per lo zoom */
+      transform-origin: center center; /* Lo zoom parte dal centro dell'immagine */
+      cursor: grab; /* Indica che l'immagine può essere trascinata */
+    }
+
+    .lightbox-content img.dragging {
+      cursor: grabbing;
+    }
+
+    /* Stili per i pulsanti di navigazione della lightbox (precedente/successivo) */
+    .lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      border: none;
+      color: white;
+      font-size: 2rem;
+      /* Imposta larghezza e altezza fisse per garantire la rotondità */
+      width: 60px; /* Larghezza del pulsante */
+      height: 60px; /* Altezza del pulsante */
+      display: flex; /* Usa flexbox per centrare il contenuto */
+      justify-content: center; /* Centra orizzontalmente */
+      align-items: center; /* Centra verticalmente */
+      cursor: pointer;
+      border-radius: 50%; /* Rende il pulsante perfettamente rotondo */
+      transition: all 0.3s ease;
+      z-index: 10001;
+    }
+
+    .lightbox-nav:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .lightbox-prev {
+      left: 2rem;
+    }
+
+    .lightbox-next {
+      right: 2rem;
+    }
+
+    /* Stili per il pulsante di chiusura della lightbox */
+    .lightbox-close {
+      position: absolute;
+      top: 2rem;
+      right: 2rem;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      border: none;
+      color: white;
+      font-size: 2rem;
+      /* Imposta larghezza e altezza fisse per garantire la rotondità */
+      width: 60px; /* Larghezza del pulsante */
+      height: 60px; /* Altezza del pulsante */
+      display: flex; /* Usa flexbox per centrare il contenuto */
+      justify-content: center; /* Centra orizzontalmente */
+      align-items: center; /* Centra verticalmente */
+      cursor: pointer;
+      border-radius: 50%; /* Rende il pulsante perfettamente rotondo */
+      transition: all 0.3s ease;
+      z-index: 10001;
+    }
+
+    .lightbox-close:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.1);
+    }
+
+    .floating-element {
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.8s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .stagger-animation {
+      animation: staggerIn 0.6s ease-out forwards;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    @keyframes staggerIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Stili per il modale dei contatti */
+    .contact-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      backdrop-filter: blur(10px);
+    }
+
+    .contact-modal.show {
+      display: flex;
+    }
+
+    .contact-modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      max-width: 90%;
+      width: 400px;
+      position: relative;
+      text-align: center;
+    }
+
+    .contact-modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 1.8rem;
+      color: #333;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .contact-modal-close:hover {
+      color: #ef4444;
+    }
+
+    /* Stile per l'immagine del profilo nella testata */
+    .profile-pic {
+      width: 48px; /* Dimensione desiderata */
+      height: 48px; /* Dimensione desiderata */
+      border-radius: 50%; /* Rende l'immagine rotonda */
+      object-fit: cover; /* Assicura che l'immagine copra l'area senza distorsioni */
+      cursor: pointer; /* Indica che l'elemento è cliccabile */
+      transition: transform 0.3s ease;
+    }
+
+    .profile-pic:hover {
+      transform: scale(1.05);
+    }
+
+    @media (max-width: 768px) {
+      /* Adatta le dimensioni dei pulsanti per schermi più piccoli */
+      .lightbox-nav, .lightbox-close {
+        font-size: 1.5rem;
+        width: 45px; /* Larghezza ridotta */
+        height: 45px; /* Altezza ridotta */
+        padding: 0; /* Rimuovi il padding per evitare ovalizzazione */
+      }
+      
+      .lightbox-prev {
+        left: 1rem;
+      }
+      
+      .lightbox-next {
+        right: 1rem;
+      }
+      
+      .lightbox-close {
+        top: 1rem;
+        right: 1rem;
+      }
+    }
+  </style>
 </head>
-<body>
-    <div class="container">
-        <!-- Language selector buttons -->
-        <div class="language-selector-buttons">
-            <span id="langIta" class="active-lang">ITA</span>
-            <span id="langEng">ENG</span>
-            <span id="langDeu">DEU</span>
-            <span id="langFra">FRA</span>
-            <span id="langEsp">ESP</span>
+<body class="min-h-screen">
+  <header class="fixed top-0 w-full z-50 glass-effect">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-20">
+        <div class="flex items-center space-x-3">
+          <!-- Immagine di Gianna al posto dell'icona 'G' -->
+          <img id="gianna-profile-pic" src="gianna1.jpg" alt="Gianna" class="profile-pic">
+          <div>
+            <h1 class="heading-font text-xl font-semibold text-gray-900">Casa Gianna</h1>
+            <p class="text-sm text-gray-600" data-key="nav-location">Lido delle Nazioni</p>
+          </div>
         </div>
 
-        <!-- Scritta "Registro" -->
-        <div id="toggleRegisteredEvents" class="registry-toggle">Registro</div>
+        <div class="flex items-center space-x-4">
+          <nav class="hidden md:flex space-x-6">
+            <a href="index.html" class="text-gray-700 hover:text-blue-600 transition duration-300 font-medium" data-key="nav-home-desktop">Home</a>
+            <a href="#gallery-section" class="text-gray-700 hover:text-blue-600 transition duration-300 font-medium" data-key="nav-gallery-desktop">Galleria</a>
+            <a href="#features-section" class="text-gray-700 hover:text-blue-600 transition duration-300 font-medium" data-key="nav-features-desktop">Caratteristiche</a>
+            <a href="#contact-section" class="text-gray-700 hover:text-blue-600 transition duration-300 font-medium" data-key="nav-contact-desktop">Contatti</a>
+          </nav>
 
-        <div id="calendarView">
-            <h1 id="mainTitle">Prenota ora la tua vacanza!!</h1>
-            <p class="subtitle" id="mainSubtitle">Scorri tra i mesi, verifica la disponibilità, seleziona i giorni ed invia la richiesta</p>
-
-            <div class="calendar-section">
-                <div class="calendar-header">
-                    <button id="prevMonth"></button>
-                    <select id="monthSelect"></select>
-                    <button id="nextMonth"></button>
-                </div>
-                <table class="calendar-grid" id="calendarGrid">
-                    <thead>
-                        <tr id="calendarDaysOfWeek">
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- I giorni del calendario verranno inseriti qui da JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="message" id="eventMessage"></div>
-            
-            <div class="button-group">
-                <a href="#" id="registerButtonLink">
-                    <button class="register-button" id="registerButton"></button>
-                </a>
-                <a href="#" id="addToOutlookButtonLink" class="outlook-button-container">
-                    <button class="outlook-button" id="outlookButton"></button>
-                    <span class="outlook-tooltip" id="outlookTooltip"></span>
-                </a>
-            </div>
-
-            <!-- Sezione per visualizzare le registrazioni -->
-            <div class="registered-events-section" id="registeredEventsSection">
-                <h3 id="registeredEventsTitle"></h3>
-                <ul id="registeredEventsList" class="registered-events-list">
-                    <!-- Le registrazioni verranno popolate qui da JavaScript -->
-                </ul>
-                <div class="user-id-display" id="currentUserIdDisplay"></div>
-            </div>
+          <select id="language-select" class="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <option value="it">🇮🇹 Italiano</option>
+            <option value="en"> 🇧 English</option>
+            <option value="de">🇩🇪 Deutsch</option>
+          </select>
+          
+          <button id="mobile-menu-button" class="md:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+            </svg>
+          </button>
         </div>
-
-        <!-- Registration Form View -->
-        <div id="registrationFormView" style="display:none;">
-            <h1 id="registrationFormTitle"></h1>
-            <div class="event-info">
-                <span id="selectedEventDateDisplay"></span>
-            </div>
-            <form id="registrationForm">
-                <div class="form-group">
-                    <label for="firstNameInput" id="firstNameLabel"></label>
-                    <input type="text" id="firstNameInput" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label for="lastNameInput" id="lastNameLabel"></label>
-                    <input type="text" id="lastNameInput" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label for="countryInput" id="countryLabel"></label>
-                    <input type="text" id="countryInput" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label for="phoneNumberInput" id="phoneNumberLabel"></label>
-                    <input type="tel" id="phoneNumberInput" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label for="emailInput" id="emailLabel"></label>
-                    <input type="email" id="emailInput" class="form-input" required>
-                </div>
-                <p id="formMessage" class="form-validation-message"></p>
-                <div class="form-button-group">
-                    <button type="button" class="form-button cancel" id="cancelRegistrationButton"></button>
-                    <button type="submit" class="form-button submit" id="submitRegistrationButton"></button>
-                </div>
-            </form>
-        </div>
+      </div>
     </div>
 
-    <!-- Password Modal -->
-    <div id="passwordModalOverlay" class="password-modal-overlay">
-        <div class="password-modal-content">
-            <h3 id="passwordModalTitle"></h3>
-            <input type="password" id="passwordInput" placeholder="Inserisci password">
-            <p id="passwordValidationMessage" class="password-validation-message"></p>
-            <div class="form-button-group">
-                <button type="button" class="form-button cancel" id="cancelPasswordButton"></button>
-                <button type="button" class="form-button submit" id="submitPasswordButton"></button>
-            </div>
-        </div>
+    <div id="mobile-menu" class="hidden md:hidden fixed inset-0 bg-white bg-opacity-95 z-40 flex flex-col items-center justify-center space-y-8 py-20 transition-transform transform -translate-y-full">
+      <button id="close-mobile-menu" class="absolute top-6 right-6 p-2 rounded-md text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+        <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+      <a href="index.html" class="text-3xl text-gray-800 hover:text-blue-600 transition duration-300 font-medium" data-key="nav-home-mobile">Home</a>
+      <a href="#gallery-section" class="text-3xl text-gray-800 hover:text-blue-600 transition duration-300 font-medium" data-key="nav-gallery-mobile">Galleria</a>
+      <a href="#features-section" class="text-3xl text-gray-800 hover:text-blue-600 transition duration-300 font-medium" data-key="nav-features-mobile">Caratteristiche</a>
+      <a href="#contact-section" class="text-3xl text-gray-800 hover:text-blue-600 transition duration-300 font-medium" data-key="nav-contact-mobile">Contatti</a>
     </div>
+  </header>
 
-    <script type="module">
-        // Importa i moduli Firebase necessari
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, onSnapshot, doc, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+  <section class="hero-gradient pt-32 pb-20 relative overflow-hidden">
+    <div class="absolute inset-0 bg-black/20"></div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div class="floating-element">
+        <h1 class="heading-font text-4xl md:text-6xl font-bold text-white mb-6">
+          <span data-key="hero-title">Galleria Casa Gianna</span>
+        </h1>
+        <p class="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto" data-key="hero-subtitle">
+          Scopri ogni angolo della tua prossima casa vacanze
+        </p>
+        <div class="flex justify-center space-x-4 text-white/80">
+          <span class="flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"></path>
+            </svg>
+            <span data-key="hero-photos">Dettagli Cristallini</span>
+          </span>
+          <span class="flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" clip-rule="evenodd"></path>
+            </svg>
+            <span data-key="hero-rooms">Un Tour Completo</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        // Variabili globali per l'applicazione
-        let db;
-        let auth;
-        let currentUserId; // Questo verrà popolato dall'autenticazione Firebase
-        let registrationsCollection; // Riferimento alla collezione Firestore
+  <section class="py-20 bg-white" id="gallery-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="heading-font text-4xl font-bold text-gray-900 mb-4" data-key="gallery-title">
+          Esplora Casa Gianna
+        </h2>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto" data-key="gallery-subtitle">
+          Ogni foto racconta la storia del tuo perfetto soggiorno al mare
+        </p>
+      </div>
 
-        const calendarView = document.getElementById('calendarView');
-        const registrationFormView = document.getElementById('registrationFormView');
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="gallery">
+        <!-- Gallery items will be injected here by JavaScript -->
+      </div>
+    </div>
+  </section>
 
-        const eventMessageElement = document.getElementById('eventMessage');
+  <section class="py-20 bg-gradient-to-br from-slate-50 to-blue-50" id="features-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="heading-font text-4xl font-bold text-gray-900 mb-4" data-key="features-title">
+          Caratteristiche Uniche
+        </h2>
+        <p class="text-xl text-gray-600" data-key="features-subtitle">
+          Dettagli che fanno la differenza
+        </p>
+      </div>
 
-        const calendarGridBody = document.querySelector('#calendarGrid tbody');
-        const monthSelect = document.getElementById('monthSelect');
-        const calendarDaysOfWeekElements = document.querySelectorAll('#calendarDaysOfWeek th');
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="card-hover bg-white p-8 rounded-2xl shadow-sm">
+          <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mb-6">
+            <span class="text-white text-2xl">🏖️</span>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-3" data-key="feature-beach-title">Vicino al Mare</h3>
+          <p class="text-gray-600" data-key="feature-beach-desc">200 metri dalla spiaggia di Lido delle Nazioni</p>
+        </div>
 
-        const prevMonthButton = document.getElementById('prevMonth');
-        const nextMonthButton = document.getElementById('nextMonth');
+        <div class="card-hover bg-white p-8 rounded-2xl shadow-sm">
+          <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mb-6">
+            <span class="text-white text-2xl">🌿</span>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-3" data-key="feature-garden-title">Giardino Privato</h3>
+          <p class="text-gray-600" data-key="feature-garden-desc">Spazi verdi per relax e privacy</p>
+        </div>
 
-        const registerButtonLink = document.getElementById('registerButtonLink');
-        const registerButton = document.getElementById('registerButton');
-        const outlookButton = document.getElementById('outlookButton');
+        <div class="card-hover bg-white p-8 rounded-2xl shadow-sm">
+          <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6">
+            <span class="text-white text-2xl">🛏️</span>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-3" data-key="feature-rooms-title">Camere Confortevoli</h3>
+          <p class="text-gray-600" data-key="feature-rooms-desc">Arredamento curato e spazi luminosi</p>
+        </div>
 
-        const outlookButtonContainer = document.getElementById('addToOutlookButtonLink');
-        const outlookTooltip = document.getElementById('outlookTooltip');
+        <div class="card-hover bg-white p-8 rounded-2xl shadow-sm">
+          <div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mb-6">
+            <span class="text-white text-2xl">🍽️</span>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-3" data-key="feature-kitchen-title">Cucina Completa</h3>
+          <p class="text-gray-600" data-key="feature-kitchen-desc">Elettrodomestici moderni e funzionali</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        const mainTitle = document.getElementById('mainTitle');
-        const mainSubtitle = document.getElementById('mainSubtitle');
-        const docTitle = document.getElementById('docTitle');
+  <section class="py-20 bg-gradient-to-br from-blue-600 to-cyan-600" id="contact-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center text-white mb-16">
+        <h2 class="heading-font text-4xl font-bold mb-4" data-key="contact-title">
+          Ti Piace Quello Che Vedi?
+        </h2>
+        <p class="text-xl text-blue-100 max-w-2xl mx-auto" data-key="contact-subtitle">
+          Prenota ora la tua vacanza da sogno
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <a href="https://wa.me/393388984269?text=Ciao%2C%20vorrei%20ricevere%20maggiori%20informazioni%20su%20Casa%20Vacanze%20Gianna"
+           target="_blank"
+           class="card-hover bg-white/10 backdrop-blur-sm border border-white/20 p-8 rounded-2xl text-center text-white hover:bg-white/20 transition duration-300">
+          <div class="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <span class="text-2xl">💬</span>
+          </div>
+          <h3 class="text-xl font-semibold mb-3" data-key="contact-whatsapp">WhatsApp</h3>
+          <p class="text-blue-100 mb-4" data-key="contact-whatsapp-desc">Risposta immediata</p>
+          <span class="text-white font-medium" data-key="contact-whatsapp-action">Chatta con noi</span>
+        </a>
+
+        <a href="mailto:casamarenazioni@gmail.com?subject=Richiesta%20di%20prenotazione%20per%20Casa%20Vacanze%20Gianna"
+           class="card-hover bg-white/10 backdrop-blur-sm border border-white/20 p-8 rounded-2xl text-center text-white hover:bg-white/20 transition duration-300">
+          <div class="w-16 h-16 bg-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <span class="text-2xl">📧</span>
+          </div>
+          <h3 class="text-xl font-semibold mb-3" data-key="contact-email">Email</h3>
+          <p class="text-blue-100 mb-4" data-key="contact-email-desc">Richiesta dettagliata</p>
+          <span class="text-white font-medium" data-key="contact-email-action">Scrivi una mail</span>
+        </a>
+
+        <a href="https://www.google.com/maps?q=44.733726811572964,12.23992232510686"
+           target="_blank"
+           class="card-hover bg-white/10 backdrop-blur-sm border border-white/20 p-8 rounded-2xl text-center text-white hover:bg-white/20 transition duration-300">
+          <div class="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <span class="text-2xl">📍</span>
+          </div>
+          <h3 class="text-xl font-semibold mb-3" data-key="contact-location">Posizione</h3>
+          <p class="text-blue-100 mb-4" data-key="contact-location-desc">Visualizza su Maps</p>
+          <span class="text-white font-medium" data-key="contact-location-action">Apri Maps</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bg-gray-900 text-white py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="mb-6 md:mb-0">
+          <h3 class="heading-font text-2xl font-bold mb-2">Casa Vacanze Gianna</h3>
+          <p class="text-gray-400" data-key="footer-location">Lido delle Nazioni, Comacchio (FE), Italia</p>
+        </div>
+        <div class="text-center md:text-right">
+          <p class="text-gray-400">© <span id="current-year"></span> Casa Vacanze Gianna</p>
+          <p class="text-gray-400 mt-2" data-key="footer-rights">Tutti i diritti riservati</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Lightbox per le immagini della galleria -->
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="closeBtn">×</button>
+    <button class="lightbox-nav lightbox-prev" id="prevBtn">❮</button>
+    <div class="lightbox-content">
+      <img id="lightbox-img" src="" alt="">
+    </div>
+    <button class="lightbox-nav lightbox-next" id="nextBtn">❯</button>
+  </div>
+
+  <!-- Modale per i contatti di Gianna -->
+  <div class="contact-modal" id="contactModal">
+    <div class="contact-modal-content">
+      <button class="contact-modal-close" id="closeContactModalBtn">×</button>
+      <h3 class="heading-font text-2xl font-bold mb-4" data-key="contact-card-title">Contatti di Gianna</h3>
+      <div class="text-center mb-4">
+        <img id="contact-modal-img" src="gianna1.jpg" alt="Gianna" class="mx-auto rounded-full w-32 h-32 object-cover mb-4">
+        <p class="text-lg font-semibold" data-key="contact-person-name">Gianna Santececca</p>
+      </div>
+      <div class="text-left space-y-2">
+        <p><strong data-key="contact-person-phone">Telefono:</strong> <a id="contact-phone-link" href="#" class="text-blue-600 hover:underline"></a></p>
+        <p><strong data-key="contact-person-whatsapp">WhatsApp:</strong> <a id="contact-whatsapp-link" href="#" target="_blank" class="text-blue-600 hover:underline"></a></p>
+        <p><strong data-key="contact-person-email">Email:</strong> <a id="contact-email-link" href="#" class="text-blue-600 hover:underline"></a></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Dati delle immagini della galleria - Assicurati che questi percorsi siano corretti!
+    const galleryImages = [
+      { src: "casa29.jpg", key: "gallery-img-1" },
+      { src: "casa35.jpg", key: "gallery-img-2" },
+      { src: "casa27.jpg", key: "gallery-img-3" },
+      { src: "casa14.jpg", key: "gallery-img-4" },
+      { src: "casa26.jpg", key: "gallery-img-5" },
+      { src: "casa37.jpg", key: "gallery-img-6" },
+      { src: "casa17.jpg", key: "gallery-img-7" },
+      { src: "casa2.jpg", key: "gallery-img-8" },
+      { src: "casa32.jpg", key: "gallery-img-9" },
+      { src: "casa11.jpg", key: "gallery-img-10" },
+      { src: "casa31.jpg", key: "gallery-img-11" },
+      { src: "casa36.png", key: "gallery-img-12" }
+    ];
+
+    // Dettagli di contatto di Gianna
+    const contactDetails = {
+        name: "Gianna Santececca",
+        phone: "+393388984269",
+        whatsapp: "+393388984269",
+        email: "casamarenazioni@gmail.com"
+    };
+
+    // Funzionalità della galleria
+    let currentIndex = 0;
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const closeBtn = document.getElementById('closeBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const gallery = document.getElementById('gallery');
+    const lightboxContent = document.querySelector('.lightbox-content'); // Seleziona il contenitore per lo scroll
+
+    let currentZoom = 1; // Inizializza il livello di zoom
+    const zoomStep = 0.1; // Incremento/decremento dello zoom
+
+    // Funzione per creare gli elementi della galleria
+    function createGalleryItems() {
+      gallery.innerHTML = ''; // Pulisce gli elementi esistenti
+      const currentLang = document.documentElement.lang; // Ottiene la lingua corrente
+      
+      galleryImages.forEach((image, index) => {
+        const galleryItem = document.createElement('div');
+        galleryItem.className = 'gallery-item stagger-animation';
+        galleryItem.style.animationDelay = `${index * 0.1}s`;
+
+        // Ottiene il testo alt tradotto
+        const translatedAlt = translations[currentLang][image.key] || image.key;
         
-        const langIta = document.getElementById('langIta');
-        const langEng = document.getElementById('langEng');
-        const langDeu = document.getElementById('langDeu');
-        const langFra = document.getElementById('langFra');
-        const langEsp = document.getElementById('langEsp');
+        galleryItem.innerHTML = `
+          <img src="${image.src}" alt="${translatedAlt}" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/000000?text=Immagine+non+trovata';">
+          <div class="gallery-overlay" data-index="${index}">
+            <div class="text-white text-center">
+              <svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+              <span class="text-lg font-semibold">${translatedAlt}</span>
+            </div>
+          </div>
+        `;
+        gallery.appendChild(galleryItem);
+      });
 
-        const registeredEventsTitle = document.getElementById('registeredEventsTitle');
-        const registeredEventsList = document.getElementById('registeredEventsList');
-        const currentUserIdDisplay = document.getElementById('currentUserIdDisplay');
-        const registeredEventsSection = document.getElementById('registeredEventsSection');
-        const toggleRegisteredEventsButton = document.getElementById('toggleRegisteredEvents');
-
-        const registrationFormTitle = document.getElementById('registrationFormTitle');
-        const registrationForm = document.getElementById('registrationForm');
-        const firstNameInput = document.getElementById('firstNameInput');
-        const lastNameInput = document.getElementById('lastNameInput');
-        const countryInput = document.getElementById('countryInput');
-        const phoneNumberInput = document.getElementById('phoneNumberInput');
-        const emailInput = document.getElementById('emailInput');
-        const formMessage = document.getElementById('formMessage');
-        const cancelRegistrationButton = document.getElementById('cancelRegistrationButton');
-        const submitRegistrationButton = document.getElementById('submitRegistrationButton');
-        const firstNameLabel = document.getElementById('firstNameLabel');
-        const lastNameLabel = document.getElementById('lastNameLabel');
-        const countryLabel = document.getElementById('countryLabel');
-        const phoneNumberLabel = document.getElementById('phoneNumberLabel');
-        const emailLabel = document.getElementById('emailLabel');
-        const selectedEventDateDisplay = document.getElementById('selectedEventDateDisplay');
-
-        const passwordModalOverlay = document.getElementById('passwordModalOverlay');
-        const passwordModalTitle = document.getElementById('passwordModalTitle');
-        const passwordInput = document.getElementById('passwordInput');
-        const passwordValidationMessage = document.getElementById('passwordValidationMessage');
-        const cancelPasswordButton = document.getElementById('cancelPasswordButton');
-        const submitPasswordButton = document.getElementById('submitPasswordButton');
-
-        const CORRECT_PASSWORD = "imagroup";
-        const WHATSAPP_PHONE_NUMBER = "393356259151"; // Numero di telefono per WhatsApp (con prefisso internazionale)
-        const WHATSAPP_MESSAGE = "Hey, ho prenotato, controlla il calendario al seguente link: https://raoulfilippi.github.io/locazione-gianna/index.html"; 
-
-        let countdownInterval;
-        let eventDate = null;
-
-        let currentCalendarDate = new Date();
-        let selectedDates = new Set();
-        let isDragging = false; // Nuovo stato per il trascinamento
-
-        const eventHour = 10;
-        const eventMinute = 0;
-
-        // Variabile per memorizzare le registrazioni da Firestore
-        let allRegistrations = [];
-
-        const translations = {
-            it: {
-                docTitle: "Prenota ora la tua vacanza!!",
-                title: "Prenota ora la tua vacanza!!",
-                subtitle: "Scorri tra i mesi, verifica la disponibilità, seleziona i giorni ed invia la richiesta",
-                prevMonth: "Mese Precedente",
-                nextMonth: "Mese Successivo",
-                daysOfWeek: ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"],
-                monthNames: [
-                    "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
-                    "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"
-                ],
-                eventStarted: "L'evento è iniziato o è terminato!",
-                dateInPast: "La data selezionata è nel passato!",
-                noSecondWednesday: "Nessun secondo mercoledì disponibile nei prossimi mesi.",
-                selectValidFutureDate: "Seleziona prima una o più date future valide per l'evento.",
-                registerButton: "Prenota la tua vacanza",
-                outlookButton: "Aggiungi al calendario",
-                outlookTooltip: "Un file ICS è stato generato. Se non si apre automaticamente, controlla i tuoi download e aprilo manualmente per aggiungere l'evento al tuo calendario.",
-                registrationSuccess: "Registrazione avvenuta con successo! Verrai reindirizzato a WhatsApp per inviare una notifica.",
-                registrationFailed: "Errore durante la registrazione.",
-                registeredEventsTitle: "Eventi Registrati",
-                currentUserIdLabel: "Il tuo ID Utente (locale): ",
-                registrationTimestampLabel: "Data e Ora Registrazione: ",
-                noRegistrations: "Nessuna registrazione presente.",
-                errorLoadingRegistrations: "Errore nel caricare le registrazioni.",
-                registryToggle: "Registro",
-                registrationFormTitle: "Registrazione Evento",
-                eventDatePrefix: "Stai registrando per gli eventi del: ",
-                firstNameLabel: "Nome:",
-                lastNameLabel: "Cognome:",
-                countryLabel: "Nazione:",
-                phoneNumberLabel: "Numero di telefono:",
-                emailLabel: "Email:",
-                formRequiredFields: "Tutti i campi sono obbligatori!",
-                formInvalidEmail: "Inserisci un'email valida!",
-                cancelButton: "Annulla",
-                submitButton: "Registra",
-                passwordModalTitle: "Inserisci Password",
-                passwordPlaceholder: "Password",
-                passwordRequired: "La password è richiesta.",
-                passwordIncorrect: "Password errata!",
-                passwordConfirm: "Conferma",
-                disableDateLabel: "Disabilita data nel calendario",
-                deleteButton: "Elimina",
-                emailSubject: "La tua vacanza è stata prenotata!",
-                emailBody: "Gentile {firstName} {lastName}, ti confermiamo che la tua prenotazione è confermata, cordialmente"
-            },
-            en: {
-                docTitle: "Book your vacation now!!",
-                title: "Book your vacation now!!",
-                subtitle: "Scroll through the months, check availability, select days and send your request",
-                prevMonth: "Previous Month",
-                nextMonth: "Next Month",
-                daysOfWeek: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-                monthNames: [
-                    "January", "February", "March", "April", "May", "June",
-                    "July", "August", "September", "October", "November", "December"
-                ],
-                eventStarted: "The event has started or ended!",
-                dateInPast: "The selected date is in the past!",
-                noSecondWednesday: "No second Wednesday available in the coming months.",
-                selectValidFutureDate: "Please select one or more valid future event dates first.",
-                registerButton: "Book your vacation",
-                outlookButton: "Add to Calendar",
-                outlookTooltip: "An ICS file has been generated. If it doesn't open automatically, please check your downloads and open it manually to add the event to your calendar.",
-                registrationSuccess: "Registration successful! You will be redirected to WhatsApp to send a notification.",
-                registrationFailed: "Error during registration.",
-                registeredEventsTitle: "Registered Events",
-                currentUserIdLabel: "Your User ID (local): ",
-                registrationTimestampLabel: "Registration Date and Time: ",
-                noRegistrations: "No registrations found.",
-                errorLoadingRegistrations: "Error loading registrations.",
-                registryToggle: "Registry",
-                registrationFormTitle: "Event Registration",
-                eventDatePrefix: "You are registering for events on: ",
-                firstNameLabel: "First Name:",
-                lastNameLabel: "Last Name:",
-                countryLabel: "Country:",
-                phoneNumberLabel: "Phone Number:",
-                emailLabel: "Email:",
-                formRequiredFields: "All fields are required!",
-                formInvalidEmail: "Please enter a valid email address!",
-                cancelButton: "Cancel",
-                submitButton: "Register",
-                passwordModalTitle: "Enter Password",
-                passwordPlaceholder: "Password",
-                passwordRequired: "Password is required.",
-                passwordIncorrect: "Incorrect password!",
-                passwordConfirm: "Confirm",
-                disableDateLabel: "Disable date in calendar",
-                deleteButton: "Delete",
-                emailSubject: "Your vacation has been booked!",
-                emailBody: "Dear {firstName} {lastName}, we confirm that your booking is confirmed, best regards"
-            },
-            de: {
-                docTitle: "Buche jetzt deinen Urlaub!!",
-                title: "Buche jetzt deinen Urlaub!!",
-                subtitle: "Scrolle durch die Monate, überprüfe die Verfügbarkeit, wähle Tage aus und sende deine Anfrage",
-                prevMonth: "Vorheriger Monat",
-                nextMonth: "Nächster Monat",
-                daysOfWeek: ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"],
-                monthNames: [
-                    "Januar", "Februar", "März", "April", "Mai", "Juni",
-                    "Juli", "August", "September", "Oktober", "November", "Dezember"
-                ],
-                eventStarted: "Die Veranstaltung hat begonnen oder ist beendet!",
-                dateInPast: "Das ausgewählte Datum liegt in der Vergangenheit!",
-                noSecondWednesday: "Kein zweiter Mittwoch in den kommenden Monaten verfügbar.",
-                selectValidFutureDate: "Bitte wählen Sie zuerst ein oder mehrere gültige zukünftige Veranstaltungsdaten aus.",
-                registerButton: "Buche deinen Urlaub",
-                outlookButton: "Zum Kalender hinzufügen",
-                outlookTooltip: "Eine ICS-Datei wurde generiert. Wenn sie sich nicht automatisch öffnet, überprüfen Sie Ihre Downloads und öffnen Sie sie manuell, um das Ereignis zu Ihrem Kalender hinzuzufügen.",
-                registrationSuccess: "Registrierung erfolgreich! Sie werden zu WhatsApp weitergeleitet, um eine Benachrichtigung zu senden.",
-                registrationFailed: "Fehler bei der Registrierung.",
-                registeredEventsTitle: "Registrierte Veranstaltungen",
-                currentUserIdLabel: "Ihre Benutzer-ID (lokal): ",
-                registrationTimestampLabel: "Registrierungsdatum und -zeit: ",
-                noRegistrations: "Keine Registrierungen gefunden.",
-                errorLoadingRegistrations: "Fehler beim Laden der Registrierungen.",
-                registryToggle: "Register",
-                registrationFormTitle: "Veranstaltungsregistrierung",
-                eventDatePrefix: "Sie registrieren sich für Veranstaltungen am: ",
-                firstNameLabel: "Vorname:",
-                lastNameLabel: "Nachname:",
-                countryLabel: "Land:",
-                phoneNumberLabel: "Telefonnummer:",
-                emailLabel: "E-Mail:",
-                formRequiredFields: "Alle Felder sind erforderlich!",
-                formInvalidEmail: "Bitte geben Sie eine gültige E-Mail-Adresse ein!",
-                cancelButton: "Abbrechen",
-                submitButton: "Registrieren",
-                passwordModalTitle: "Passwort eingeben",
-                passwordPlaceholder: "Passwort",
-                passwordRequired: "Passwort ist erforderlich.",
-                passwordIncorrect: "Falsches Passwort!",
-                passwordConfirm: "Bestätigen",
-                disableDateLabel: "Datum im Kalender deaktivieren",
-                deleteButton: "Löschen",
-                emailSubject: "Ihr Urlaub wurde gebucht!",
-                emailBody: "Sehr geehrte/r {firstName} {lastName}, wir bestätigen, dass Ihre Buchung bestätigt ist, mit freundlichen Grüßen"
-            },
-            fr: {
-                docTitle: "Réservez vos vacances maintenant !!",
-                title: "Réservez vos vacances maintenant !!",
-                subtitle: "Faites défiler les mois, vérifiez la disponibilité, sélectionnez les jours et envoyez votre demande",
-                prevMonth: "Mois précédent",
-                nextMonth: "Mois suivant",
-                daysOfWeek: ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"],
-                monthNames: [
-                    "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
-                    "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
-                ],
-                eventStarted: "L'événement a commencé ou est terminé !",
-                dateInPast: "La date sélectionnée est dans le passé !",
-                noSecondWednesday: "Aucun deuxième mercredi disponible dans les mois à venir.",
-                selectValidFutureDate: "Veuillez d'abord sélectionner une ou plusieurs dates d'événement futures valides.",
-                registerButton: "Réservez vos vacances",
-                outlookButton: "Ajouter au calendrier",
-                outlookTooltip: "Un fichier ICS a été généré. S'il ne s'ouvre pas automatiquement, veuillez vérifier vos téléchargements et l'ouvrir manuellement pour ajouter l'événement à votre calendrier.",
-                registrationSuccess: "Inscription réussie ! Vous serez redirigé vers WhatsApp pour envoyer une notification.",
-                registrationFailed: "Erreur lors de l'inscription.",
-                registeredEventsTitle: "Événements enregistrés",
-                currentUserIdLabel: "Votre ID utilisateur (local) : ",
-                registrationTimestampLabel: "Date et heure d'inscription : ",
-                noRegistrations: "Aucune inscription trouvée.",
-                errorLoadingRegistrations: "Erreur lors du chargement des inscriptions.",
-                registryToggle: "Registre",
-                registrationFormTitle: "Inscription à l'événement",
-                eventDatePrefix: "Vous vous inscrivez aux événements du : ",
-                firstNameLabel: "Prénom :",
-                lastNameLabel: "Nom :",
-                countryLabel: "Pays :",
-                phoneNumberLabel: "Numéro de téléphone :",
-                emailLabel: "E-mail :",
-                formRequiredFields: "Tous les champs sont obligatoires !",
-                formInvalidEmail: "Veuillez entrer une adresse e-mail valide !",
-                cancelButton: "Annuler",
-                submitButton: "S'inscrire",
-                passwordModalTitle: "Entrer le mot de passe",
-                passwordPlaceholder: "Mot de passe",
-                passwordRequired: "Le mot de passe est requis.",
-                passwordIncorrect: "Mot de passe incorrect !",
-                passwordConfirm: "Confirmer",
-                disableDateLabel: "Désactiver la date dans le calendrier",
-                deleteButton: "Supprimer",
-                emailSubject: "Vos vacances ont été réservées !",
-                emailBody: "Cher/Chère {firstName} {lastName}, nous confirmons que votre réservation est confirmée, cordialement"
-            },
-            es: {
-                docTitle: "¡¡Reserva tus vacaciones ahora!!",
-                title: "¡¡Reserva tus vacaciones ahora!!",
-                subtitle: "Desplázate por los meses, verifica la disponibilidad, selecciona los días y envía tu solicitud",
-                prevMonth: "Mes anterior",
-                nextMonth: "Mes siguiente",
-                daysOfWeek: ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"],
-                monthNames: [
-                    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-                    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-                ],
-                eventStarted: "¡El evento ha comenzado o ha terminado!",
-                dateInPast: "¡La fecha seleccionada está en el pasado!",
-                noSecondWednesday: "No hay segundo miércoles disponible en los próximos meses.",
-                selectValidFutureDate: "Por favor, seleccione una o más fechas de evento futuras válidas primero.",
-                registerButton: "Reserva tus vacaciones",
-                outlookButton: "Añadir al calendario",
-                outlookTooltip: "Se ha generado un archivo ICS. Si no se abre automáticamente, por favor, revise sus descargas y ábralo manualmente para añadir el evento a su calendario.",
-                registrationSuccess: "¡Registro exitoso! Será redirigido a WhatsApp para enviar una notificación.",
-                registrationFailed: "Error durante el registro.",
-                registeredEventsTitle: "Eventos registrados",
-                currentUserIdLabel: "Su ID de usuario (local): ",
-                registrationTimestampLabel: "Fecha y hora de registro: ",
-                noRegistrations: "No se encontraron registros.",
-                errorLoadingRegistrations: "Error al cargar los registros.",
-                registryToggle: "Registro",
-                registrationFormTitle: "Registro de evento",
-                eventDatePrefix: "Se está registrando para los eventos del: ",
-                firstNameLabel: "Nombre:",
-                lastNameLabel: "Apellido:",
-                countryLabel: "País:",
-                phoneNumberLabel: "Número de teléfono:",
-                emailLabel: "Correo electrónico:",
-                formRequiredFields: "¡Todos los campos son obligatorios!",
-                formInvalidEmail: "¡Por favor, introduzca una dirección de correo electrónico válida!",
-                cancelButton: "Cancelar",
-                submitButton: "Registrar",
-                passwordModalTitle: "Introducir contraseña",
-                passwordPlaceholder: "Contraseña",
-                passwordRequired: "La contraseña es obligatoria.",
-                passwordIncorrect: "¡Contraseña incorrecta!",
-                passwordConfirm: "Confirmar",
-                disableDateLabel: "Deshabilitar fecha en el calendario",
-                deleteButton: "Eliminar",
-                emailSubject: "¡Tus vacaciones han sido reservadas!",
-                emailBody: "Estimado/a {firstName} {lastName}, le confirmamos que su reserva está confirmata, atentamente"
-            }
-        };
-
-        let currentLanguage = 'it'; // Lingua di default
-
-        /**
-         * Aggiorna tutti gli elementi testuali della UI alla lingua selezionata.
-         * @param {string} lang - Il codice della lingua ('it' o 'en').
-         */
-        function updateLanguage(lang) {
-            currentLanguage = lang;
-            const t = translations[currentLanguage];
-
-            docTitle.textContent = t.docTitle;
-            mainTitle.textContent = t.title;
-            mainSubtitle.textContent = t.subtitle;
-            prevMonthButton.textContent = t.prevMonth;
-            nextMonthButton.textContent = t.nextMonth;
-            registerButton.textContent = t.registerButton;
-            outlookButton.textContent = t.outlookButton;
-            outlookTooltip.textContent = t.outlookTooltip;
-            registeredEventsTitle.textContent = t.registeredEventsTitle;
-            toggleRegisteredEventsButton.textContent = t.registryToggle;
-
-            registrationFormTitle.textContent = t.registrationFormTitle;
-            firstNameLabel.textContent = t.firstNameLabel;
-            lastNameLabel.textContent = t.lastNameLabel;
-            countryLabel.textContent = t.countryLabel;
-            phoneNumberLabel.textContent = t.phoneNumberLabel;
-            emailLabel.textContent = t.emailLabel;
-            cancelRegistrationButton.textContent = t.cancelButton;
-            submitRegistrationButton.textContent = t.submitButton;
-
-            if (selectedDates.size > 0) {
-                const dateOptions = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
-                const sortedDates = Array.from(selectedDates).sort();
-                const datesText = sortedDates.map(dateString => {
-                    const [year, month, day] = dateString.split('-').map(Number);
-                    return new Date(year, month - 1, day).toLocaleDateString(currentLanguage, dateOptions);
-                }).join(', ');
-                selectedEventDateDisplay.textContent = `${t.eventDatePrefix} ${datesText}`;
-            } else {
-                selectedEventDateDisplay.textContent = '';
-            }
-
-            calendarDaysOfWeekElements.forEach((th, index) => {
-                th.textContent = t.daysOfWeek[index];
-            });
-
-            generateCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
-            populateMonthDropdown();
-
-            const currentMessage = eventMessageElement.textContent;
-            if (currentMessage.includes(translations['it'].eventStarted) || currentMessage.includes(translations['en'].eventStarted) || currentMessage.includes(translations['de'].eventStarted) || currentMessage.includes(translations['fr'].eventStarted) || currentMessage.includes(translations['es'].eventStarted)) {
-                eventMessageElement.textContent = t.eventStarted;
-            } else if (currentMessage.includes(translations['it'].dateInPast) || currentMessage.includes(translations['en'].dateInPast) || currentMessage.includes(translations['de'].dateInPast) || currentMessage.includes(translations['fr'].dateInPast) || currentMessage.includes(translations['es'].dateInPast)) {
-                eventMessageElement.textContent = t.dateInPast;
-            } else if (currentMessage.includes(translations['it'].noSecondWednesday) || currentMessage.includes(translations['en'].noSecondWednesday) || currentMessage.includes(translations['de'].noSecondWednesday) || currentMessage.includes(translations['fr'].noSecondWednesday) || currentMessage.includes(translations['es'].noSecondWednesday)) {
-                eventMessageElement.textContent = t.noSecondWednesday;
-            } else if (currentMessage.includes(translations['it'].selectValidFutureDate) || currentMessage.includes(translations['en'].selectValidFutureDate) || currentMessage.includes(translations['de'].selectValidFutureDate) || currentMessage.includes(translations['fr'].selectValidFutureDate) || currentMessage.includes(translations['es'].selectValidFutureDate)) {
-                eventMessageElement.textContent = t.selectValidFutureDate;
-            } else if (currentMessage.includes(translations['it'].registrationSuccess) || currentMessage.includes(translations['en'].registrationSuccess) || currentMessage.includes(translations['de'].registrationSuccess) || currentMessage.includes(translations['fr'].registrationSuccess) || currentMessage.includes(translations['es'].registrationSuccess)) {
-                eventMessageElement.textContent = t.registrationSuccess;
-            } else if (currentMessage.includes(translations['it'].registrationFailed) || currentMessage.includes(translations['en'].registrationFailed) || currentMessage.includes(translations['de'].registrationFailed) || currentMessage.includes(translations['fr'].registrationFailed) || currentMessage.includes(translations['es'].registrationFailed)) {
-                if (currentMessage.includes(translations['it'].registrationFailed)) {
-                    eventMessageElement.textContent = `${t.registrationFailed}`;
-                } else {
-                    eventMessageElement.textContent = `${t.registrationFailed}`;
-                }
-            } else if (currentMessage.includes(translations['it'].noRegistrations) || currentMessage.includes(translations['en'].noRegistrations) || currentMessage.includes(translations['de'].noRegistrations) || currentMessage.includes(translations['fr'].noRegistrations) || currentMessage.includes(translations['es'].noRegistrations)) {
-                eventMessageElement.textContent = t.noRegistrations;
-            } else {
-                eventMessageElement.textContent = '';
-            }
-
-            const currentFormMessage = formMessage.textContent;
-            if (currentFormMessage.includes(translations['it'].formRequiredFields) || currentFormMessage.includes(translations['en'].formRequiredFields) || currentFormMessage.includes(translations['de'].formRequiredFields) || currentFormMessage.includes(translations['fr'].formRequiredFields) || currentFormMessage.includes(translations['es'].formRequiredFields)) {
-                formMessage.textContent = t.formRequiredFields;
-            } else if (currentFormMessage.includes(translations['it'].formInvalidEmail) || currentFormMessage.includes(translations['en'].formInvalidEmail) || currentFormMessage.includes(translations['de'].formInvalidEmail) || currentFormMessage.includes(translations['fr'].formInvalidEmail) || currentFormMessage.includes(translations['es'].formInvalidEmail)) {
-                formMessage.textContent = t.formInvalidEmail;
-            } else if (currentFormMessage.includes(translations['it'].registrationSuccess) || currentFormMessage.includes(translations['en'].registrationSuccess) || currentFormMessage.includes(translations['de'].registrationSuccess) || currentFormMessage.includes(translations['fr'].registrationSuccess) || currentFormMessage.includes(translations['es'].registrationSuccess)) {
-                formMessage.textContent = t.registrationSuccess;
-            } else if (currentFormMessage.includes(translations['it'].registrationFailed) || currentFormMessage.includes(translations['en'].registrationFailed) || currentFormMessage.includes(translations['de'].registrationFailed) || currentFormMessage.includes(translations['fr'].registrationFailed) || currentFormMessage.includes(translations['es'].registrationFailed)) {
-                if (currentFormMessage.includes(translations['it'].registrationFailed)) {
-                    formMessage.textContent = `${t.registrationFailed}`;
-                } else {
-                    formMessage.textContent = `${t.registrationFailed}`;
-                }
-            }
-
-            document.querySelectorAll('.language-selector-buttons span').forEach(span => {
-                span.classList.remove('active-lang');
-            });
-
-            const langIdMap = {
-                it: 'Ita',
-                en: 'Eng',
-                de: 'Deu',
-                fr: 'Fra',
-                es: 'Esp'
-            };
-            const targetLangId = `lang${langIdMap[lang]}`;
-            const targetElement = document.getElementById(targetLangId);
-            if (targetElement) {
-                targetElement.classList.add('active-lang');
-            } else {
-                console.error(`Element with ID ${targetLangId} not found.`);
-            }
-
-            if (currentUserId) {
-                currentUserIdDisplay.textContent = `${t.currentUserIdLabel}${currentUserId}`;
-            }
-            localStorage.setItem('preferredLang', lang);
-
-            passwordModalTitle.textContent = t.passwordModalTitle;
-            passwordInput.placeholder = t.passwordPlaceholder;
-            cancelPasswordButton.textContent = t.cancelButton;
-            submitPasswordButton.textContent = t.passwordConfirm;
-
-            passwordValidationMessage.textContent = '';
-        }
-
-        /**
-         * Popola il menu a tendina con i prossimi 12 mesi.
-         */
-        function populateMonthDropdown() {
-            monthSelect.innerHTML = ''; // Pulisci le opzioni esistenti
-            const today = new Date();
-            const currentMonth = today.getMonth();
-            const currentYear = today.getFullYear();
-
-            for (let i = 0; i < 12; i++) {
-                const futureDate = new Date(currentYear, currentMonth + i, 1);
-                const option = document.createElement('option');
-                const valueMonth = futureDate.getMonth();
-                const valueYear = futureDate.getFullYear();
-                
-                // Il valore dell'opzione sarà "YYYY-MM"
-                option.value = `${valueYear}-${String(valueMonth + 1).padStart(2, '0')}`;
-                option.textContent = `${translations[currentLanguage].monthNames[valueMonth]} ${valueYear}`;
-                monthSelect.appendChild(option);
-            }
-
-            // Seleziona il mese corrente nel dropdown
-            const selectedMonthValue = `${currentCalendarDate.getFullYear()}-${String(currentCalendarDate.getMonth() + 1).padStart(2, '0')}`;
-            monthSelect.value = selectedMonthValue;
-        }
-
-        /**
-         * Trova la data della N-esima occorrenza di un giorno specifico della settimana in un dato mese.
-         * @param {number} year - L'anno (es. 2025).
-         * @param {number} month - Il mese con indice 0 (0-11).
-         * @param {number} dayOfWeek - Il giorno della settimana con indice 0 (0=Domenica, 1=Lunedì, ..., 6=Sabato).
-         * @param {number} occurrence - La N-esima occorrenza (es. 2 per la seconda).
-         * @returns {Date|null} L'oggetto Date per il giorno specificato, o null se non trovato.
-         */
-        function findNthDayOfWeek(year, month, dayOfWeek, occurrence) {
-            let count = 0;
-            for (let i = 1; i <= 31; i++) {
-                const d = new Date(year, month, i);
-                if (d.getMonth() !== month) break;
-                if (d.getDay() === dayOfWeek) {
-                    count++;
-                    if (count === occurrence) {
-                        return d;
-                    }
-                }
-            }
-            return null;
-        }
-
-        // --- Generazione Calendario ---
-
-        /**
-         * Genera la griglia del calendario per un dato anno e mese.
-         * Rende tutte le date future selezionabili, escludendo quelle disabilitate manualmente.
-         * @param {number} year - L'anno.
-         * @param {number} month - Il mese con indice 0.
-         */
-        function generateCalendar(year, month) {
-            calendarGridBody.innerHTML = '';
-
-            const firstDayOfMonth = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-            // Usa le registrazioni caricate da Firestore
-            const disabledDatesMap = new Map();
-            allRegistrations.forEach(event => {
-                if (event.isCalendarDisabled) {
-                    disabledDatesMap.set(event.eventDate, true);
-                }
-            });
-
-            let date = 1;
-            for (let i = 0; i < 6; i++) {
-                const row = document.createElement('tr');
-
-                for (let j = 0; j < 7; j++) {
-                    const cell = document.createElement('td');
-
-                    if (i === 0 && j < firstDayOfMonth) {
-                        cell.textContent = '';
-                        cell.classList.add('disabled-date');
-                    } else if (date > daysInMonth) {
-                        cell.textContent = '';
-                        cell.classList.add('disabled-date');
-                    } else {
-                        cell.textContent = date;
-                        const currentDate = new Date(year, month, date);
-                        
-                        const formattedCurrentDate = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
-
-                        const today = new Date();
-                        today.setHours(0, 0, 0, 0);
-
-                        if (currentDate.setHours(0, 0, 0, 0) >= today.getTime() && 
-                            !disabledDatesMap.has(formattedCurrentDate)) {
-                            
-                            cell.classList.add('selectable-date');
-
-                            if (currentDate.getDay() === 0) {
-                                cell.classList.add('sunday-date');
-                            }
-
-                            if (selectedDates.has(formattedCurrentDate)) {
-                                cell.classList.add('selected-date');
-                            }
-
-                            // Event listener per il trascinamento e la selezione
-                            cell.addEventListener('mousedown', (e) => {
-                                if (e.button === 0) { // Solo tasto sinistro del mouse
-                                    isDragging = true;
-                                    // Deseleziona tutte le date se si inizia un nuovo trascinamento
-                                    selectedDates.forEach(date => {
-                                        const prevSelectedCell = document.querySelector(`td[data-date="${date}"]`);
-                                        if (prevSelectedCell) {
-                                            prevSelectedCell.classList.remove('selected-date');
-                                        }
-                                    });
-                                    selectedDates.clear();
-
-                                    selectedDates.add(formattedCurrentDate);
-                                    cell.classList.add('selected-date');
-                                    updateEventDateAndCountdown();
-                                }
-                            });
-
-                            cell.addEventListener('mouseover', () => {
-                                if (isDragging) {
-                                    selectedDates.add(formattedCurrentDate);
-                                    cell.classList.add('selected-date');
-                                    updateEventDateAndCountdown(); // Aggiorna i pulsanti durante il trascinamento
-                                }
-                            });
-
-                        } else {
-                            cell.textContent = date; // Assicurati che il numero del giorno sia visibile anche se disabilitato
-                            cell.classList.add('disabled-date');
-                            // Rimuovi eventuali listener ereditati
-                            cell.removeEventListener('mousedown', () => {});
-                            cell.removeEventListener('mouseover', () => {});
-                        }
-                        cell.dataset.date = formattedCurrentDate; // Aggiungi data come attributo per un facile recupero
-                        date++;
-                    }
-                    row.appendChild(cell);
-                }
-                calendarGridBody.appendChild(row);
-                if (date > daysInMonth) break;
-            }
-        }
-
-        // Aggiungi un listener globale per `mouseup` per terminare il trascinamento ovunque sul documento
-        document.addEventListener('mouseup', () => {
-            if (isDragging) {
-                isDragging = false;
-                updateEventDateAndCountdown(); // Aggiorna lo stato finale dei pulsanti
-                console.log('Dragging ended. Final selected dates:', Array.from(selectedDates));
-            }
+      // Aggiunge i listener di click ai nuovi elementi della galleria
+      document.querySelectorAll('.gallery-overlay').forEach(overlay => {
+        overlay.addEventListener('click', (e) => {
+          currentIndex = parseInt(e.currentTarget.dataset.index);
+          openLightbox(currentIndex);
         });
+      });
+    }
 
+    // Funzione per aprire la lightbox
+    function openLightbox(index) {
+      const currentLang = document.documentElement.lang;
+      const translatedAlt = translations[currentLang][galleryImages[index].key] || galleryImages[index].key;
 
-        /**
-         * Imposta la data finale dell'evento con la data del calendario selezionata e l'ora fissa,
-         * quindi avvia/riavvia il conto alla rovescia (solo logica interna per abilitare/disabilitare pulsanti).
-         */
-        function updateEventDateAndCountdown() {
-            console.log('updateEventDateAndCountdown called. Current selectedDates:', Array.from(selectedDates));
-            clearInterval(countdownInterval);
+      lightboxImg.src = galleryImages[index].src;
+      lightboxImg.alt = translatedAlt; // Usa il testo alt tradotto
+      lightbox.classList.add('show');
+      document.body.classList.add('no-scroll'); // Disabilita lo scroll del body
+      currentZoom = 1; // Resetta lo zoom all'apertura
+      lightboxImg.style.transform = `scale(${currentZoom})`; // Applica lo zoom iniziale
 
-            if (selectedDates.size === 0) {
-                eventMessageElement.textContent = '';
-                registerButton.disabled = true;
-                outlookButton.disabled = true;
-                registerButtonLink.style.pointerEvents = 'none';
-                outlookButtonContainer.style.pointerEvents = 'none';
-                eventDate = null;
-                console.log('No dates selected or all in past. Buttons disabled.');
-                return;
-            }
+      // Aggiunge l'event listener per lo zoom con la rotellina del mouse
+      lightboxImg.addEventListener('wheel', handleImageZoom, { passive: false });
+    }
 
-            let earliestFutureDate = null;
-            const now = new Date();
-            now.setSeconds(0, 0);
+    // Funzione per chiudere la lightbox
+    function closeLightbox() {
+      lightbox.classList.remove('show');
+      lightboxImg.src = ""; // Pulisce la sorgente dell'immagine
+      lightboxImg.alt = ""; // Pulisce il testo alt
+      document.body.classList.remove('no-scroll'); // Riabilita lo scroll del body
+      
+      // Rimuove l'event listener per lo zoom
+      lightboxImg.removeEventListener('wheel', handleImageZoom);
+    }
 
-            for (const dateString of selectedDates) {
-                const [year, month, day] = dateString.split('-').map(Number);
-                const currentSelectedEventDate = new Date(year, month - 1, day, eventHour, eventMinute, 0);
+    // Gestore dello zoom dell'immagine
+    function handleImageZoom(e) {
+      e.preventDefault(); // Previene lo zoom della pagina
+      
+      const delta = Math.sign(e.deltaY); // -1 per zoom in, 1 per zoom out
 
-                if (currentSelectedEventDate.getTime() >= now.getTime()) {
-                    if (!earliestFutureDate || currentSelectedEventDate.getTime() < earliestFutureDate.getTime()) {
-                        earliestFutureDate = currentSelectedEventDate;
-                    }
-                }
-            }
+      if (delta === -1) { // Zoom in
+        currentZoom += zoomStep;
+      } else { // Zoom out
+        currentZoom -= zoomStep;
+      }
 
-            if (earliestFutureDate) {
-                eventDate = earliestFutureDate;
-                eventMessageElement.textContent = '';
-                registerButton.disabled = false;
-                outlookButton.disabled = false;
-                registerButtonLink.style.pointerEvents = 'auto';
-                outlookButtonContainer.style.pointerEvents = 'auto';
-                console.log('Valid future date selected. Buttons enabled. Earliest future date:', eventDate.toLocaleDateString());
-            } else {
-                eventMessageElement.textContent = translations[currentLanguage].dateInPast;
-                registerButton.disabled = true;
-                outlookButton.disabled = true;
-                registerButtonLink.style.pointerEvents = 'none';
-                outlookButtonContainer.style.pointerEvents = 'none';
-                eventDate = null;
-                console.log('All selected dates are in the past. Buttons disabled.');
-            }
+      // Limita lo zoom a valori ragionevoli
+      currentZoom = Math.max(0.5, Math.min(currentZoom, 3)); // Min 0.5x, Max 3x
+
+      lightboxImg.style.transform = `scale(${currentZoom})`;
+
+      // Se l'immagine è ingrandita, abilita lo scroll del contenitore
+      if (currentZoom > 1) {
+          lightboxContent.style.overflow = 'auto';
+      } else {
+          lightboxContent.style.overflow = 'hidden'; // Nasconde le scrollbar se l'immagine è rimpicciolita
+      }
+    }
+
+    // Funzione per mostrare l'immagine successiva
+    function showNextImage() {
+      currentIndex = (currentIndex + 1) % galleryImages.length;
+      openLightbox(currentIndex);
+    }
+
+    // Funzione per mostrare l'immagine precedente
+    function showPrevImage() {
+      currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
+      openLightbox(currentIndex);
+    }
+
+    // Listener degli eventi della lightbox
+    closeBtn.addEventListener('click', closeLightbox);
+    nextBtn.addEventListener('click', showNextImage);
+    prevBtn.addEventListener('click', showPrevImage);
+
+    // Chiude la lightbox con il tasto ESC e naviga con le frecce
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && lightbox.classList.contains('show')) {
+        closeLightbox();
+      }
+      if (e.key === 'ArrowRight' && lightbox.classList.contains('show')) {
+        showNextImage();
+      }
+      if (e.key === 'ArrowLeft' && lightbox.classList.contains('show')) {
+        showPrevImage();
+      }
+    });
+
+    // Funzionalità del modale dei contatti
+    const profilePic = document.getElementById('gianna-profile-pic');
+    const contactModal = document.getElementById('contactModal');
+    const closeContactModalBtn = document.getElementById('closeContactModalBtn');
+    const contactModalImg = document.getElementById('contact-modal-img');
+    const contactPhoneLink = document.getElementById('contact-phone-link');
+    const contactWhatsappLink = document.getElementById('contact-whatsapp-link');
+    const contactEmailLink = document.getElementById('contact-email-link');
+
+    // Funzione per aprire il modale dei contatti
+    function openContactModal() {
+        contactModalImg.src = "gianna1.jpg"; // Assicurati che questo percorso sia corretto per l'immagine completa
+        // Aggiorna il testo del nome della persona di contatto in base alla lingua corrente
+        document.querySelector('#contactModal [data-key="contact-person-name"]').textContent = translations[document.documentElement.lang]["contact-person-name"];
+        
+        // Imposta i link per telefono, WhatsApp ed email
+        contactPhoneLink.href = `tel:${contactDetails.phone}`;
+        contactPhoneLink.textContent = contactDetails.phone;
+
+        contactWhatsappLink.href = `https://wa.me/${contactDetails.whatsapp}`;
+        contactWhatsappLink.textContent = contactDetails.whatsapp;
+
+        contactEmailLink.href = `mailto:${contactDetails.email}`;
+        contactEmailLink.textContent = contactDetails.email;
+
+        contactModal.classList.add('show');
+    }
+
+    // Funzione per chiudere il modale dei contatti
+    function closeContactModal() {
+        contactModal.classList.remove('show');
+    }
+
+    // Listener degli eventi per il modale dei contatti
+    if (profilePic) {
+        profilePic.addEventListener('click', openContactModal);
+    }
+    if (closeContactModalBtn) {
+        closeContactModalBtn.addEventListener('click', closeContactModal);
+    }
+
+    // Chiude il modale dei contatti con il tasto ESC
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && contactModal.classList.contains('show')) {
+        closeContactModal();
+      }
+    });
+
+    // Funzionalità di cambio lingua
+    const languageSelect = document.getElementById('language-select');
+
+    // Oggetto delle traduzioni
+    const translations = {
+      it: {
+        "nav-location": "Lido delle Nazioni",
+        "nav-home-desktop": "Home",
+        "nav-gallery-desktop": "Galleria",
+        "nav-features-desktop": "Caratteristiche",
+        "nav-contact-desktop": "Contatti",
+        "nav-home-mobile": "Home",
+        "nav-gallery-mobile": "Galleria",
+        "nav-features-mobile": "Caratteristiche",
+        "nav-contact-mobile": "Contatti",
+        "hero-title": "Galleria Casa Gianna",
+        "hero-subtitle": "Scopri ogni angolo della tua prossima casa vacanze",
+        "hero-photos": "Dettagli Cristallini",
+        "hero-rooms": "Un Tour Completo",
+        "gallery-title": "Esplora Casa Gianna",
+        "gallery-subtitle": "Ogni foto racconta la storia del tuo perfetto soggiorno al mare",
+        "features-title": "Caratteristiche Uniche",
+        "features-subtitle": "Dettagli che fanno la differenza",
+        "feature-beach-title": "Vicino al Mare",
+        "feature-beach-desc": "200 metri dalla spiaggia di Lido delle Nazioni",
+        "feature-garden-title": "Giardino Privato",
+        "feature-garden-desc": "Spazi verdi per relax e privacy",
+        "feature-rooms-title": "Camere Confortevoli",
+        "feature-rooms-desc": "Arredamento curato e spazi luminosi",
+        "feature-kitchen-title": "Cucina Completa",
+        "feature-kitchen-desc": "Elettrodomestici moderni e funzionali",
+        "contact-title": "Ti Piace Quello Che Vedi?",
+        "contact-subtitle": "Prenota ora la tua vacanza da sogno",
+        "contact-whatsapp": "WhatsApp",
+        "contact-whatsapp-desc": "Risposta immediata",
+        "contact-whatsapp-action": "Chatta con noi",
+        "contact-email": "Email",
+        "contact-email-desc": "Richiesta dettagliata",
+        "contact-email-action": "Scrivi una mail",
+        "contact-location": "Posizione",
+        "contact-location-desc": "Visualizza su Maps",
+        "contact-location-action": "Apri Maps",
+        "footer-location": "Lido delle Nazioni, Comacchio (FE), Italia",
+        "footer-rights": "Tutti i diritti riservati",
+        "contact-card-title": "Contatti di Gianna",
+        "contact-person-name": "Gianna Santececca",
+        "contact-person-phone": "Telefono:",
+        "contact-person-whatsapp": "WhatsApp:",
+        "contact-person-email": "E-mail:",
+        // Traduzioni per i titoli delle immagini della galleria
+        "gallery-img-1": "Esterno Casa Gianna",
+        "gallery-img-2": "Ingresso principale",
+        "gallery-img-3": "Camera da letto con libreria",
+        "gallery-img-4": "Soggiorno luminoso",
+        "gallery-img-5": "Zona relax",
+        "gallery-img-6": "Parcheggio privato",
+        "gallery-img-7": "Zona pranzo e cucina",
+        "gallery-img-8": "Seconda camera da letto",
+        "gallery-img-9": "Giardino posteriore",
+        "gallery-img-10": "Doccia all'aperto",
+        "gallery-img-11": "Patio posteriore",
+        "gallery-img-12": "Distanza dal mare"
+      },
+      en: {
+        "nav-location": "Lido delle Nazioni",
+        "nav-home-desktop": "Home",
+        "nav-gallery-desktop": "Gallery",
+        "nav-features-desktop": "Features",
+        "nav-contact-desktop": "Contact",
+        "nav-home-mobile": "Home",
+        "nav-gallery-mobile": "Gallery",
+        "nav-features-mobile": "Features",
+        "nav-contact-mobile": "Contact",
+        "hero-title": "Casa Gianna Gallery",
+        "hero-subtitle": "Discover every corner of your next holiday home",
+        "hero-photos": "Crystal-Clear Details",
+        "hero-rooms": "A Complete Tour",
+        "gallery-title": "Explore Casa Gianna",
+        "gallery-subtitle": "Every photo tells the story of your perfect seaside stay",
+        "features-title": "Unique Features",
+        "features-subtitle": "Details that make the difference",
+        "feature-beach-title": "Near the Sea",
+        "feature-beach-desc": "200 meters from Lido delle Nazioni beach",
+        "feature-garden-title": "Private Garden",
+        "feature-garden-desc": "Green spaces for relaxation and privacy",
+        "feature-rooms-title": "Comfortable Rooms",
+        "feature-rooms-desc": "Carefully furnished and bright spaces",
+        "feature-kitchen-title": "Complete Kitchen",
+        "feature-kitchen-desc": "Modern and functional appliances",
+        "contact-title": "Like What You See?",
+        "contact-subtitle": "Book your dream vacation now",
+        "contact-whatsapp": "WhatsApp",
+        "contact-whatsapp-desc": "Immediate response",
+        "contact-whatsapp-action": "Chat with us",
+        "contact-email": "Email",
+        "contact-email-desc": "Detailed request",
+        "contact-email-action": "Write an email",
+        "contact-location": "Location",
+        "contact-location-desc": "View on Maps",
+        "contact-location-action": "Open Maps",
+        "footer-location": "Lido delle Nazioni, Comacchio (FE), Italy",
+        "footer-rights": "All rights reserved",
+        "contact-card-title": "Gianna's Contacts",
+        "contact-person-name": "Gianna Santececca",
+        "contact-person-phone": "Phone:",
+        "contact-person-whatsapp": "WhatsApp:",
+        "contact-person-email": "Email:",
+        // Traduzioni per i titoli delle immagini della galleria
+        "gallery-img-1": "Casa Gianna Exterior",
+        "gallery-img-2": "Main Entrance",
+        "gallery-img-3": "Bedroom with Bookshelf",
+        "gallery-img-4": "Bright Living Room",
+        "gallery-img-5": "Relaxation Area",
+        "gallery-img-6": "Private Parking",
+        "gallery-img-7": "Dining and Kitchen Area",
+        "gallery-img-8": "Second Bedroom",
+        "gallery-img-9": "Backyard Garden",
+        "gallery-img-10": "Outdoor Shower",
+        "gallery-img-11": "Back Patio",
+        "gallery-img-12": "Distance from the Sea"
+      },
+      de: {
+        "nav-location": "Lido delle Nazioni",
+        "nav-home-desktop": "Startseite",
+        "nav-gallery-desktop": "Galerie",
+        "nav-features-desktop": "Merkmale",
+        "nav-contact-desktop": "Kontakt",
+        "nav-home-mobile": "Startseite",
+        "nav-gallery-mobile": "Galerie",
+        "nav-features-mobile": "Merkmale",
+        "nav-contact-mobile": "Kontakt",
+        "hero-title": "Casa Gianna Galerie",
+        "hero-subtitle": "Entdecken Sie jede Ecke Ihres nächsten Ferienhauses",
+        "hero-photos": "Kristallklare Details",
+        "hero-rooms": "Eine Komplette Tour",
+        "gallery-title": "Erkunden Sie Casa Gianna",
+        "gallery-subtitle": "Jedes Foto erzählt die Geschichte Ihres perfekten Aufenthalts am Meer",
+        "features-title": "Einzigartige Merkmale",
+        "features-subtitle": "Details, die den Unterschied machen",
+        "feature-beach-title": "Nahe dem Meer",
+        "feature-beach-desc": "200 Meter vom Strand Lido delle Nazioni entfernt",
+        "feature-garden-title": "Privater Garten",
+        "feature-garden-desc": "Grünflächen für Entspannung und Privatsphäre",
+        "feature-rooms-title": "Komfortable Zimmer",
+        "feature-rooms-desc": "Sorgfältig eingerichtete und helle Räume",
+        "feature-kitchen-title": "Vollständige Küche",
+        "feature-kitchen-desc": "Moderne und funktionale Geräte",
+        "contact-title": "Gefällt Ihnen was Sie sehen?",
+        "contact-subtitle": "Buchen Sie jetzt Ihren Traumurlaub",
+        "contact-whatsapp": "WhatsApp",
+        "contact-whatsapp-desc": "Sofortige Antwort",
+        "contact-whatsapp-action": "Chatten Sie mit uns",
+        "contact-email": "E-Mail",
+        "contact-email-desc": "Detaillierte Anfrage",
+        "contact-email-action": "E-Mail schreiben",
+        "contact-location": "Standort",
+        "contact-location-desc": "Auf Maps anzeigen",
+        "contact-location-action": "Maps öffnen",
+        "footer-location": "Lido delle Nazioni, Comacchio (FE), Italien",
+        "footer-rights": "Alle Rechte vorbehalten",
+        "contact-card-title": "Giannas Kontakte",
+        "contact-person-name": "Gianna Santececca",
+        "contact-person-phone": "Telefon:",
+        "contact-person-whatsapp": "WhatsApp:",
+        "contact-person-email": "E-Mail:",
+        // Traduzioni per i titoli delle immagini della galleria
+        "gallery-img-1": "Außenansicht Casa Gianna",
+        "gallery-img-2": "Haupteingang",
+        "gallery-img-3": "Schlafzimmer mit Bücherregal",
+        "gallery-img-4": "Helles Wohnzimmer",
+        "gallery-img-5": "Entspannungsbereich",
+        "gallery-img-6": "Privatparkplatz",
+        "gallery-img-7": "Ess- und Küchenbereich",
+        "gallery-img-8": "Zweites Schlafzimmer",
+        "gallery-img-9": "Hinterer Garten",
+        "gallery-img-10": "Außendusche",
+        "gallery-img-11": "Hintere Terrasse",
+        "gallery-img-12": "Entfernung zum Meer"
+      }
+    };
+
+    // Funzione per impostare la lingua
+    function setLanguage(lang) {
+      document.documentElement.lang = lang;
+      document.querySelectorAll('[data-key]').forEach(element => {
+        const key = element.dataset.key;
+        if (translations[lang] && translations[lang][key]) {
+          element.textContent = translations[lang][key];
         }
+      });
+      // Aggiorna anche il nome della persona di contatto nel modale quando la lingua cambia
+      if (contactModal.classList.contains('show')) { // Solo se il modale è aperto
+          document.querySelector('#contactModal [data-key="contact-person-name"]').textContent = translations[lang]["contact-person-name"];
+      }
+      // Ricrea gli elementi della galleria per aggiornare i testi alt delle immagini
+      createGalleryItems();
+    }
 
-        /**
-         * Formatta una data per iCalendar (YYYYMMDDTHHMMSS).
-         * @param {Date} date - L'oggetto data da formattare.
-         * @returns {string} La stringa data formattata.
-         */
-        function formatICSDate(date) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            const hour = String(date.getHours()).padStart(2, '0');
-            const minute = String(date.getMinutes()).padStart(2, '0');
-            const second = String(date.getSeconds()).padStart(2, '0');
-            return `${year}${month}${day}T${hour}${minute}${second}`;
-        }
+    // Listener per il cambio di lingua
+    languageSelect.addEventListener('change', (e) => {
+      setLanguage(e.target.value);
+    });
 
-        /**
-         * Formatta una data per iCalendar (YYYYMMDD) per eventi di tutto il giorno.
-         * @param {Date} date - L'oggetto data da formattare.
-         * @returns {string} La stringa data formattata.
-         */
-        function formatICSDateOnly(date) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            return `${year}${month}${day}`;
-        }
+    // Imposta la lingua iniziale in base al browser o al default italiano
+    const userLang = navigator.language.split('-')[0];
+    const initialLang = translations[userLang] ? userLang : 'it';
+    languageSelect.value = initialLang;
+    setLanguage(initialLang);
 
-        /**
-         * Genera un file ICS e tenta di aprirlo con l'applicazione calendario predefinita.
-         */
-        function addEventToOutlook() {
-            if (selectedDates.size === 0) {
-                eventMessageElement.textContent = translations[currentLanguage].selectValidFutureDate;
-                return;
-            }
+    // Imposta dinamicamente l'anno corrente nel footer
+    document.getElementById('current-year').textContent = new Date().getFullYear();
 
-            const eventTitle = "La tua vacanza prenotata";
-            const eventDescription = "La tua prenotazione è stata confermata. Goditi la tua vacanza!";
-            const eventLocation = "La tua destinazione";
+    // Mobile menu functionality
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const closeMobileMenu = document.getElementById('close-mobile-menu');
 
-            let icsEvents = [];
-            const sortedSelectedDates = Array.from(selectedDates).sort();
+    mobileMenuButton.addEventListener('click', () => {
+      mobileMenu.classList.remove('hidden');
+      setTimeout(() => {
+        mobileMenu.classList.add('translate-y-0');
+        mobileMenu.classList.remove('-translate-y-full');
+      }, 10); // Piccolo ritardo per applicare la transizione
+    });
 
-            sortedSelectedDates.forEach(dateString => {
-                const [year, month, day] = dateString.split('-').map(Number);
-                const eventStartDate = new Date(year, month - 1, day);
-                const eventEndDate = new Date(year, month - 1, day + 1);
+    closeMobileMenu.addEventListener('click', () => {
+      mobileMenu.classList.remove('translate-y-0');
+      mobileMenu.classList.add('-translate-y-full');
+      setTimeout(() => {
+        mobileMenu.classList.add('hidden');
+      }, 300); // Attende la fine della transizione prima di nascondere
+    });
 
-                if (eventStartDate.getTime() >= new Date().setHours(0,0,0,0)) {
-                    const dtStart = formatICSDateOnly(eventStartDate);
-                    const dtEnd = formatICSDateOnly(eventEndDate);
-
-                    icsEvents.push(`BEGIN:VEVENT
-UID:${Date.now()}-${dateString}@PrenotazioneVacanza
-DTSTAMP:${formatICSDate(new Date())}
-DTSTART;VALUE=DATE:${dtStart}
-DTEND;VALUE=DATE:${dtEnd}
-SUMMARY:${eventTitle} - ${dateString}
-DESCRIPTION:${eventDescription}
-LOCATION:${eventLocation}
-END:VEVENT`);
-                }
-            });
-
-            if (icsEvents.length === 0) {
-                eventMessageElement.textContent = translations[currentLanguage].selectValidFutureDate;
-                return;
-            }
-
-            const icsContent = `BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//PrenotazioneVacanza//IT
-${icsEvents.join('\n')}
-END:VCALENDAR`;
-
-            const blob = new Blob([icsContent], { type: 'text/calendar' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-
-        /**
-         * Invia un messaggio WhatsApp al numero predefinito con il messaggio predefinito.
-         * L'utente dovrà confermare l'invio nell'app WhatsApp.
-         */
-        function sendWhatsAppMessage() {
-            const encodedMessage = encodeURIComponent(WHATSAPP_MESSAGE);
-            const whatsappUrl = `https://wa.me/${WHATSAPP_PHONE_NUMBER}?text=${encodedMessage}`;
-            window.open(whatsappUrl, '_blank');
-        }
-
-        let clickTimeout;
-
-        prevMonthButton.addEventListener('click', () => {
-            currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
-            generateCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
-            populateMonthDropdown();
-            updateEventDateAndCountdown(); 
+    // Chiude il menu mobile quando si clicca su un link
+    document.querySelectorAll('#mobile-menu a').forEach(link => {
+        link.addEventListener('click', () => {
+            closeMobileMenu.click(); // Simula il click sul pulsante di chiusura
         });
+    });
 
-        nextMonthButton.addEventListener('click', () => {
-            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
-            generateCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
-            populateMonthDropdown();
-            updateEventDateAndCountdown();
-        });
-
-        outlookButtonContainer.addEventListener('click', (e) => {
-            e.preventDefault();
-            addEventToOutlook();
-
-            clearInterval(clickTimeout);
-
-            outlookTooltip.style.visibility = 'visible';
-            outlookTooltip.style.opacity = '1';
-
-            clickTimeout = setTimeout(() => {
-                outlookTooltip.style.opacity = '0';
-                outlookTooltip.style.visibility = 'hidden';
-            }, 3000);
-        });
-
-        outlookButton.addEventListener('mouseover', () => {
-            clearInterval(clickTimeout);
-            outlookTooltip.style.visibility = 'visible';
-            outlookTooltip.style.opacity = '1';
-        });
-
-        outlookButton.addEventListener('mouseout', () => {
-            outlookTooltip.style.opacity = '0';
-            outlookTooltip.style.visibility = 'hidden';
-            clearInterval(clickTimeout);
-        });
-
-        langIta.addEventListener('click', () => updateLanguage('it'));
-        langEng.addEventListener('click', () => updateLanguage('en'));
-        langDeu.addEventListener('click', () => updateLanguage('de'));
-        langFra.addEventListener('click', () => updateLanguage('fr'));
-        langEsp.addEventListener('click', () => updateLanguage('es'));
-
-        monthSelect.addEventListener('change', (event) => {
-            const [year, month] = event.target.value.split('-').map(Number);
-            currentCalendarDate = new Date(year, month - 1, 1);
-            generateCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
-            updateEventDateAndCountdown();
-        });
-
-        toggleRegisteredEventsButton.addEventListener('click', () => {
-            if (registeredEventsSection.style.display === 'block') {
-                registeredEventsSection.style.display = 'none';
-            } else {
-                showPasswordModal();
-            }
-        });
-
-        /**
-         * Mostra/nasconde la sezione degli eventi registrati.
-         * Questa funzione ora viene chiamata solo dopo la verifica della password.
-         */
-        function toggleRegisteredEventsSectionVisibility(show) {
-            if (show) {
-                registeredEventsSection.style.display = 'block';
-                // loadRegistrations è ora gestito da onSnapshot direttamente
-            } else {
-                registeredEventsSection.style.display = 'none';
-            }
-        }
-
-        function showRegistrationForm() {
-            console.log('showRegistrationForm called. Selected Dates:', Array.from(selectedDates));
-            if (selectedDates.size === 0) {
-                eventMessageElement.textContent = translations[currentLanguage].selectValidFutureDate;
-                return;
-            }
-            calendarView.style.display = 'none';
-            registrationFormView.style.display = 'block';
-            registeredEventsSection.style.display = 'none';
-            formMessage.textContent = '';
-            registrationForm.reset();
-            if (selectedDates.size > 0) {
-                const dateOptions = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
-                const sortedDates = Array.from(selectedDates).sort();
-                const datesText = sortedDates.map(dateString => {
-                    const [year, month, day] = dateString.split('-').map(Number);
-                    return new Date(year, month - 1, day).toLocaleDateString(currentLanguage, dateOptions);
-                }).join(', ');
-                selectedEventDateDisplay.textContent = `${translations[currentLanguage].eventDatePrefix} ${datesText}`;
-            }
-        }
-
-        function showCalendarView() {
-            calendarView.style.display = 'block';
-            registrationFormView.style.display = 'none';
-        }
-
-        /**
-         * Aggiunge una nuova registrazione evento a Firestore.
-         * @param {object} formData - Oggetto contenente i dati del modulo (nome, cognome, nazione, numero di telefono, email).
-         */
-        async function addRegistrationToFirestore(formData) {
-            try {
-                submitRegistrationButton.disabled = true;
-                formMessage.textContent = "Registrazione in corso...";
-
-                // Controllo per assicurarsi che Firebase sia inizializzato
-                if (!db || !registrationsCollection) {
-                    console.error("Firestore non è ancora inizializzato. Impossibile registrare.");
-                    formMessage.textContent = "Errore: il sistema non è ancora pronto. Riprova tra un momento.";
-                    formMessage.classList.remove('success-message');
-                    return; // Esci se non è pronto
-                }
-
-                if (selectedDates.size === 0) {
-                    formMessage.textContent = translations[currentLanguage].selectValidFutureDate;
-                    formMessage.classList.remove('success-message');
-                    return;
-                }
-
-                for (const dateString of selectedDates) {
-                    const newRegistration = {
-                        userId: currentUserId, // L'ID utente di Firebase Auth
-                        eventDate: dateString,
-                        eventTime: `${String(eventHour).padStart(2, '0')}:${String(eventMinute).padStart(2, '0')}`,
-                        firstName: formData.firstName,
-                        lastName: formData.lastName,
-                        country: formData.country,
-                        phoneNumber: formData.phoneNumber,
-                        email: formData.email,
-                        timestamp: new Date().toISOString(),
-                        isCalendarDisabled: false // Default a false, può essere modificato dal registro
-                    };
-                    await addDoc(registrationsCollection, newRegistration);
-                }
-
-                formMessage.textContent = translations[currentLanguage].registrationSuccess;
-                formMessage.classList.add('success-message');
-                eventMessageElement.textContent = translations[currentLanguage].registrationSuccess;
-                
-                selectedDates.clear(); // Pulisce le date selezionate dopo la registrazione
-                
-                // loadRegistrations() e generateCalendar() saranno chiamati automaticamente da onSnapshot
-                updateEventDateAndCountdown();
-
-                // Invia il messaggio WhatsApp dopo la registrazione riuscita
-                sendWhatsAppMessage();
-
-                setTimeout(() => {
-                    registrationForm.reset();
-                    showCalendarView();
-                }, 1500);
-                
-            } catch (e) {
-                // Logga l'errore completo per il debug
-                console.error("Errore durante l'aggiunta della registrazione a Firestore:", e.code, e.message, e);
-                formMessage.textContent = `${translations[currentLanguage].registrationFailed}: ${e.message || e}`; // Mostra il messaggio di errore di Firebase
-                formMessage.classList.remove('success-message');
-                eventMessageElement.textContent = `${translations[currentLanguage].registrationFailed}`;
-            } finally {
-                submitRegistrationButton.disabled = false;
-            }
-        }
-
-        function handleRegistrationSubmit(event) {
-            event.preventDefault();
-
-            const firstName = firstNameInput.value.trim();
-            const lastName = lastNameInput.value.trim();
-            const country = countryInput.value.trim();
-            const phoneNumber = phoneNumberInput.value.trim();
-            const email = emailInput.value.trim();
-
-            if (!firstName || !lastName || !country || !phoneNumber || !email) {
-                formMessage.textContent = translations[currentLanguage].formRequiredFields;
-                formMessage.classList.remove('success-message');
-                return;
-            }
-
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailPattern.test(email)) {
-                formMessage.textContent = translations[currentLanguage].formInvalidEmail;
-                formMessage.classList.remove('success-message');
-                return;
-            }
-
-            formMessage.textContent = '';
-            formMessage.classList.remove('success-message');
-
-            const formData = {
-                firstName,
-                lastName,
-                country,
-                phoneNumber,
-                email
-            };
-
-            addRegistrationToFirestore(formData); // Chiama la funzione Firestore
-        }
-
-        /**
-         * Gestisce il cambio di stato della checkbox di una registrazione in Firestore.
-         * @param {Event} event - L'evento di cambio della checkbox.
-         */
-        async function handleRegistrationCheckboxChange(event) {
-            const registrationId = event.target.dataset.id;
-            const isChecked = event.target.checked;
-
-            try {
-                await updateDoc(doc(db, registrationsCollection.path, registrationId), {
-                    isCalendarDisabled: isChecked
-                });
-                // generateCalendar() sarà chiamato da onSnapshot
-            } catch (e) {
-                console.error("Errore durante l'aggiornamento della registrazione in Firestore: ", e);
-            }
-        }
-
-        /**
-         * Elimina una registrazione da Firestore.
-         * @param {string} id - L'ID del documento da eliminare.
-         */
-        async function deleteRegistration(id) {
-            try {
-                await deleteDoc(doc(db, registrationsCollection.path, id));
-                // loadRegistrations() e generateCalendar() saranno chiamati da onSnapshot
-            } catch (e) {
-                console.error("Errore durante l'eliminazione della registrazione da Firestore: ", e);
-            }
-        }
-
-        /**
-         * Carica e visualizza le registrazioni da Firestore in tempo reale.
-         */
-        function setupRealtimeRegistrationsListener() {
-            // Assicurati che db e registrationsCollection siano stati inizializzati
-            if (!db || !registrationsCollection) {
-                console.warn("Firestore non è ancora inizializzato. Riprovo tra poco.");
-                setTimeout(setupRealtimeRegistrationsListener, 500); // Riprova dopo un breve ritardo
-                return;
-            }
-
-            onSnapshot(query(registrationsCollection), (snapshot) => {
-                allRegistrations = [];
-                snapshot.forEach((doc) => {
-                    allRegistrations.push({ id: doc.id, ...doc.data() });
-                });
-                
-                registeredEventsList.innerHTML = ''; // Pulisci la lista corrente
-
-                if (allRegistrations.length === 0) {
-                    const li = document.createElement('li');
-                    li.textContent = translations[currentLanguage].noRegistrations;
-                    registeredEventsList.appendChild(li);
-                } else {
-                    allRegistrations.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-
-                    allRegistrations.forEach((data) => {
-                        const li = document.createElement('li');
-                        
-                        const emailSubject = encodeURIComponent(translations[currentLanguage].emailSubject);
-                        const emailBodyContent = translations[currentLanguage].emailBody
-                            .replace('{firstName}', data.firstName)
-                            .replace('{lastName}', data.lastName);
-                        const emailBody = encodeURIComponent(emailBodyContent);
-
-                        li.innerHTML = `
-                            <span>
-                                ${data.firstName} ${data.lastName} (${data.phoneNumber}, ${data.country}) - ${data.eventDate} ${data.eventTime} - 
-                                <a href="mailto:${data.email}?subject=${emailSubject}&body=${emailBody}">${data.email}</a> - 
-                                ${translations[currentLanguage].registrationTimestampLabel}${new Date(data.timestamp).toLocaleString(currentLanguage)}
-                            </span>
-                            <div class="registration-item-controls">
-                                <label>
-                                    <input type="checkbox" data-id="${data.id}" ${data.isCalendarDisabled ? 'checked' : ''}>
-                                    ${translations[currentLanguage].disableDateLabel}
-                                </label>
-                                <button class="delete-button" data-id="${data.id}" title="${translations[currentLanguage].deleteButton}">
-                                    &#x1F5D1;
-                                </button>
-                            </div>
-                        `;
-                        const checkbox = li.querySelector(`input[type="checkbox"][data-id="${data.id}"]`);
-                        if (checkbox) {
-                            checkbox.addEventListener('change', handleRegistrationCheckboxChange);
-                        }
-                        const deleteBtn = li.querySelector(`.delete-button[data-id="${data.id}"]`);
-                        if (deleteBtn) {
-                            deleteBtn.addEventListener('click', () => deleteRegistration(data.id));
-                        }
-                        registeredEventsList.appendChild(li);
-                    });
-                }
-                // Rigenera il calendario ogni volta che le registrazioni cambiano
-                generateCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
-            }, (error) => {
-                console.error("Errore nell'ascolto delle registrazioni da Firestore: ", error);
-                registeredEventsList.innerHTML = `<li>${translations[currentLanguage].errorLoadingRegistrations}</li>`;
-            });
-        }
-
-
-        registerButtonLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            showRegistrationForm();
-        });
-
-        cancelRegistrationButton.addEventListener('click', showCalendarView);
-        registrationForm.addEventListener('submit', handleRegistrationSubmit);
-
-        function showPasswordModal() {
-            passwordModalOverlay.classList.add('visible');
-            passwordInput.value = '';
-            passwordValidationMessage.textContent = '';
-            passwordInput.focus();
-        }
-
-        function hidePasswordModal() {
-            passwordModalOverlay.classList.remove('visible');
-            passwordValidationMessage.textContent = '';
-        }
-
-        function handlePasswordSubmit() {
-            const enteredPassword = passwordInput.value;
-            if (enteredPassword.trim() === '') {
-                passwordValidationMessage.textContent = translations[currentLanguage].passwordRequired;
-                return;
-            }
-
-            if (enteredPassword === CORRECT_PASSWORD) {
-                hidePasswordModal();
-                toggleRegisteredEventsSectionVisibility(true);
-            } else {
-                passwordValidationMessage.textContent = translations[currentLanguage].passwordIncorrect;
-            }
-        }
-
-        cancelPasswordButton.addEventListener('click', hidePasswordModal);
-        submitPasswordButton.addEventListener('click', handlePasswordSubmit);
-        passwordInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                handlePasswordSubmit();
-            }
-        });
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Inizializza Firebase
-            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-            const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-
-            const app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            auth = getAuth(app);
-
-            // Definisci il percorso della collezione per i dati pubblici
-            registrationsCollection = collection(db, `artifacts/${appId}/public/data/eventRegistrations`);
-
-            // Autenticazione
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    currentUserId = user.uid;
-                } else {
-                    try {
-                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                            await signInWithCustomToken(auth, __initial_auth_token);
-                            currentUserId = auth.currentUser.uid;
-                        } else {
-                            await signInAnonymously(auth);
-                            currentUserId = auth.currentUser.uid;
-                        }
-                    } catch (error) {
-                        console.error("Errore nell'autenticazione Firebase:", error);
-                        currentUserId = crypto.randomUUID(); // Fallback a un ID locale se l'autenticazione fallisce
-                    }
-                }
-                console.log("Firebase Auth Ready. User ID:", currentUserId);
-                currentUserIdDisplay.textContent = `${translations[currentLanguage].currentUserIdLabel}${currentUserId}`;
-                setupRealtimeRegistrationsListener(); // Avvia l'ascolto di Firestore solo dopo l'autenticazione
-            });
-
-            let initialLang = localStorage.getItem('preferredLang') || 'it';
-            updateLanguage(initialLang);
-            
-            generateCalendar(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth());
-            populateMonthDropdown();
-
-            registerButton.disabled = true;
-            outlookButton.disabled = true;
-            registerButtonLink.style.pointerEvents = 'none';
-            outlookButtonContainer.style.pointerEvents = 'none';
-
-            updateEventDateAndCountdown();
-        });
-    </script>
+    // Creazione iniziale della galleria
+    // createGalleryItems(); // Questa chiamata è ora gestita da setLanguage all'inizializzazione
+  </script>
 </body>
 </html>
+ 
