@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-key="private-page-title">Area Privata - Casa Vacanze Gianna</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-blue: #1e40af;
+      --secondary-blue: #3b82f6;
+      --accent-gold: #f59e0b;
+      --warm-white: #fefcfb;
+      --soft-gray: #f8fafc;
+      --text-dark: #1f2937;
+      --text-light: #6b7280;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      color: var(--text-dark);
+    }
+
+    /* Stile per disabilitare lo scroll del body quando il modale è aperto */
+    body.no-scroll {
+      overflow: hidden;
+    }
+
+    .heading-font {
+      font-family: 'Playfair Display', serif;
+    }
+
+    .hero-gradient {
+      /* Modificato per usare l'immagine di sfondo spiaggia4.jpg */
+      background-image: url('spiaggia4.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .glass-effect {
+      backdrop-filter: blur(20px);
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .card-hover {
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card-hover:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    .floating-element {
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+
+    /* Stile per l'immagine del profilo nella testata */
+    .profile-pic {
+      width: 48px; /* Dimensione desiderata */
+      height: 48px; /* Dimensione desiderata */
+      border-radius: 50%; /* Rende l'immagine rotonda */
+      object-fit: cover; /* Assicura che l'immagine copra l'area senza distorsioni */
+      cursor: pointer; /* Indica che l'elemento è cliccabile */
+      transition: transform 0.3s ease;
+    }
+
+    .profile-pic:hover {
+      transform: scale(1.05);
+    }
+
+    /* Stili per il modale dei contatti */
+    .contact-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      backdrop-filter: blur(10px);
+    }
+
+    .contact-modal.show {
+      display: flex;
+    }
+
+    .contact-modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      max-width: 90%;
+      width: 400px;
+      position: relative;
+      text-align: center;
+    }
+
+    .contact-modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 1.8rem;
+      color: #333;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .contact-modal-close:hover {
+      color: #ef4444;
+    }
+
+    /* Stili per i video */
+    .video-container {
+      position: relative;
+      padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+      height: 0;
+      overflow: hidden;
+      max-width: 100%;
+      background: #000;
+      border-radius: 1rem;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .video-container video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain; /* Assicura che il video si adatti senza tagliare */
+    }
+
+    /* Stili per il form link */
+    .form-link-card {
+      /* Modificato per usare l'immagine di sfondo */
+      background-image: url('spiaggia3.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      color: white;
+      padding: 2.5rem;
+      border-radius: 1.5rem;
+      text-align: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      position: relative; /* Necessario per l'overlay */
+      overflow: hidden; /* Nasconde parti dell'immagine se troppo grandi */
+    }
+
+    .form-link-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.4); /* Overlay scuro per migliorare la leggibilità del testo */
+      z-index: 1;
+    }
+
+    .form-link-card > * {
+      position: relative;
+      z-index: 2; /* Assicura che il contenuto sia sopra l'overlay */
+    }
+
+    .form-link-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .form-link-card a {
+      display: inline-flex;
+      align-items: center;
+      background-color: rgba(255, 255, 255, 0.2);
+      padding: 0.75rem 2rem;
+      border-radius: 9999px; /* Fully rounded */
+      font-weight: 600;
+      color: white;
+      text-decoration: none;
+      transition: background-color 0.3s ease;
+    }
+
+    .form-link-card a:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+  <!-- Navigation Header -->
+  <header class="fixed top-0 w-full z-50 glass-effect">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-20">
+        <!-- Logo -->
+        <div class="flex items-center space-x-3">
+          <!-- Immagine di Gianna al posto dell'icona 'G' -->
+          <img id="gianna-profile-pic" src="gianna1.jpg" alt="Gianna" class="profile-pic">
+          <div>
+            <h1 class="heading-font text-xl font-semibold text-gray-900">Casa Gianna</h1>
+            <p class="text-sm text-gray-600" data-key="nav-location">Lido delle Nazioni</p>
+          </div>
+        </div>
+
+        <!-- Language Selector and Home Link -->
+        <div class="flex items-center space-x-4">
+          <!-- Link "Home" al posto di "Area Privata" -->
+          <a href="index.html" class="text-gray-700 hover:text-blue-600 transition duration-300 font-medium whitespace-nowrap" data-key="home-link">Home</a>
+          <select id="language-select" class="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <option value="it">🇮🇹 Italiano</option>
+            <option value="en">🇬🇧 English</option>
+            <option value="de">🇩🇪 Deutsch</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section for Private Area -->
+  <section class="hero-gradient pt-32 pb-20 relative overflow-hidden">
+    <div class="absolute inset-0 bg-black/20"></div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div class="floating-element">
+        <h1 class="heading-font text-5xl md:text-7xl font-bold text-white mb-6">
+          <span data-key="private-hero-title">Area Privata</span>
+        </h1>
+        <p class="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto" data-key="private-hero-subtitle">
+          Contenuti e istruzioni esclusive per i nostri ospiti
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content Section: Videos and Form -->
+  <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="heading-font text-4xl font-bold text-gray-900 mb-4" data-key="content-title">
+          Le Tue Risorse Esclusive
+        </h2>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto" data-key="content-subtitle">
+          Video utili e modulo di registrazione dati.
+        </p>
+      </div>
+
+      <!-- Google Form Link - Spostato in alto -->
+      <div class="form-link-card mb-16">
+        <h3 class="text-3xl font-bold mb-6" data-key="form-title">Forniscici i Tuoi Dati</h3>
+        <p class="text-lg mb-8 opacity-90" data-key="form-subtitle">
+          La legge italiana richiede l'acquisizione dei seguenti dati al fine di registrare correttamente l'ospite.
+        </p>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSe7dZJoPJNWTZBik08rSPj53-436-gq9tohqR1Wyx4ltDOn5Q/viewform" target="_blank">
+          <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+          </svg>
+          <span data-key="form-button">Apri il Modulo Google</span>
+        </a>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <!-- Contenitore per i video condizionali ITA/ENG -->
+        <div class="flex flex-col gap-12">
+          <!-- Video: Indicazioni ITA -->
+          <div id="video-ita-container" class="bg-gray-50 p-6 rounded-2xl shadow-lg">
+            <h3 class="text-2xl font-semibold text-gray-900 mb-4" data-key="video-ita-title">Come Raggiungerci</h3>
+            <div class="video-container">
+              <video controls preload="metadata">
+                <source src="indicazioni_ita.mp4" type="video/mp4">
+                Il tuo browser non supporta il tag video.
+              </video>
+            </div>
+          </div>
+
+          <!-- Video: Indicazioni ENG -->
+          <div id="video-eng-container" class="bg-gray-50 p-6 rounded-2xl shadow-lg hidden">
+            <h3 class="text-2xl font-semibold text-gray-900 mb-4" data-key="video-eng-title">Video: Instructions (English)</h3>
+            <div class="video-container">
+              <video controls preload="metadata">
+                <source src="indicazioni_eng.mp4" type="video/mp4">
+                Il tuo browser non supporta il tag video.
+              </video>
+            </div>
+          </div>
+        </div>
+
+        <!-- Video: Key Instructions - ora a fianco -->
+        <div class="bg-gray-50 p-6 rounded-2xl shadow-lg">
+          <h3 class="text-2xl font-semibold text-gray-900 mb-4" data-key="video-key-title">Utilizzo delle chiavi</h3>
+          <div class="video-container">
+            <video controls preload="metadata">
+              <source src="key_instructions.mp4" type="video/mp4">
+              Il tuo browser non supporta il tag video.
+            </video>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-white py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="mb-6 md:mb-0">
+          <h3 class="heading-font text-2xl font-bold mb-2">Casa Vacanze Gianna</h3>
+          <p class="text-gray-400" data-key="footer-location">Lido delle Nazioni, Comacchio (FE), Italia</p>
+        </div>
+        <div class="text-center md:text-right">
+          <p class="text-gray-400">&copy; <span id="current-year"></span> Casa Vacanze Gianna</p>
+          <p class="text-gray-400 mt-2" data-key="footer-rights">Tutti i diritti riservati</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Modale per i contatti di Gianna -->
+  <div class="contact-modal" id="contactModal">
+    <div class="contact-modal-content">
+      <button class="contact-modal-close" id="closeContactModalBtn">×</button>
+      <h3 class="heading-font text-2xl font-bold mb-4" data-key="contact-card-title">Contatti di Gianna</h3>
+      <div class="text-center mb-4">
+        <img id="contact-modal-img" src="gianna1.jpg" alt="Gianna" class="mx-auto rounded-full w-32 h-32 object-cover mb-4">
+        <p class="text-lg font-semibold" data-key="contact-person-name">Gianna Santececca</p>
+      </div>
+      <div class="text-left space-y-2">
+        <p><strong data-key="contact-person-phone">Telefono:</strong> <a id="contact-phone-link" href="#" class="text-blue-600 hover:underline"></a></p>
+        <p><strong data-key="contact-person-whatsapp">WhatsApp:</strong> <a id="contact-whatsapp-link" href="#" target="_blank" class="text-blue-600 hover:underline"></a></p>
+        <p><strong data-key="contact-person-email">Email:</strong> <a id="contact-email-link" href="#" class="text-blue-600 hover:underline"></a></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Dettagli di contatto di Gianna
+    const contactDetails = {
+        name: "Gianna Santececca",
+        phone: "+393388984269",
+        whatsapp: "+393388984269", 
+        email: "casamarenazioni@gmail.com"
+    };
+
+    // Funzionalità del modale dei contatti
+    const profilePic = document.getElementById('gianna-profile-pic');
+    const contactModal = document.getElementById('contactModal');
+    const closeContactModalBtn = document.getElementById('closeContactModalBtn');
+    const contactModalImg = document.getElementById('contact-modal-img');
+    const contactPhoneLink = document.getElementById('contact-phone-link');
+    const contactWhatsappLink = document.getElementById('contact-whatsapp-link');
+    const contactEmailLink = document.getElementById('contact-email-link');
+
+    // Riferimenti ai contenitori dei video
+    const videoItaContainer = document.getElementById('video-ita-container');
+    const videoEngContainer = document.getElementById('video-eng-container');
+
+    // Funzione per aprire il modale dei contatti
+    function openContactModal() {
+        contactModalImg.src = "gianna1.jpg"; 
+        // Aggiorna il testo del nome della persona di contatto in base alla lingua corrente
+        document.querySelector('#contactModal [data-key="contact-person-name"]').textContent = translations[document.documentElement.lang]["contact-person-name"];
+        
+        // Imposta i link per telefono, WhatsApp ed email
+        contactPhoneLink.href = `tel:${contactDetails.phone}`;
+        contactPhoneLink.textContent = contactDetails.phone;
+
+        // Per WhatsApp, il link wa.me di solito funziona meglio senza il '+'
+        contactWhatsappLink.href = `https://wa.me/${contactDetails.whatsapp.replace('+', '')}`; 
+        contactWhatsappLink.textContent = contactDetails.whatsapp; // Visualizza con il '+'
+
+        contactEmailLink.href = `mailto:${contactDetails.email}`;
+        contactEmailLink.textContent = contactDetails.email;
+
+        contactModal.classList.add('show');
+    }
+
+    // Funzione per chiudere il modale dei contatti
+    function closeContactModal() {
+        contactModal.classList.remove('show');
+    }
+
+    // Listener degli eventi per il modale dei contatti
+    if (profilePic) {
+        profilePic.addEventListener('click', openContactModal);
+    }
+    if (closeContactModalBtn) {
+        closeContactModalBtn.addEventListener('click', closeContactModal);
+    }
+
+    // Chiude il modale dei contatti con il tasto ESC
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && contactModal.classList.contains('show')) {
+        closeContactModal();
+      }
+    });
+
+    // Translations object
+    const translations = {
+      it: {
+        "nav-location": "Lido delle Nazioni",
+        "home-link": "Home",
+        "private-page-title": "Area Privata - Casa Vacanze Gianna",
+        "private-hero-title": "Area Privata",
+        "private-hero-subtitle": "Contenuti e istruzioni esclusive per i nostri ospiti",
+        "content-title": "Le Tue Risorse Esclusive",
+        "content-subtitle": "Video utili e modulo di registrazione dati.",
+        "video-ita-title": "Come Raggiungerci",
+        "video-eng-title": "Video: Instructions (English)",
+        "video-key-title": "Utilizzo delle chiavi", // Modificato
+        "form-title": "Forniscici i Tuoi Dati",
+        "form-subtitle": "La legge italiana richiede l'acquisizione dei seguenti dati al fine di registrare correttamente l'ospite.",
+        "form-button": "Apri il Modulo Google",
+        "footer-location": "Lido delle Nazioni, Comacchio (FE), Italia",
+        "footer-rights": "Tutti i diritti riservati",
+        "contact-card-title": "Contatti di Gianna",
+        "contact-person-name": "Gianna Santececca",
+        "contact-person-phone": "Telefono:",
+        "contact-person-whatsapp": "WhatsApp:",
+        "contact-person-email": "Email:"
+      },
+      en: {
+        "nav-location": "Lido delle Nazioni",
+        "home-link": "Home",
+        "private-page-title": "Private Area - Casa Vacanze Gianna",
+        "private-hero-title": "Private Area",
+        "private-hero-subtitle": "Exclusive content and instructions for our guests",
+        "content-title": "Your Exclusive Resources",
+        "content-subtitle": "Useful videos and data registration form.",
+        "video-ita-title": "How to Reach Us",
+        "video-eng-title": "Video: Instructions (English)",
+        "video-key-title": "Key Usage", // Modificato
+        "form-title": "Provide Your Data",
+        "form-subtitle": "Italian law requires the acquisition of the following data in order to correctly register the guest.",
+        "form-button": "Open Google Form",
+        "footer-location": "Lido delle Nazioni, Comacchio (FE), Italy",
+        "footer-rights": "All rights reserved",
+        "contact-card-title": "Gianna's Contacts",
+        "contact-person-name": "Gianna Santececca",
+        "contact-person-phone": "Phone:",
+        "contact-person-whatsapp": "WhatsApp:",
+        "contact-person-email": "Email:"
+      },
+      de: {
+        "nav-location": "Lido delle Nazioni",
+        "home-link": "Startseite",
+        "private-page-title": "Privater Bereich - Casa Vacanze Gianna",
+        "private-hero-title": "Privater Bereich",
+        "private-hero-subtitle": "Exklusive Inhalte und Anweisungen für unsere Gäste",
+        "content-title": "Ihre Exklusiven Ressourcen",
+        "content-subtitle": "Nützliche Videos und Datenregistrierungsformular.",
+        "video-ita-title": "Wie Sie uns erreichen",
+        "video-eng-title": "Video: Anweisungen (Englisch)",
+        "video-key-title": "Schlüsselnutzung", // Modificato
+        "form-title": "Geben Sie Ihre Daten an",
+        "form-subtitle": "Das italienische Gesetz erfordert die Erfassung der folgenden Daten, um den Gast korrekt zu registrieren.",
+        "form-button": "Google Formular öffnen",
+        "footer-location": "Lido delle Nazioni, Comacchio (FE), Italien",
+        "footer-rights": "Alle Rechte vorbehalten",
+        "contact-card-title": "Giannas Kontakte",
+        "contact-person-name": "Gianna Santececca",
+        "contact-person-phone": "Telefono:",
+        "contact-person-whatsapp": "WhatsApp:",
+        "contact-person-email": "E-Mail:"
+      }
+    };
+
+    // Function to set the language
+    function setLanguage(lang) {
+      document.querySelectorAll('[data-key]').forEach(element => {
+        const key = element.getAttribute('data-key');
+        if (translations[lang] && translations[lang][key]) {
+          element.textContent = translations[lang][key];
+        }
+      });
+      
+      // Update the lang attribute of the html tag
+      document.documentElement.lang = lang;
+
+      // Aggiorna anche il nome della persona di contatto nel modale quando la lingua cambia
+      if (contactModal.classList.contains('show')) { // Solo se il modale è aperto
+          document.querySelector('#contactModal [data-key="contact-person-name"]').textContent = translations[lang]["contact-person-name"];
+      }
+      // Aggiorna il titolo della pagina
+      document.title = translations[lang]["private-page-title"];
+
+      // Logica per la visualizzazione condizionale dei video
+      if (videoItaContainer && videoEngContainer) {
+        if (lang === 'it') {
+          videoItaContainer.classList.remove('hidden');
+          videoEngContainer.classList.add('hidden');
+        } else {
+          videoItaContainer.classList.add('hidden');
+          videoEngContainer.classList.remove('hidden');
+        }
+      }
+    }
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', () => {
+      const langSelect = document.getElementById('language-select');
+      
+      // Set initial language based on browser or default to Italian
+      const initialLang = localStorage.getItem('lang') || 'it';
+      langSelect.value = initialLang;
+      setLanguage(initialLang);
+
+      // Add event listener for language changes
+      langSelect.addEventListener('change', (event) => {
+        const selectedLang = event.target.value;
+        localStorage.setItem('lang', selectedLang); // Save preference
+        setLanguage(selectedLang);
+      });
+
+      // Set current year in footer
+      document.getElementById('current-year').textContent = new Date().getFullYear();
+    });
+  </script>
+</body>
+</html>
