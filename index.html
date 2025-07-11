@@ -244,8 +244,9 @@
           </div>
         </div>
 
-        <!-- Language Selector -->
+        <!-- Language Selector and Private Area Link -->
         <div class="flex items-center space-x-4">
+          <a href="#" id="private-area-link" class="text-gray-700 hover:text-blue-600 transition duration-300 font-medium whitespace-nowrap" data-key="private-area">Area Privata</a>
           <select id="language-select" class="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
             <option value="it">🇮🇹 Italiano</option>
             <option value="en">🇬🇧 English</option>
@@ -555,6 +556,7 @@
     const contactPhoneLink = document.getElementById('contact-phone-link');
     const contactWhatsappLink = document.getElementById('contact-whatsapp-link');
     const contactEmailLink = document.getElementById('contact-email-link');
+    const privateAreaLink = document.getElementById('private-area-link');
 
     // Funzione per aprire il modale dei contatti
     function openContactModal() {
@@ -595,6 +597,19 @@
         closeContactModal();
       }
     });
+
+    // Gestione del link "Area Privata"
+    if (privateAreaLink) {
+        privateAreaLink.addEventListener('click', (e) => {
+            e.preventDefault(); // Previene la navigazione diretta
+            const password = prompt(translations[document.documentElement.lang]["password-prompt"]);
+            if (password === "imagroup") {
+                window.location.href = "private.html";
+            } else {
+                alert(translations[document.documentElement.lang]["wrong-password"]);
+            }
+        });
+    }
 
     // Translations object
     const translations = {
@@ -652,7 +667,10 @@
         "contact-person-name": "Gianna Santececca",
         "contact-person-phone": "Telefono:",
         "contact-person-whatsapp": "WhatsApp:",
-        "contact-person-email": "Email:"
+        "contact-person-email": "Email:",
+        "private-area": "Area Privata",
+        "password-prompt": "Inserisci la password per accedere all'area privata:",
+        "wrong-password": "Password errata. Accesso negato."
       },
       en: {
         "nav-location": "Lido delle Nazioni",
@@ -708,7 +726,10 @@
         "contact-person-name": "Gianna Santececca",
         "contact-person-phone": "Phone:",
         "contact-person-whatsapp": "WhatsApp:",
-        "contact-person-email": "Email:"
+        "contact-person-email": "Email:",
+        "private-area": "Private Area",
+        "password-prompt": "Please enter the password to access the private area:",
+        "wrong-password": "Wrong password. Access denied."
       },
       de: {
         "nav-location": "Lido delle Nazioni",
@@ -751,20 +772,23 @@
         "contact-subtitle": "Contattaci per disponibilità e preventivi personalizzati",
         "contact-whatsapp": "WhatsApp",
         "contact-whatsapp-desc": "Sofortige risposta alle tue domande",
-        "contact-whatsapp-action": "Chatten Sie con uns",
+        "contact-whatsapp-action": "Chatten Sie con us",
         "contact-email": "E-Mail",
         "contact-email-desc": "Senden Sie Ihre detaillierte Anfrage",
         "contact-email-action": "E-Mail schreiben",
         "contact-location": "Standort",
         "contact-location-desc": "Standort auf Maps anzeigen",
         "contact-location-action": "Maps Öffnen",
-        "footer-location": "Lido delle Nazioni, Comacchio (FE), Italien",
-        "footer-rights": "Alle Rechte vorbehalten",
+        "footer-location": "Lido delle Nazioni, Comacchio (FE), Italia",
+        "footer-rights": "Tutti i diritti riservati",
         "contact-card-title": "Giannas Kontakte",
         "contact-person-name": "Gianna Santececca",
         "contact-person-phone": "Telefono:",
         "contact-person-whatsapp": "WhatsApp:",
-        "contact-person-email": "E-Mail:"
+        "contact-person-email": "E-Mail:",
+        "private-area": "Privater Bereich",
+        "password-prompt": "Bitte geben Sie das Passwort ein, um den privaten Bereich zu betreten:",
+        "wrong-password": "Falsches Passwort. Zugang verweigert."
       }
     };
 
@@ -808,8 +832,15 @@
       // Smooth scrolling for anchor links
       document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
+          const href = this.getAttribute('href');
+          // Ignora i link che hanno solo "#" come href per evitare errori di querySelector
+          if (href === "#" || href.trim() === "") {
+            e.preventDefault(); 
+            return; 
+          }
+
           e.preventDefault();
-          const target = document.querySelector(this.getAttribute('href'));
+          const target = document.querySelector(href);
           if (target) {
             target.scrollIntoView({
               behavior: 'smooth',
