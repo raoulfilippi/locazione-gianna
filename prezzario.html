@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tariffe 2026 - Casa Vacanze Gianna</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #1e40af;
+            --secondary-blue: #3b82f6;
+            --accent-gold: #f59e0b;
+            --warm-white: #fefcfb;
+            --soft-gray: #f8fafc;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: var(--text-dark);
+        }
+
+        .heading-font {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Header Glass Effect - come in index.html */
+        .glass-effect {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Profile Picture */
+        .profile-pic {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .profile-pic:hover {
+            transform: scale(1.05);
+        }
+
+        /* Hero Section con immagine di sfondo */
+        .hero-gradient {
+            background-image: url('spiaggia4.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        /* Card Hover Effect - come in index.html */
+        .card-hover {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Calendario */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+
+        .day-card {
+            transition: all 0.2s ease;
+            min-height: 58px;
+            cursor: pointer;
+            border: 1px solid #f1f5f9;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 5px;
+        }
+
+        .day-card.active:hover {
+            border-color: var(--accent-gold);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .day-card.selected {
+            background-color: var(--primary-blue) !important;
+            color: white !important;
+            border-color: var(--primary-blue);
+        }
+
+        .day-card.selected .price-tag, 
+        .day-card.selected .day-num {
+            color: white !important;
+        }
+
+        .day-card.in-range {
+            background-color: #dbeafe !important;
+        }
+
+        .day-card.disabled {
+            background-color: #f3f4f6;
+            opacity: 0.5;
+            cursor: not-allowed;
+            border: none;
+        }
+
+        .price-tag {
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: #059669;
+        }
+
+        /* Barra Preventivo Floating */
+        .floating-calc {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            width: calc(100% - 30px);
+            max-width: 600px;
+        }
+
+        .glass-panel {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+        }
+
+        .accent-bar {
+            height: 4px;
+            background: var(--accent-gold);
+        }
+
+        /* Pulse Glow Effect - come in index.html */
+        .pulse-glow {
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+            }
+            50% { 
+                transform: scale(1.05);
+                box-shadow: 0 0 30px rgba(245, 158, 11, 0.6);
+            }
+        }
+
+        /* Floating Element - come in index.html */
+        .floating-element {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Navigation Header - identico a index.html -->
+    <header class="fixed top-0 w-full z-50 glass-effect">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <img src="gianna1.jpg" alt="Gianna" class="profile-pic">
+                    <div>
+                        <h1 class="heading-font text-xl font-semibold text-gray-900">Casa Gianna</h1>
+                        <p class="text-sm text-gray-600" data-key="nav-location">Lido delle Nazioni</p>
+                    </div>
+                </div>
+
+                <!-- Language Selector and Back Link -->
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" id="nav-back" class="text-gray-700 hover:text-blue-600 transition duration-300 font-medium whitespace-nowrap" data-key="nav-back">Torna al Sito</a>
+                    <select id="language-select" class="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="it">🇮🇹 Italiano</option>
+                        <option value="en">🇬🇧 English</option>
+                        <option value="de">🇩🇪 Deutsch</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section - stile identico a index.html -->
+    <section class="hero-gradient pt-32 pb-20 relative overflow-hidden">
+        <div class="absolute inset-0 bg-black/20"></div>
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="floating-element">
+                <h1 class="heading-font text-5xl md:text-7xl font-bold text-white mb-6">
+                    <span data-key="hero-title">Listino Prezzi 2026</span>
+                </h1>
+                <p class="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto" data-key="hero-subtitle">
+                    Seleziona le date del tuo soggiorno per visualizzare il preventivo immediato
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Calendario Section -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="heading-font text-4xl font-bold text-gray-900 mb-4" data-key="calendar-title">
+                    Seleziona le Date
+                </h2>
+                <p class="text-xl text-gray-600" data-key="calendar-subtitle">
+                    Clicca sui giorni per scegliere check-in e check-out
+                </p>
+            </div>
+
+            <div id="calendar-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Calendari generati via JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer - identico a index.html -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <h3 class="heading-font text-2xl font-bold mb-2">Casa Vacanze Gianna</h3>
+                    <p class="text-gray-400" data-key="footer-location">Lido delle Nazioni, Comacchio (FE), Italia</p>
+                </div>
+                <div class="text-center md:text-right">
+                    <p class="text-gray-400">&copy; <span id="current-year"></span> Casa Vacanze Gianna</p>
+                    <p class="text-gray-400 mt-2" data-key="footer-rights">Tutti i diritti riservati</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Barra Preventivo Floating -->
+    <div id="calc-bar" class="floating-calc hidden">
+        <div class="glass-panel">
+            <div class="accent-bar"></div>
+            <div class="p-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="bg-blue-50 p-2.5 rounded-full text-blue-800">
+                        <i class="fa-solid fa-calendar-check"></i>
+                    </div>
+                    <div>
+                        <p id="label-selected-period" class="text-[10px] uppercase font-bold text-slate-400 tracking-wider" data-key="label-period">Periodo Selezionato</p>
+                        <p class="text-base font-bold text-blue-900" id="selected-dates">--</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-6 w-full sm:w-auto border-t sm:border-t-0 pt-3 sm:pt-0">
+                    <div class="text-right flex-grow">
+                        <p class="text-[10px] uppercase font-bold text-slate-400" id="label-nights">0 giorni</p>
+                        <p class="text-2xl font-black text-amber-600" id="total-price">€ 0</p>
+                    </div>
+                    <button onclick="resetSelection()" class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SEASON_START = '2026-05-01';
+        const SEASON_END = '2026-10-04';
+
+        let checkIn = null;
+        let checkOut = null;
+        let currentLang = 'it';
+
+        const translations = {
+            it: {
+                "nav-location": "Lido delle Nazioni",
+                "nav-back": "Torna al Sito",
+                "hero-title": "Listino Prezzi 2026",
+                "hero-subtitle": "Seleziona le date del tuo soggiorno per visualizzare il preventivo immediato",
+                "hero-badge": "Stagione 2026",
+                "calendar-title": "Seleziona le Date",
+                "calendar-subtitle": "Clicca sui giorni per scegliere check-in e check-out",
+                "label-period": "Periodo Selezionato",
+                "select-end": "Scegli fine",
+                "day": "giorno",
+                "days": "giorni",
+                "closed": "Chiuso",
+                "footer-location": "Lido delle Nazioni, Comacchio (FE), Italia",
+                "footer-rights": "Tutti i diritti riservati",
+                "months": ["Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre"],
+                "weekdays": ["Lu", "Ma", "Me", "Gi", "Ve", "Sa", "Do"]
+            },
+            en: {
+                "nav-location": "Lido delle Nazioni",
+                "nav-back": "Back to Site",
+                "hero-title": "Price List 2026",
+                "hero-subtitle": "Select your stay dates to view an instant quote",
+                "hero-badge": "2026 Season",
+                "calendar-title": "Select Dates",
+                "calendar-subtitle": "Click on days to choose check-in and check-out",
+                "label-period": "Selected Period",
+                "select-end": "Choose end date",
+                "day": "day",
+                "days": "days",
+                "closed": "Closed",
+                "footer-location": "Lido delle Nazioni, Comacchio (FE), Italy",
+                "footer-rights": "All rights reserved",
+                "months": ["May", "June", "July", "August", "September", "October"],
+                "weekdays": ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
+            },
+            de: {
+                "nav-location": "Lido delle Nazioni",
+                "nav-back": "Zurück zur Seite",
+                "hero-title": "Preisliste 2026",
+                "hero-subtitle": "Wählen Sie Ihre Reisedaten aus, um ein sofortiges Angebot zu erhalten",
+                "hero-badge": "Saison 2026",
+                "calendar-title": "Daten Auswählen",
+                "calendar-subtitle": "Klicken Sie auf die Tage, um Check-in und Check-out zu wählen",
+                "label-period": "Ausgewählter Zeitraum",
+                "select-end": "Enddatum wählen",
+                "day": "Tag",
+                "days": "Tage",
+                "closed": "Geschlossen",
+                "footer-location": "Lido delle Nazioni, Comacchio (FE), Italien",
+                "footer-rights": "Alle Rechte vorbehalten",
+                "months": ["Mai", "Juni", "Juli", "August", "September", "Oktober"],
+                "weekdays": ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
+            }
+        };
+
+        const dailyRates = { '05': 98, '06': 150, '07': 200, '08': 200, '09': 120, '10': 90 };
+        const exceptions = {
+            '2026-05-01': 200, '2026-05-02': 240, '2026-05-03': 130, 
+            '2026-05-08': 130, '2026-05-09': 240, '2026-05-10': 130, 
+            '2026-05-15': 130, '2026-05-16': 240, '2026-05-17': 130,
+            '2026-05-22': 130, '2026-05-23': 240, '2026-05-24': 130,
+            '2026-05-29': 130, '2026-05-30': 240, '2026-05-31': 130,
+            '2026-06-06': 240, '2026-06-13': 240, '2026-06-20': 240, '2026-06-27': 240,
+            '2026-07-04': 350, '2026-07-05': 500, '2026-07-11': 350, '2026-07-12': 500,
+            '2026-07-18': 350, '2026-07-19': 500, '2026-07-25': 350, '2026-07-26': 500,
+            '2026-08-01': 350, '2026-08-02': 500, '2026-08-08': 350, '2026-08-09': 500,
+            '2026-08-15': 350, '2026-08-16': 500, '2026-08-22': 350, '2026-08-23': 500,
+            '2026-08-29': 350, '2026-08-30': 500,
+            '2026-09-05': 240, '2026-09-12': 240, '2026-09-19': 240, '2026-09-26': 240,
+            '2026-10-01': 110, '2026-10-02': 110, '2026-10-03': 110, '2026-10-04': 110
+        };
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.querySelectorAll('[data-key]').forEach(element => {
+                const key = element.getAttribute('data-key');
+                if (translations[lang] && translations[lang][key]) {
+                    element.textContent = translations[lang][key];
+                }
+            });
+            document.documentElement.lang = lang;
+            renderAllCalendars();
+            updateUI();
+        }
+
+        function getPriceForDate(dateStr) {
+            if (dateStr > SEASON_END || dateStr < SEASON_START) return null;
+            if (exceptions[dateStr]) return exceptions[dateStr];
+            const month = dateStr.split('-')[1];
+            return dailyRates[month] || 0;
+        }
+
+        function handleDateClick(dateStr) {
+            if (dateStr > SEASON_END || dateStr < SEASON_START) return;
+            if (!checkIn || (checkIn && checkOut)) {
+                checkIn = dateStr;
+                checkOut = null;
+            } else {
+                if (dateStr <= checkIn) { 
+                    checkIn = dateStr; 
+                } else { 
+                    checkOut = dateStr; 
+                }
+            }
+            updateUI();
+        }
+
+        function resetSelection() {
+            checkIn = null; 
+            checkOut = null;
+            updateUI();
+        }
+
+        function updateUI() {
+            const t = translations[currentLang];
+            document.querySelectorAll('.day-card').forEach(card => {
+                const date = card.dataset.date;
+                card.classList.remove('selected', 'in-range');
+                if (date === checkIn || date === checkOut) {
+                    card.classList.add('selected');
+                } else if (checkIn && checkOut && date > checkIn && date < checkOut) {
+                    card.classList.add('in-range');
+                }
+            });
+
+            const bar = document.getElementById('calc-bar');
+            if (checkIn) {
+                bar.classList.remove('hidden');
+                const d1 = new Date(checkIn).toLocaleDateString(
+                    currentLang === 'it' ? 'it-IT' : (currentLang === 'en' ? 'en-GB' : 'de-DE'), 
+                    {day:'numeric', month:'short'}
+                );
+                if (checkOut) {
+                    const d2 = new Date(checkOut).toLocaleDateString(
+                        currentLang === 'it' ? 'it-IT' : (currentLang === 'en' ? 'en-GB' : 'de-DE'), 
+                        {day:'numeric', month:'short'}
+                    );
+                    document.getElementById('selected-dates').textContent = `${d1} — ${d2}`;
+                    calculateTotal();
+                } else {
+                    document.getElementById('selected-dates').textContent = `${d1} — ${t["select-end"]}`;
+                    document.getElementById('total-price').textContent = `€ --`;
+                    document.getElementById('label-nights').textContent = `${t["select-end"]}`;
+                }
+            } else { 
+                bar.classList.add('hidden'); 
+            }
+        }
+
+        function calculateTotal() {
+            const t = translations[currentLang];
+            let total = 0; 
+            let daysCount = 0;
+            let current = new Date(checkIn);
+            const end = new Date(checkOut);
+            while (current <= end) {
+                const dateStr = current.toISOString().split('T')[0];
+                const price = getPriceForDate(dateStr);
+                if (price) total += price;
+                daysCount++;
+                current.setDate(current.getDate() + 1);
+            }
+            document.getElementById('total-price').textContent = `€ ${total}`;
+            document.getElementById('label-nights').textContent = `${daysCount} ${daysCount === 1 ? t.day : t.days}`;
+        }
+
+        function renderMonth(year, month, monthName) {
+            const container = document.getElementById('calendar-container');
+            const t = translations[currentLang];
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const adjustedStart = firstDay === 0 ? 6 : firstDay - 1;
+
+            let html = `
+                <div class="card-hover bg-white p-6 rounded-2xl border border-slate-200 shadow-lg">
+                    <h3 class="heading-font text-2xl font-bold mb-6 text-gray-900 flex justify-between items-center border-b pb-3">
+                        ${monthName} 
+                        <span class="text-slate-400 font-light text-base">${year}</span>
+                    </h3>
+                    <div class="calendar-grid">
+                        ${t.weekdays.map(d => `<div class="text-center text-xs font-bold text-slate-400 uppercase pb-2">${d}</div>`).join('')}
+                        ${Array(adjustedStart).fill('<div></div>').join('')}
+            `;
+
+            for(let d = 1; d <= daysInMonth; d++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                const price = getPriceForDate(dateStr);
+                const isClosed = dateStr > SEASON_END || dateStr < SEASON_START;
+
+                html += `
+                    <div class="day-card ${isClosed ? 'disabled' : 'active'}" 
+                         data-date="${dateStr}" 
+                         onclick="handleDateClick('${dateStr}')">
+                        <span class="day-num text-xs font-bold text-slate-500 leading-none">${d}</span>
+                        <div class="text-center">
+                            ${isClosed ? `<span class="text-[9px] text-slate-300">${t.closed}</span>` : (price ? `<span class="price-tag">€${price}</span>` : '')}
+                        </div>
+                    </div>
+                `;
+            }
+            html += `</div></div>`;
+            container.innerHTML += html;
+        }
+
+        function renderAllCalendars() {
+            const container = document.getElementById('calendar-container');
+            container.innerHTML = "";
+            const t = translations[currentLang];
+            const mesi = [
+                { id: 4, nome: t.months[0] }, 
+                { id: 5, nome: t.months[1] }, 
+                { id: 6, nome: t.months[2] },
+                { id: 7, nome: t.months[3] }, 
+                { id: 8, nome: t.months[4] }, 
+                { id: 9, nome: t.months[5] }
+            ];
+            mesi.forEach(m => renderMonth(2026, m.id, m.nome));
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            const langSelect = document.getElementById('language-select');
+            
+            // Set initial language
+            const initialLang = localStorage.getItem('lang') || 'it';
+            langSelect.value = initialLang;
+            setLanguage(initialLang);
+
+            // Language change listener
+            langSelect.addEventListener('change', (event) => {
+                const selectedLang = event.target.value;
+                localStorage.setItem('lang', selectedLang);
+                setLanguage(selectedLang);
+            });
+
+            // Set current year in footer
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    const href = this.getAttribute('href');
+                    if (href === "#" || href.trim() === "") {
+                        e.preventDefault(); 
+                        return; 
+                    }
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
