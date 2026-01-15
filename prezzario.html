@@ -734,6 +734,9 @@ function renderUserBookings(userBookings){
 
 // Login / Registrazione / Logout
 document.addEventListener('DOMContentLoaded',()=>{
+    // ✅ eredita la lingua da index.html
+    const currentLang = localStorage.getItem('selectedLanguage') || 'it';
+    setLanguage(currentLang);
     const showRegister=document.getElementById('show-register');
     const showLogin=document.getElementById('show-login');
     const registerForm=document.getElementById('register-form');
@@ -898,3 +901,4 @@ renderAllCalendars();
 
 </body>
 </html>
+
