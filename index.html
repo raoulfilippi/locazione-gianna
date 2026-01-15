@@ -247,6 +247,17 @@
         <!-- Language Selector and Private Area Link -->
         <div class="flex items-center space-x-4">
           <a href="#" id="private-area-link" class="text-gray-700 hover:text-blue-600 transition duration-300 font-medium whitespace-nowrap" data-key="private-area">Area Privata</a>
+
+
+
+<a href="prezzario.html" class="text-gray-700 hover:text-blue-600 transition duration-300 font-medium whitespace-nowrap" data-key="prices">
+  Prezzi <span id="current-year-link"></span>
+</a>
+
+
+
+
+
           <select id="language-select" class="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
             <option value="it">🇮🇹 Italiano</option>
             <option value="en">🇬🇧 English</option>
@@ -614,7 +625,7 @@
     // Translations object
     const translations = {
       it: {
-        "nav-location": "Lido delle Nazioni",
+	"nav-location": "Lido delle Nazioni",
         "hero-title": "Casa Vacanze Gianna",
         "hero-subtitle": "Villa elegante a 200 metri dal mare, nel cuore del Lido delle Nazioni",
         "hero-book": "Prenota Ora",
@@ -670,9 +681,11 @@
         "contact-person-email": "Email:",
         "private-area": "Area Privata",
         "password-prompt": "Inserisci la password per accedere all'area privata:",
-        "wrong-password": "Password errata. Accesso negato."
+        "wrong-password": "Password errata. Accesso negato.",
+"prices": "Prezzi"
       },
       en: {
+
         "nav-location": "Lido delle Nazioni",
         "hero-title": "Casa Vacanze Gianna",
         "hero-subtitle": "Elegant villa 200 meters from the sea, in the heart of Lido delle Nazioni",
@@ -729,10 +742,12 @@
         "contact-person-email": "Email:",
         "private-area": "Private Area",
         "password-prompt": "Please enter the password to access the private area:",
-        "wrong-password": "Wrong password. Access denied."
+        "wrong-password": "Wrong password. Access denied.",
+"prices": "Prices"
       },
       de: {
-        "nav-location": "Lido delle Nazioni",
+
+	"nav-location": "Lido delle Nazioni",
         "hero-title": "Casa Vacanze Gianna",
         "hero-subtitle": "Stilvolle Villa 200 Meter vom Meer entfernt, im Herzen von Lido delle Nazioni",
         "hero-book": "Jetzt Buchen",
@@ -788,7 +803,8 @@
         "contact-person-email": "E-Mail:",
         "private-area": "Privater Bereich",
         "password-prompt": "Bitte geben Sie das Passwort ein, um den privaten Bereich zu betreten:",
-        "wrong-password": "Falsches Passwort. Zugang verweigert."
+        "wrong-password": "Falsches Passwort. Zugang verweigert.",
+"prices": "Preise"
       }
     };
 
@@ -828,6 +844,11 @@
 
       // Set current year in footer
       document.getElementById('current-year').textContent = new Date().getFullYear();
+
+
+      // Set current year in 
+document.getElementById('current-year-link').textContent = new Date().getFullYear();
+
 
       // Smooth scrolling for anchor links
       document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -944,6 +965,8 @@
         }
       });
     });
+
+
   </script>
 </body>
 </html>
