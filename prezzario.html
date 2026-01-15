@@ -284,6 +284,18 @@
         let checkOut = null;
         let currentLang = 'it';
 
+
+
+// Regole nuove
+const MIN_STAY_DAYS = 5;                 // minimo giorni inclusivo del giorno di check-in
+const ALLOWED_START_DAYS = [0, 1];       // 0 = Domenica, 1 = Lunedì
+
+function isValidStart(dateStr) {
+    const d = new Date(dateStr);
+    return ALLOWED_START_DAYS.includes(d.getDay());
+}
+
+
         const translations = {
             it: {
                 "nav-location": "Lido delle Nazioni",
@@ -378,26 +390,45 @@
             return dailyRates[month] || 0;
         }
 
-        function handleDateClick(dateStr) {
-            if (dateStr > SEASON_END || dateStr < SEASON_START) return;
-            if (!checkIn || (checkIn && checkOut)) {
-                checkIn = dateStr;
-                checkOut = null;
-            } else {
-                if (dateStr <= checkIn) { 
-                    checkIn = dateStr; 
-                } else { 
-                    checkOut = dateStr; 
-                }
-            }
-            updateUI();
+function handleDateClick(dateStr) {
+    if (dateStr > SEASON_END || dateStr < SEASON_START) return;
+
+    // Se sto scegliendo il check-in
+    if (!checkIn || (checkIn && checkOut)) {
+
+        // REGOLA 1: check-in solo Domenica o Lunedì
+        if (!isValidStart(dateStr)) {
+            alert('Il check-in è consentito solo di Domenica o Lunedì');
+            return;
         }
 
-        function resetSelection() {
-            checkIn = null; 
-            checkOut = null;
-            updateUI();
-        }
+        checkIn = dateStr;
+        checkOut = null;
+        updateUI();
+        return;
+    }
+
+    // Se sto scegliendo il check-out
+    if (dateStr <= checkIn) {
+        checkIn = dateStr;
+        checkOut = null;
+        updateUI();
+        return;
+    }
+
+    // REGOLA 2: minimo 5 giorni inclusivo
+    const msPerDay = 24 * 60 * 60 * 1000;
+    const diffDays =
+        Math.floor((new Date(dateStr) - new Date(checkIn)) / msPerDay) + 1;
+
+    if (diffDays < MIN_STAY_DAYS) {
+        alert(`Soggiorno minimo ${MIN_STAY_DAYS} giorni (incluso il check-in)`);
+        return;
+    }
+
+    checkOut = dateStr;
+    updateUI();
+}
 
         function updateUI() {
             const t = translations[currentLang];
