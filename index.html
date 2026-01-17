@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Casa Vacanze Gianna - Lido delle Nazioni</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Aggiunto FontAwesome per l'icona hamburger del menu mobile -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -210,12 +212,22 @@
     .feature-image-container:hover {
       transform: scale(1.02);
     }
+
+    /* Styles aggiunti per il menu mobile responsive (uguali a prezzario.html) */
+    #mobile-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 55; }
+    #mobile-overlay.show { display: block; }
+    #mobile-menu { display: none; position: fixed; top: 80px; left: 0; width: 100%; background: #fff; border-top: 1px solid #e5e7eb; box-shadow: 0 6px 20px rgba(0,0,0,0.12); z-index: 56; max-height: calc(100vh - 80px); overflow:auto; }
+    #mobile-menu.show { display: block; }
+    #menu-btn { position: relative; z-index: 60; }
   </style>
 </head>
 <body class="min-h-screen">
+  
+  <!-- Header Responsive Uniformato -->
   <header class="fixed top-0 w-full z-50 glass-effect">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-20">
+        <!-- Logo e info -->
         <div class="flex items-center space-x-3">
           <img id="gianna-profile-pic" src="gianna1.jpg" alt="Gianna" class="profile-pic">
           <div>
@@ -224,18 +236,57 @@
           </div>
         </div>
 
-        <div class="flex items-center space-x-4">
-          <a href="#" id="private-area-link" class="text-gray-700 hover:text-blue-600 transition duration-300 font-medium whitespace-nowrap" data-key="private-area">Area Privata</a>
+        <!-- Desktop links -->
+        <div class="hidden md:flex items-center space-x-4">
+          <a href="index.html" class="text-gray-700 hover:text-blue-600 font-medium" data-key="nav-back">Home</a>
+          <a href="#" id="auth-link" class="text-gray-700 hover:text-blue-600 font-medium" data-key="auth-login">Accedi</a>
+          <!-- Link Indicazioni e Admin nascosti di default, visibili via JS se necessario -->
+          <a href="private.html" id="nav-directions" class="hidden text-blue-600 hover:text-blue-800 font-bold flex items-center gap-1" data-key="nav-directions">
+            <i class="fa-solid fa-location-dot"></i> <span>Indicazioni</span>
+          </a>
           <a href="#" id="logout-link" class="hidden text-gray-700 hover:text-red-600 font-medium" data-key="nav-logout">Esci</a>
+          <a href="admin.html" id="admin-link" class="hidden text-gray-700 hover:text-purple-600 font-medium flex items-center gap-2">
+            Admin <span id="admin-badge" class="hidden bg-purple-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">ADMIN</span>
+          </a>
           <select id="language-select" class="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700">
             <option value="it">🇮🇹 Italiano</option>
             <option value="en">🇬🇧 English</option>
             <option value="de">🇩🇪 Deutsch</option>
           </select>
         </div>
+
+        <!-- Hamburger mobile -->
+        <div class="md:hidden flex items-center">
+          <button id="menu-btn" class="text-gray-700 hover:text-blue-600 focus:outline-none" aria-label="Apri menu">
+            <i class="fa-solid fa-bars fa-lg"></i>
+          </button>
+        </div>
       </div>
     </div>
   </header>
+
+  <!-- Overlay per menu mobile -->
+  <div id="mobile-overlay" aria-hidden="true"></div>
+
+  <!-- Menu Mobile -->
+  <nav id="mobile-menu" class="md:hidden" aria-hidden="true">
+    <div class="flex flex-col p-4 space-y-2">
+      <a href="index.html" class="text-gray-700 hover:text-blue-600 font-medium" data-key="nav-back">Home</a>
+      <a href="#" id="mobile-auth-link" class="text-gray-700 hover:text-blue-600 font-medium" data-key="auth-login">Accedi</a>
+      <a href="private.html" id="mobile-nav-directions" class="hidden text-blue-600 hover:text-blue-800 font-bold flex items-center gap-1">
+        <i class="fa-solid fa-location-dot"></i> <span data-key="nav-directions">Indicazioni</span>
+      </a>
+      <a href="#" id="mobile-logout-link" class="hidden text-gray-700 hover:text-red-600 font-medium" data-key="nav-logout">Esci</a>
+      <a href="admin.html" id="mobile-admin-link" class="hidden text-gray-700 hover:text-purple-600 font-medium flex items-center gap-2">
+        Admin <span id="mobile-admin-badge" class="hidden bg-purple-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">ADMIN</span>
+      </a>
+      <select id="mobile-language-select" class="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700">
+        <option value="it">🇮🇹 Italiano</option>
+        <option value="en">🇬🇧 English</option>
+        <option value="de">🇩🇪 Deutsch</option>
+      </select>
+    </div>
+  </nav>
 
   <section class="hero-gradient pt-32 pb-20 relative overflow-hidden">
     <div class="absolute inset-0 bg-black/20"></div>
@@ -532,7 +583,7 @@
 
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-    import { getFirestore, collection, addDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    import { getFirestore, collection, addDoc, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
     const firebaseConfig = {
@@ -559,6 +610,10 @@
     const translations = {
       it: {
         "nav-location": "Lido delle Nazioni",
+        "nav-back": "Home",
+        "auth-login": "Accedi",
+        "nav-logout": "Esci",
+        "nav-directions": "Indicazioni",
         "hero-title": "Casa Vacanze Gianna",
         "hero-subtitle": "Villa elegante a 200 metri dal mare, nel cuore del Lido delle Nazioni",
         "hero-book": "Prenota Ora",
@@ -612,9 +667,6 @@
         "contact-person-phone": "Telefono:",
         "contact-person-whatsapp": "WhatsApp:",
         "contact-person-email": "Email:",
-        "private-area": "Accedi",
-        "prices": "Prezzi",
-        "nav-logout": "Esci",
         "login-title": "Area Privata",
         "btn-login": "Accedi",
         "login-no-account": "Non hai un account?",
@@ -626,6 +678,10 @@
       },
       en: {
         "nav-location": "Lido delle Nazioni",
+        "nav-back": "Home",
+        "auth-login": "Login",
+        "nav-logout": "Logout",
+        "nav-directions": "Directions",
         "hero-title": "Casa Vacanze Gianna",
         "hero-subtitle": "Elegant villa 200 meters from the sea, in the heart of Lido delle Nazioni",
         "hero-book": "Book Now",
@@ -679,9 +735,6 @@
         "contact-person-phone": "Phone:",
         "contact-person-whatsapp": "WhatsApp:",
         "contact-person-email": "Email:",
-        "private-area": "Sign In",
-        "prices": "Prices",
-        "nav-logout": "Logout",
         "login-title": "Private Area",
         "btn-login": "Login",
         "login-no-account": "Don't have an account?",
@@ -693,6 +746,10 @@
       },
       de: {
         "nav-location": "Lido delle Nazioni",
+        "nav-back": "Home",
+        "auth-login": "Einloggen",
+        "nav-logout": "Abmelden",
+        "nav-directions": "Wegbeschreibung",
         "hero-title": "Casa Vacanze Gianna",
         "hero-subtitle": "Stilvolle Villa 200 Meter vom Meer entfernt, im Herzen von Lido delle Nazioni",
         "hero-book": "Jetzt Buchen",
@@ -746,9 +803,6 @@
         "contact-person-phone": "Telefon:",
         "contact-person-whatsapp": "WhatsApp:",
         "contact-person-email": "E-Mail:",
-        "private-area": "Anmelden",
-        "prices": "Preise",
-        "nav-logout": "Abmelden",
         "login-title": "Privater Bereich",
         "btn-login": "Einloggen",
         "login-no-account": "Noch kein Konto?",
@@ -774,6 +828,25 @@
       });
       document.documentElement.lang = lang;
       
+      // Update anche per le select del linguaggio
+      const s1 = document.getElementById('language-select');
+      const s2 = document.getElementById('mobile-language-select');
+      if(s1) s1.value = lang;
+      if(s2) s2.value = lang;
+
+      // Update auth text logic inside setLanguage
+      const user = auth.currentUser;
+      const authLink = document.getElementById('auth-link');
+      const mobileAuthLink = document.getElementById('mobile-auth-link');
+      if (!user) {
+         if(authLink) authLink.textContent = translations[lang]["auth-login"];
+         if(mobileAuthLink) mobileAuthLink.textContent = translations[lang]["auth-login"];
+      } else {
+         const firstName = user.displayName ? user.displayName.split(' ')[0] : user.email;
+         if(authLink) authLink.textContent = firstName;
+         if(mobileAuthLink) mobileAuthLink.textContent = firstName;
+      }
+
       if (contactModal.classList.contains('show')) {
         document.querySelector('#contactModal [data-key="contact-person-name"]').textContent = translations[lang]["contact-person-name"];
       }
@@ -786,8 +859,12 @@
     const contactPhoneLink = document.getElementById('contact-phone-link');
     const contactWhatsappLink = document.getElementById('contact-whatsapp-link');
     const contactEmailLink = document.getElementById('contact-email-link');
-    const privateAreaLink = document.getElementById('private-area-link');
+    
+    // Nuovi riferimenti header
+    const authLink = document.getElementById('auth-link');
+    const mobileAuthLink = document.getElementById('mobile-auth-link');
     const logoutLink = document.getElementById('logout-link');
+    const mobileLogoutLink = document.getElementById('mobile-logout-link');
     
     const authModal = document.getElementById('authModal');
     const closeAuthModalBtn = document.getElementById('closeAuthModalBtn');
@@ -797,6 +874,36 @@
     const showLogin = document.getElementById('show-login');
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
+
+    // Menu mobile logic
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mobileOverlay = document.getElementById('mobile-overlay');
+
+    function openMobileMenu(){
+      mobileMenu.classList.add('show');
+      mobileOverlay.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeMobileMenu(){
+      mobileMenu.classList.remove('show');
+      mobileOverlay.classList.remove('show');
+      document.body.style.overflow = 'auto';
+    }
+    function closeMobileMenuIfOpen(){ if(mobileMenu.classList.contains('show')) closeMobileMenu(); }
+
+    if(menuBtn){
+      menuBtn.addEventListener('click', ()=> {
+        if(mobileMenu.classList.contains('show')) closeMobileMenu(); else openMobileMenu();
+      });
+    }
+    if(mobileOverlay){
+      mobileOverlay.addEventListener('click', ()=> closeMobileMenu());
+    }
+    mobileMenu.querySelectorAll('a').forEach(el => {
+      el.addEventListener('click', ()=> setTimeout(()=> closeMobileMenu(), 60));
+    });
+
 
     function openContactModal() {
       const lang = document.documentElement.lang;
@@ -820,6 +927,7 @@
     }
 
     function openAuthModal() {
+      closeMobileMenuIfOpen();
       authModal.classList.add('show');
       loginBox.classList.remove('hidden');
       registerBox.classList.add('hidden');
@@ -843,17 +951,21 @@
       closeAuthModalBtn.addEventListener('click', closeAuthModal);
     }
 
-    if (privateAreaLink) {
-      privateAreaLink.addEventListener('click', (e) => {
+    // Gestione click Login
+    const handleAuthClick = (e) => {
         e.preventDefault();
         const user = auth.currentUser;
         if (user) {
-          window.location.href = "prezzario.html";
+          // Se già loggato, non fare nulla o redirect (in prezzario non fa nulla, mostra solo il nome)
+          // Qui potremmo mandare a prezzario.html se clicca sul nome? 
+          // Per ora lascio comportamento standard: apre modal se non loggato.
         } else {
           openAuthModal();
         }
-      });
-    }
+    };
+
+    if (authLink) authLink.addEventListener('click', handleAuthClick);
+    if (mobileAuthLink) mobileAuthLink.addEventListener('click', handleAuthClick);
 
     if (showRegister) {
       showRegister.addEventListener('click', (e) => {
@@ -916,26 +1028,77 @@
       });
     }
 
-    if (logoutLink) {
-      logoutLink.addEventListener('click', async (e) => {
-        e.preventDefault();
-        try {
-          await signOut(auth);
-        } catch (err) {
-          alert("Errore durante il logout: " + err.message);
-        }
-      });
-    }
+    const handleLogout = async (e) => {
+      e.preventDefault();
+      try {
+        await signOut(auth);
+        closeMobileMenuIfOpen();
+      } catch (err) {
+        alert("Errore durante il logout: " + err.message);
+      }
+    };
 
-    onAuthStateChanged(auth, (user) => {
+    if (logoutLink) logoutLink.addEventListener('click', handleLogout);
+    if (mobileLogoutLink) mobileLogoutLink.addEventListener('click', handleLogout);
+
+    onAuthStateChanged(auth, async (user) => {
+      const adminLink = document.getElementById('admin-link');
+      const adminBadge = document.getElementById('admin-badge');
+      const mobileAdminLink = document.getElementById('mobile-admin-link');
+      const mobileAdminBadge = document.getElementById('mobile-admin-badge');
+      const navDirections = document.getElementById('nav-directions');
+      const mobileNavDirections = document.getElementById('mobile-nav-directions');
+
       if (user) {
         const firstName = user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0];
-        privateAreaLink.textContent = firstName;
-        logoutLink.classList.remove('hidden');
+        if(authLink) authLink.textContent = firstName;
+        if(mobileAuthLink) mobileAuthLink.textContent = firstName;
+        
+        if(logoutLink) logoutLink.classList.remove('hidden');
+        if(mobileLogoutLink) mobileLogoutLink.classList.remove('hidden');
+
+        // Check Admin
+        try {
+          const utentiRef = collection(db, "utenti");
+          const q = query(utentiRef, where("userId", "==", user.uid));
+          const snap = await getDocs(q);
+          const isAdmin = !snap.empty && snap.docs[0].data().role === "admin";
+
+          if (isAdmin) {
+            if (adminLink) adminLink.classList.remove('hidden');
+            if (adminBadge) adminBadge.classList.remove('hidden');
+            if (mobileAdminLink) mobileAdminLink.classList.remove('hidden');
+            if (mobileAdminBadge) mobileAdminBadge.classList.remove('hidden');
+          } else {
+            if (adminLink) adminLink.classList.add('hidden');
+            if (adminBadge) adminBadge.classList.add('hidden');
+            if (mobileAdminLink) mobileAdminLink.classList.add('hidden');
+            if (mobileAdminBadge) mobileAdminBadge.classList.add('hidden');
+          }
+        } catch (e) {
+          console.warn(e);
+        }
+
+        // Check prenotazioni per mostrare "Indicazioni" (simulato, o basato su logica esistente se presente)
+        // Qui rendiamo visibile il link indicazioni se l'utente è loggato, per semplicità
+        if(navDirections) navDirections.classList.remove('hidden');
+        if(mobileNavDirections) mobileNavDirections.classList.remove('hidden');
+
       } else {
-        const lang = document.documentElement.lang;
-        privateAreaLink.textContent = translations[lang]["private-area"];
-        logoutLink.classList.add('hidden');
+        const lang = document.documentElement.lang || 'it';
+        if(authLink) authLink.textContent = translations[lang]["auth-login"];
+        if(mobileAuthLink) mobileAuthLink.textContent = translations[lang]["auth-login"];
+        
+        if(logoutLink) logoutLink.classList.add('hidden');
+        if(mobileLogoutLink) mobileLogoutLink.classList.add('hidden');
+        
+        if (adminLink) adminLink.classList.add('hidden');
+        if (adminBadge) adminBadge.classList.add('hidden');
+        if (mobileAdminLink) mobileAdminLink.classList.add('hidden');
+        if (mobileAdminBadge) mobileAdminBadge.classList.add('hidden');
+        
+        if(navDirections) navDirections.classList.add('hidden');
+        if(mobileNavDirections) mobileNavDirections.classList.add('hidden');
       }
     });
 
@@ -956,10 +1119,17 @@
     document.addEventListener('DOMContentLoaded', () => {
       const savedLang = localStorage.getItem('selectedLanguage') || 'it';
       const langSelect = document.getElementById('language-select');
+      const mobileLangSelect = document.getElementById('mobile-language-select');
 
       if (langSelect) {
         langSelect.value = savedLang;
         langSelect.addEventListener('change', (e) => {
+          setLanguage(e.target.value);
+        });
+      }
+      if (mobileLangSelect) {
+        mobileLangSelect.value = savedLang;
+        mobileLangSelect.addEventListener('change', (e) => {
           setLanguage(e.target.value);
         });
       }
@@ -971,7 +1141,7 @@
         anchor.addEventListener('click', function (e) {
           const href = this.getAttribute('href');
           if (href === "#" || href.trim() === "") {
-            e.preventDefault(); 
+            // e.preventDefault();  // Rimosso per permettere ai link #auth-link di funzionare con listener propri
             return; 
           }
 
@@ -982,6 +1152,7 @@
               behavior: 'smooth',
               block: 'start'
             });
+            closeMobileMenuIfOpen();
           }
         });
       });
