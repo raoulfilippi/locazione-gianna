@@ -545,14 +545,6 @@ function renderUserBookings(userBookings){
   container.classList.remove('hidden');
 }
 
-
-
-
-
-
-
-
-
 // DOM READY: handlers
 document.addEventListener('DOMContentLoaded', ()=>{
   const showRegister = document.getElementById('show-register');
@@ -561,6 +553,11 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const loginForm = document.getElementById('login-form');
   const logoutLink = document.getElementById('logout-link');
   const langSelect = document.getElementById('language-select');
+  const navBack = document.getElementById('nav-back');
+  navBack.addEventListener('click', e => {
+  e.preventDefault(); // evita eventuali interferenze
+  window.location.href = 'index.html'; // forza il redirect
+});
 
   // lingua persistente
   const saved = localStorage.getItem('selectedLanguage');
@@ -708,3 +705,4 @@ onAuthStateChanged(auth, async user => {
 </script>
 </body>
 </html>
+
