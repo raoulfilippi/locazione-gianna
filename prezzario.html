@@ -24,6 +24,17 @@
   .day-card.disabled{background:#f3f4f6;opacity:0.6;cursor:not-allowed;border:none}
   .day-card.booked{background:#fee2e2;border-color:#fca5a5;cursor:not-allowed;opacity:0.95}
   .day-card.booked .price-tag{color:#ef4444 !important}
+  /* prenotazioni dell'utente loggato (nuovo) */
+  .day-card.booked-user{
+    background:#d1fae5;        /* verde chiaro */
+    border-color:#10b981;      /* verde */
+    cursor:not-allowed;
+    opacity:1;
+  }
+  .day-card.booked-user .day-num,
+  .day-card.booked-user .price-tag{
+    color:#065f46 !important;
+  }
   .day-card.selected{background:var(--primary-blue) !important;color:#fff !important;border-color:var(--primary-blue)}
   .day-card.selected .day-num,.day-card.selected .price-tag{color:#fff !important}
   .day-card.in-range{background:#dbeafe !important}
@@ -81,7 +92,8 @@
         </div>
       </div>
       <div class="flex items-center space-x-4">
-        <a href="index.html" id="nav-back" class="text-gray-700 hover:text-blue-600 font-medium" data-key="nav-back">Home</a>
+
+	<a href="index.html" id="nav-back" class="text-gray-700 hover:text-blue-600 font-medium" data-key="nav-back">Home</a>
 
         <!-- Aggiunto: link per il popup (minima modifica) -->
         <a href="#" id="auth-link" class="text-gray-700 hover:text-blue-600 font-medium" style="margin-left:0.5rem;">Accedi</a>
@@ -232,6 +244,7 @@ const collectionRef = collection(db, "prenotazioni casa mare");
 emailjs.init("BG7V9gDfHMArYHoiv");
 
 let bookedDates = [];
+let userBookedDates = new Set(); // <-- aggiunta
 let checkIn = null;
 let checkOut = null;
 let currentLang = 'it';
@@ -446,18 +459,34 @@ function renderMonth(year,month,monthName){
     ${t.weekdays.map(d=>`<div class="text-center text-xs font-bold text-slate-400 uppercase pb-2">${d}</div>`).join('')}
     ${Array(adjustedStart).fill('<div></div>').join('')}`;
 
-  for(let d=1; d<=daysInMonth; d++){
+  // ciclo giorni con distinzione prenotazione utente
+  for (let d = 1; d <= daysInMonth; d++) {
     const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const isBooked = bookedDates.includes(dateStr);
+    const isUserBooked = userBookedDates.has(dateStr); // controllo prenotazione dell'utente
     const price = exceptions[dateStr] || dailyRates[dateStr.split('-')[1]];
     const isClosed = dateStr < SEASON_START || dateStr > SEASON_END;
-    const classes = isClosed ? 'day-card disabled' : (isBooked ? 'day-card booked' : 'day-card active');
-    const label = isClosed ? `<span class="text-[9px] text-slate-300">${t.closed}</span>` : (isBooked ? `<span class="price-tag">${t.booked}</span>` : `<span class="price-tag">€${price}</span>`);
+
+    // Scegli la classe in base allo stato:
+    let classes = 'day-card active';
+    if (isClosed) {
+      classes = 'day-card disabled';
+    } else if (isBooked) {
+      // se prenotato e appartiene all'utente -> booked-user, altrimenti booked
+      classes = isUserBooked ? 'day-card booked-user' : 'day-card booked';
+    }
+
+    // Etichetta (manteniamo lo stesso testo per booked)
+    const label = isClosed
+      ? `<span class="text-[9px] text-slate-300">${t.closed}</span>`
+      : (isBooked ? `<span class="price-tag">${t.booked}</span>` : `<span class="price-tag">€${price}</span>`);
+
     html += `<div class="${classes}" data-date="${dateStr}" onclick="handleDateClick('${dateStr}')">
       <span class="day-num">${d}</span>
       <div class="text-center">${label}</div>
     </div>`;
   }
+
   html += `</div></div>`;
   container.innerHTML += html;
 }
@@ -650,19 +679,39 @@ onAuthStateChanged(auth, async user => {
       }
     } catch(err) { }
 
+    // rimuovi eventuale listener precedente
     if(typeof unsubscribeBookings === 'function'){ unsubscribeBookings(); }
+
+    // listener aggiornato che popola bookedDates + userBookedDates
     unsubscribeBookings = onSnapshot(collectionRef, snapshot => {
       bookedDates = [];
+      userBookedDates.clear(); // svuota il set prima di ricostruirlo
       const userBookings = [];
-      snapshot.docs.forEach(docSnap=>{
+
+      snapshot.docs.forEach(docSnap => {
         const data = docSnap.data();
-        let start = new Date(data.data_inizio);
-        let end = new Date(data.data_fine);
-        while(start <= end){
-          bookedDates.push(start.toISOString().split('T')[0]);
-          start.setDate(start.getDate()+1);
+        try {
+          let start = new Date(data.data_inizio);
+          let end = new Date(data.data_fine);
+          while (start <= end) {
+            const ds = start.toISOString().split('T')[0];
+            bookedDates.push(ds);
+
+            // se la prenotazione appartiene all'utente corrente, aggiungi al set
+            if (data.userId === user.uid) {
+              userBookedDates.add(ds);
+            }
+
+            start.setDate(start.getDate() + 1);
+          }
+        } catch (e) {
+          console.warn('Booking parse error', e);
         }
-        if(data.userId === user.uid) userBookings.push({ id: docSnap.id, start: data.data_inizio, end: data.data_fine });
+
+        // mantieni la lista per il rendering della sezione "Le mie prenotazioni"
+        if (data.userId === user.uid) {
+          userBookings.push({ id: docSnap.id, start: data.data_inizio, end: data.data_fine });
+        }
       });
 
       if(userBookings.length > 0) navDirections.classList.remove('hidden');
@@ -672,6 +721,7 @@ onAuthStateChanged(auth, async user => {
       if(userBookings.length>0) renderUserBookings(userBookings);
       else userBookingsBox.classList.add('hidden');
     });
+
   } else {
     if(typeof unsubscribeBookings === 'function'){ unsubscribeBookings(); }
     // Se utente non loggato: non nascondere i calendari (sono sempre visibili)
@@ -683,7 +733,7 @@ onAuthStateChanged(auth, async user => {
     if(authLink) authLink.textContent = 'Accedi';
     if(mainTitle) mainTitle.textContent = translations[currentLang]["calendar-title"];
     if(statusText) statusText.textContent = translations[currentLang]["calendar-subtitle"];
-    bookedDates = []; checkIn = null; checkOut = null;
+    bookedDates = []; userBookedDates.clear(); checkIn = null; checkOut = null; // svuota anche userBookedDates al logout
     if(adminLink) adminLink.classList.add('hidden');
     if(adminBadge) adminBadge.classList.add('hidden');
   }
@@ -691,4 +741,3 @@ onAuthStateChanged(auth, async user => {
 </script>
 </body>
 </html>
-
