@@ -956,11 +956,13 @@
       setLanguage(e.target.value);
     });
 
-    // Imposta la lingua iniziale in base al browser o al default italiano
-    const userLang = navigator.language.split('-')[0];
-    const initialLang = translations[userLang] ? userLang : 'it';
-    languageSelect.value = initialLang;
-    setLanguage(initialLang);
+// Imposta la lingua iniziale: prima la lingua salvata, poi il browser, poi 'it'
+const savedLang = localStorage.getItem('selectedLanguage') || localStorage.getItem('lang');
+const userLang = (navigator.language || navigator.userLanguage || 'it').split('-')[0];
+const initialLang = savedLang || (translations[userLang] ? userLang : 'it');
+
+languageSelect.value = initialLang;
+setLanguage(initialLang);
 
     // Imposta dinamicamente l'anno corrente nel footer
     document.getElementById('current-year').textContent = new Date().getFullYear();
