@@ -49,14 +49,21 @@
         </div>
       </div>
       <div class="flex items-center space-x-4">
-        <a href="index.html" id="nav-back" class="text-gray-700 hover:text-blue-600 font-medium" data-key="nav-back">Torna al Sito</a>
-        <a href="#" id="logout-link" class="hidden text-gray-700 hover:text-red-600 font-medium" data-key="nav-logout">Esci</a>
-        <select id="language-select" class="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700">
-          <option value="it">🇮🇹 Italiano</option>
-          <option value="en">🇬🇧 English</option>
-          <option value="de">🇩🇪 Deutsch</option>
-        </select>
-      </div>
+  <a href="index.html" id="nav-back" class="text-gray-700 hover:text-blue-600 font-medium" data-key="nav-back">Torna al Sito</a>
+  <a href="#" id="logout-link" class="hidden text-gray-700 hover:text-red-600 font-medium" data-key="nav-logout">Esci</a>
+
+  <!-- LINK ADMIN (nascosto di default; mostra solo a role=admin) -->
+  <a href="admin.html" id="admin-link" class="hidden text-gray-700 hover:text-purple-600 font-medium flex items-center gap-2">
+    Admin <span id="admin-badge" class="hidden bg-purple-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">ADMIN</span>
+  </a>
+
+  <select id="language-select" class="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700">
+    <option value="it">🇮🇹 Italiano</option>
+    <option value="en">🇬🇧 English</option>
+    <option value="de">🇩🇪 Deutsch</option>
+  </select>
+</div>
+
     </div>
   </div>
 </header>
@@ -65,7 +72,7 @@
   <div class="absolute inset-0 bg-black/20"></div>
   <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
     <div class="floating-element">
-      <h1 class="heading-font text-5xl md:text-7xl font-bold text-white mb-6"><span data-key="hero-title">Prenota: Disponibilità e Prezzi 2026</span></h1>
+      <h1 class="heading-font text-5xl md:text-7xl font-bold text-white mb-6"><span data-key="hero-title">Disponibilità e Prezzi 2026</span></h1>
       <p class="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto" data-key="hero-subtitle">Seleziona le date del tuo soggiorno e conferma per prenotare, puoi effettuare la cancellazione in qualunque momento</p>
     </div>
   </div>
@@ -197,7 +204,7 @@ const translations = {
     "nav-location":"Lido delle Nazioni",
     "nav-back":"Torna al Sito",
     "nav-logout":"Esci",
-    "hero-title":"Prenota: Disponibilità e Prezzi 2026",
+    "hero-title":"Disponibilità e Prezzi 2026",
     "hero-subtitle":"Seleziona le date del tuo soggiorno e conferma per prenotare, puoi effettuare la cancellazione in qualunque momento",
     "calendar-title":"Sign in",
     "calendar-subtitle":"Accedi per scegliere check-in e check-out",
@@ -232,7 +239,7 @@ const translations = {
     "nav-location":"Lido delle Nazioni",
     "nav-back":"Back to Site",
     "nav-logout":"Logout",
-    "hero-title":"Book: Availability and Prices 2026",
+    "hero-title":"Availability and Prices 2026",
     "hero-subtitle":"Select your stay dates and confirm to book, you can cancel anytime",
     "calendar-title":"Sign in",
     "calendar-subtitle":"Log in to choose check-in and check-out",
@@ -267,7 +274,7 @@ const translations = {
     "nav-location":"Lido delle Nazioni",
     "nav-back":"Zurück zur Seite",
     "nav-logout":"Abmelden",
-    "hero-title":"Buchen: Verfügbarkeit und Preise 2026",
+    "hero-title":"Verfügbarkeit und Preise 2026",
     "hero-subtitle":"Wählen Sie Ihre Aufenthaltsdaten und bestätigen Sie die Buchung, Sie können jederzeit stornieren",
     "calendar-title":"Sign in",
     "calendar-subtitle":"Melden Sie sich an, um Ein- und Auschecken auszuwählen.",
@@ -516,28 +523,35 @@ window.renderAllCalendars = function(){
 };
 
 // RENDER USER BOOKINGS LIST
+
+
+
 function renderUserBookings(userBookings){
   const container = document.getElementById('user-bookings');
   const list = document.getElementById('booking-list');
   list.innerHTML = "";
+
   if(userBookings.length === 0){
     list.innerHTML = "<li>Nessuna prenotazione</li>";
   } else {
     userBookings.forEach(bk=>{
-      const li = document.createElement('li'); li.className="mb-2 flex justify-between items-center";
-      const text = document.createElement('span'); text.textContent = `${bk.start} — ${bk.end}`;
-      const delBtn = document.createElement('button'); delBtn.className="ml-4 text-red-600 hover:text-red-800"; delBtn.textContent="❌";
-      delBtn.addEventListener('click', async ()=>{
-        if(confirm("Vuoi cancellare questa prenotazione?")){
-          try{ await deleteDoc(doc(db,"prenotazioni casa mare", bk.id)); alert("Prenotazione rimossa!"); }
-          catch(err){ alert("Errore: "+err.message); }
-        }
-      });
-      li.appendChild(text); li.appendChild(delBtn); list.appendChild(li);
+      const li = document.createElement('li');
+      li.className = "mb-2";
+      li.textContent = `${bk.start} — ${bk.end}`;
+      list.appendChild(li);
     });
   }
+
   container.classList.remove('hidden');
 }
+
+
+
+
+
+
+
+
 
 // DOM READY: handlers
 document.addEventListener('DOMContentLoaded', ()=>{
@@ -605,8 +619,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
 });
 
 // onAuthStateChanged
-onAuthStateChanged(auth, user => {
+onAuthStateChanged(auth, async user => {
   if(ignoreAuthChange) return;
+
   const logoutLink = document.getElementById('logout-link');
   const loginBox = document.getElementById('login-box');
   const registerBox = document.getElementById('register-box');
@@ -615,6 +630,8 @@ onAuthStateChanged(auth, user => {
   const calendarContainer = document.getElementById('calendar-container');
   const statusText = document.getElementById('status-text');
   const mainTitle = document.getElementById('main-title');
+  const adminLink = document.getElementById('admin-link');
+  const adminBadge = document.getElementById('admin-badge');
 
   if(user){
     // mostra UI loggato
@@ -622,12 +639,30 @@ onAuthStateChanged(auth, user => {
     registerBox.classList.add('hidden');
     logoutLink.classList.remove('hidden');
     calendarContainer.classList.remove('hidden');
-    
+
     // Aggiorna il titolo con "Benvenuto/a [Nome]"
     const firstName = user.displayName ? user.displayName.split(' ')[0] : '';
     mainTitle.textContent = `${translations[currentLang]["welcome"]} ${firstName}`;
     
     if(statusText) statusText.innerHTML = `Scegli il periodo e prenota`;
+
+    // mostro / nascondo link admin in base al role nel DB
+    try {
+      const utentiRef = collection(db,"utenti");
+      const q = query(utentiRef, where("userId","==", user.uid));
+      const snap = await getDocs(q);
+      if(!snap.empty && snap.docs[0].data().role === "admin"){
+        adminLink.classList.remove('hidden');
+        adminBadge.classList.remove('hidden');
+      } else {
+        adminLink.classList.add('hidden');
+        adminBadge.classList.add('hidden');
+      }
+    } catch(err) {
+      console.error("Errore controllo admin:", err);
+      adminLink.classList.add('hidden');
+      adminBadge.classList.add('hidden');
+    }
 
     // rimuovi listener precedente se presente
     if(typeof unsubscribeBookings === 'function'){ unsubscribeBookings(); unsubscribeBookings = null; }
@@ -664,6 +699,10 @@ onAuthStateChanged(auth, user => {
     mainTitle.textContent = translations[currentLang]["calendar-title"];
     if(statusText) statusText.textContent = translations[currentLang]["calendar-subtitle"];
     bookedDates = []; checkIn = null; checkOut = null;
+
+    // nascondi admin link e badge quando logout
+    if(adminLink) adminLink.classList.add('hidden');
+    if(adminBadge) adminBadge.classList.add('hidden');
   }
 });
 </script>
