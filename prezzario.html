@@ -348,17 +348,61 @@ function isValidStart(dateStr){ return ALLOWED_START_DAYS.includes(new Date(date
 
 window.handleDateClick = function(dateStr){
   if(dateStr < SEASON_START || dateStr > SEASON_END) return;
-  if(bookedDates.includes(dateStr) && !userBookedDates.has(dateStr)) return;
+
+  // 1. Check if clicked date is already booked (generic check)
+  if(bookedDates.includes(dateStr)) return;
+
+  // Se non c'è check-in selezionato oppure entrambi check-in e check-out sono già selezionati
   if(!checkIn || (checkIn && checkOut)){
-    if(!isValidStart(dateStr)){ alert(currentLang === 'it' ? 'Check-in solo Domenica o Lunedì' : 'Check-in only Sunday or Monday'); return; }
-    checkIn = dateStr; checkOut = null; updateUI(); return;
+    if(!isValidStart(dateStr)){
+      alert(currentLang === 'it' ? 'Check-in solo Domenica o Lunedì' : 'Check-in only Sunday or Monday');
+      return;
+    }
+    checkIn = dateStr;
+    checkOut = null;
+    updateUI();
+    return;
   }
+
+  // Se l'utente clicca prima della data di check-in corrente
   if(dateStr <= checkIn){
-    checkIn = dateStr; checkOut = null; updateUI(); return;
+    checkIn = dateStr;
+    checkOut = null;
+    updateUI();
+    return;
   }
-  const diffDays = Math.floor((toTime(dateStr)-toTime(checkIn))/(24*60*60*1000))+1;
-  if(diffDays < MIN_STAY_DAYS){ alert(`${currentLang === 'it' ? 'Soggiorno minimo' : 'Min stay'} ${MIN_STAY_DAYS} ${translations[currentLang]["days"]}`); return; }
-  checkOut = dateStr; updateUI();
+
+  // 2. CHECK FOR OVERLAP (Il fix richiesto)
+  // Verifica che non ci siano date occupate TRA checkIn e la nuova dateStr
+  let tempDate = new Date(checkIn);
+  const targetDate = new Date(dateStr);
+  let overlapFound = false;
+  
+  // Scorre dal checkIn fino alla data cliccata
+  while (tempDate <= targetDate) {
+    const isoDate = tempDate.toISOString().split('T')[0];
+    if (bookedDates.includes(isoDate)) {
+      overlapFound = true;
+      break;
+    }
+    tempDate.setDate(tempDate.getDate() + 1);
+  }
+
+  if (overlapFound) {
+    alert(currentLang === 'it' ? "Il periodo selezionato include date già prenotate." : "Selected period includes booked dates.");
+    return;
+  }
+
+  // Calcola la durata e verifica il soggiorno minimo
+  const diffDays = Math.floor((toTime(dateStr) - toTime(checkIn)) / (24*60*60*1000)) + 1;
+  if(diffDays < MIN_STAY_DAYS){
+    alert(`${currentLang === 'it' ? 'Soggiorno minimo' : 'Min stay'} ${MIN_STAY_DAYS} ${translations[currentLang]["days"]}`);
+    return;
+  }
+
+  // Tutto ok, seleziona check-out
+  checkOut = dateStr;
+  updateUI();
 };
 
 window.resetSelection = function(){ checkIn=null; checkOut=null; updateUI(); };
@@ -517,24 +561,7 @@ window.renderAllCalendars = function(){
   mesi.forEach(m=>renderMonth(2026,m.id,m.nome));
 };
 
-onSnapshot(collectionRef, snapshot => {
-  bookedDates = [];
-  snapshot.docs.forEach(docSnap => {
-    const data = docSnap.data();
-    try {
-      let start = new Date(data.data_inizio);
-      let end = new Date(data.data_fine);
-      while (start <= end) {
-        bookedDates.push(start.toISOString().split('T')[0]);
-        start.setDate(start.getDate() + 1);
-      }
-    } catch (e) {
-      console.warn('Booking parse error', e);
-    }
-  });
-
-  try { renderAllCalendars(); updateUI(); } catch(e){ }
-});
+// --- REMOVED THE DUPLICATE onSnapshot HERE ---
 
 function renderUserBookings(userBookings){
   const container = document.getElementById('user-bookings');
@@ -660,8 +687,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
   window.closeMobileMenuIfOpen = closeMobileMenuIfOpen;
 });
 
+
 onAuthStateChanged(auth, async user => {
-  if(ignoreAuthChange) return;
+  if (ignoreAuthChange) return;
 
   const logoutLink = document.getElementById('logout-link');
   const loginBox = document.getElementById('login-box');
@@ -682,85 +710,126 @@ onAuthStateChanged(auth, async user => {
   const mobileAdminLink = document.getElementById('mobile-admin-link');
   const mobileAdminBadge = document.getElementById('mobile-admin-badge');
 
-  if(user){
-    if(authLink) authLink.textContent = user.displayName ? user.displayName.split(' ')[0] : user.email;
-    if(loginBox) loginBox.classList.add('hidden'); if(registerBox) registerBox.classList.add('hidden');
-    if(logoutLink) logoutLink.classList.remove('hidden'); if(calendarContainer) calendarContainer.classList.remove('hidden');
+  if (typeof unsubscribeBookings === 'function') unsubscribeBookings();
 
-    if(mobileAuthLink) mobileAuthLink.textContent = user.displayName ? user.displayName.split(' ')[0] : user.email;
-    if(mobileLogoutLink) mobileLogoutLink.classList.remove('hidden');
+  // 🔥 SNAPSHOT UNICO: SEMPRE ATTIVO (loggato o no)
+  // Questo listener è all'interno di authStateChanged così possiamo sapere chi è l'user attuale
+  // per colorare le sue prenotazioni di verde (userBookedDates)
+  unsubscribeBookings = onSnapshot(collectionRef, snapshot => {
+    bookedDates = [];
+    userBookedDates.clear();
+    const userBookings = [];
 
-    const firstName = user.displayName ? user.displayName.split(' ')[0] : '';
-    if(mainTitle) mainTitle.textContent = `${translations[currentLang]["welcome"]} ${firstName}`;
-    if(statusText) statusText.textContent = translations[currentLang]["status-logged"];
+    snapshot.docs.forEach(docSnap => {
+      const data = docSnap.data();
+      try {
+        let start = new Date(data.data_inizio);
+        let end = new Date(data.data_fine);
 
-    try {
-      const utentiRef = collection(db,"utenti");
-      const q = query(utentiRef, where("userId","==", user.uid));
-      const snap = await getDocs(q);
-      const isAdmin = !snap.empty && snap.docs[0].data().role === "admin";
-      if(isAdmin){
-        if(adminLink) adminLink.classList.remove('hidden'); if(adminBadge) adminBadge.classList.remove('hidden');
-        if(mobileAdminLink) mobileAdminLink.classList.remove('hidden'); if(mobileAdminBadge) mobileAdminBadge.classList.remove('hidden');
-      } else {
-        if(adminLink) adminLink.classList.add('hidden'); if(adminBadge) adminBadge.classList.add('hidden');
-        if(mobileAdminLink) mobileAdminLink.classList.add('hidden'); if(mobileAdminBadge) mobileAdminBadge.classList.add('hidden');
-      }
-    } catch(e){ console.warn(e); }
+        while (start <= end) {
+          const ds = start.toISOString().split('T')[0];
 
-    if(typeof unsubscribeBookings === 'function') unsubscribeBookings();
+          // 🔴 prenotato per TUTTI
+          bookedDates.push(ds);
 
-    unsubscribeBookings = onSnapshot(collectionRef, snapshot => {
-      bookedDates = [];
-      userBookedDates.clear();
-      const userBookings = [];
-
-      snapshot.docs.forEach(docSnap => {
-        const data = docSnap.data();
-        try {
-          let start = new Date(data.data_inizio);
-          let end = new Date(data.data_fine);
-          while (start <= end) {
-            const ds = start.toISOString().split('T')[0];
-            bookedDates.push(ds);
-            if(data.userId === user.uid) userBookedDates.add(ds);
-            start.setDate(start.getDate()+1);
+          // 🟢 prenotato dall’utente loggato
+          if (user && data.userId === user.uid) {
+            userBookedDates.add(ds);
           }
-        } catch(e){ console.warn('Booking parse error', e); }
 
-        if(data.userId === user.uid) userBookings.push({ id: docSnap.id, start: data.data_inizio, end: data.data_fine });
-      });
-
-      if(userBookings.length > 0){
-        if(navDirections) navDirections.classList.remove('hidden');
-        if(mobileNavDirections) mobileNavDirections.classList.remove('hidden');
-      } else {
-        if(navDirections) navDirections.classList.add('hidden');
-        if(mobileNavDirections) mobileNavDirections.classList.add('hidden');
+          start.setDate(start.getDate() + 1);
+        }
+      } catch (e) {
+        console.warn('Booking parse error', e);
       }
 
-      renderAllCalendars(); updateUI();
-      if(userBookings.length>0) renderUserBookings(userBookings);
-      else userBookingsBox.classList.add('hidden');
+      if (user && data.userId === user.uid) {
+        userBookings.push({
+          id: docSnap.id,
+          start: data.data_inizio,
+          end: data.data_fine
+        });
+      }
     });
 
-  } else {
-    if(typeof unsubscribeBookings === 'function') unsubscribeBookings();
-    if(loginBox) loginBox.classList.remove('hidden'); if(registerBox) registerBox.classList.add('hidden');
-    if(logoutLink) logoutLink.classList.add('hidden'); if(userBookingsBox) userBookingsBox.classList.add('hidden');
-    if(calcBar) calcBar.classList.add('hidden');
-    if(navDirections) navDirections.classList.add('hidden');
-    if(authLink) authLink.textContent = translations[currentLang]["auth-login"];
-    if(mobileAuthLink) mobileAuthLink.textContent = translations[currentLang]["auth-login"];
-    if(mobileLogoutLink) mobileLogoutLink.classList.add('hidden');
-    if(mainTitle) mainTitle.textContent = translations[currentLang]["calendar-title"];
-    if(statusText) statusText.textContent = translations[currentLang]["calendar-subtitle"];
-    bookedDates = []; userBookedDates.clear(); checkIn = null; checkOut = null;
-    if(adminLink) adminLink.classList.add('hidden'); if(adminBadge) adminBadge.classList.add('hidden');
-    if(mobileAdminLink) mobileAdminLink.classList.add('hidden');
-    if(mobileAdminBadge) mobileAdminBadge.classList.add('hidden');
+    renderAllCalendars();
+    updateUI();
 
-    try { renderAllCalendars(); updateUI(); } catch(e){ }
+    if (user && userBookings.length > 0) {
+      renderUserBookings(userBookings);
+      if (navDirections) navDirections.classList.remove('hidden');
+      if (mobileNavDirections) mobileNavDirections.classList.remove('hidden');
+    } else {
+      if (userBookingsBox) userBookingsBox.classList.add('hidden');
+      if (navDirections) navDirections.classList.add('hidden');
+      if (mobileNavDirections) mobileNavDirections.classList.add('hidden');
+    }
+  });
+
+  // ───────────── UI LOGIN / LOGOUT ─────────────
+
+  if (user) {
+    if (authLink) authLink.textContent = user.displayName ? user.displayName.split(' ')[0] : user.email;
+    if (mobileAuthLink) mobileAuthLink.textContent = authLink.textContent;
+
+    if (loginBox) loginBox.classList.add('hidden');
+    if (registerBox) registerBox.classList.add('hidden');
+    if (logoutLink) logoutLink.classList.remove('hidden');
+    if (mobileLogoutLink) mobileLogoutLink.classList.remove('hidden');
+    if (calendarContainer) calendarContainer.classList.remove('hidden');
+
+    const firstName = user.displayName ? user.displayName.split(' ')[0] : '';
+    if (mainTitle) mainTitle.textContent = `${translations[currentLang]["welcome"]} ${firstName}`;
+    if (statusText) statusText.textContent = translations[currentLang]["status-logged"];
+
+    try {
+      const utentiRef = collection(db, "utenti");
+      const q = query(utentiRef, where("userId", "==", user.uid));
+      const snap = await getDocs(q);
+      const isAdmin = !snap.empty && snap.docs[0].data().role === "admin";
+
+      if (isAdmin) {
+        if (adminLink) adminLink.classList.remove('hidden');
+        if (adminBadge) adminBadge.classList.remove('hidden');
+        if (mobileAdminLink) mobileAdminLink.classList.remove('hidden');
+        if (mobileAdminBadge) mobileAdminBadge.classList.remove('hidden');
+      } else {
+        if (adminLink) adminLink.classList.add('hidden');
+        if (adminBadge) adminBadge.classList.add('hidden');
+        if (mobileAdminLink) mobileAdminLink.classList.add('hidden');
+        if (mobileAdminBadge) mobileAdminBadge.classList.add('hidden');
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+
+  } else {
+    // 👤 NON LOGGATO
+    if (loginBox) loginBox.classList.remove('hidden');
+    if (registerBox) registerBox.classList.add('hidden');
+    if (logoutLink) logoutLink.classList.add('hidden');
+    if (mobileLogoutLink) mobileLogoutLink.classList.add('hidden');
+
+    if (authLink) authLink.textContent = translations[currentLang]["auth-login"];
+    if (mobileAuthLink) mobileAuthLink.textContent = translations[currentLang]["auth-login"];
+
+    if (mainTitle) mainTitle.textContent = translations[currentLang]["calendar-title"];
+    if (statusText) statusText.textContent = translations[currentLang]["calendar-subtitle"];
+
+    if (calcBar) calcBar.classList.add('hidden');
+    if (userBookingsBox) userBookingsBox.classList.add('hidden');
+
+    if (adminLink) adminLink.classList.add('hidden');
+    if (adminBadge) adminBadge.classList.add('hidden');
+    if (mobileAdminLink) mobileAdminLink.classList.add('hidden');
+    if (mobileAdminBadge) mobileAdminBadge.classList.add('hidden');
+
+    userBookedDates.clear();
+    checkIn = null;
+    checkOut = null;
+
+    renderAllCalendars();
+    updateUI();
   }
 });
 </script>
