@@ -6,17 +6,15 @@
 <title>Admin – Prenotazioni Casa Gianna</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
+<!-- SheetJS per esportare Excel -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { 
-  getFirestore, collection, onSnapshot, deleteDoc, doc, query, where, getDocs 
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { 
-  getAuth, onAuthStateChanged, signOut 
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, onSnapshot, deleteDoc, doc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-/* 🔥 FIREBASE CONFIG (uguale al tuo) */
+/* 🔥 FIREBASE CONFIG */
 const firebaseConfig = {
   apiKey: "AIzaSyALyvupZcBogh5KGATUQur4AeCrpZtzDLo",
   authDomain: "casa-mare-c974a.firebaseapp.com",
@@ -42,7 +40,7 @@ async function getUserRole(uid){
 /* 🛡️ PROTEZIONE PAGINA */
 onAuthStateChanged(auth, async user => {
   if(!user){
-    window.location.href = "index.html";
+    window.location.href = "prezzario.html";
     return;
   }
 
@@ -50,15 +48,15 @@ onAuthStateChanged(auth, async user => {
   if(role !== "admin"){
     alert("Accesso non autorizzato");
     await signOut(auth);
-    window.location.href = "index.html";
+    window.location.href = "prezzario.html";
     return;
   }
 
   loadBookings();
 });
 
-/* 📊 CARICA PRENOTAZIONI */
-function loadBookings(){
+/* 📊 CARICA PRENOTAZIONI con filtri */
+function loadBookings(startDate = null, endDate = null){
   const list = document.getElementById("booking-list");
 
   onSnapshot(bookingsRef, snapshot => {
@@ -66,6 +64,10 @@ function loadBookings(){
 
     snapshot.docs.forEach(d => {
       const b = d.data();
+
+      // Filtro per date
+      if(startDate && b.data_fine < startDate) return;
+      if(endDate && b.data_inizio > endDate) return;
 
       const li = document.createElement("li");
       li.className = "p-4 bg-white rounded shadow flex justify-between items-center";
@@ -98,6 +100,69 @@ window.logoutAdmin = async () => {
   await signOut(auth);
   window.location.href = "index.html";
 };
+
+/* 🔹 TORNA AL CALENDARIO/PREZZARIO */
+window.goToPrezzario = () => {
+  window.location.href = 'prezzario.html';
+};
+
+/* 🟢 FILTRA PER DATA */
+const startDateInput = document.getElementById("start-date");
+const endDateInput = document.getElementById("end-date");
+
+startDateInput.addEventListener("change", () => {
+  const start = startDateInput.value;
+  if(start){
+    // Imposta la data minima di fine uguale a start
+    endDateInput.min = start;
+    if(endDateInput.value && endDateInput.value < start){
+      endDateInput.value = start;
+    }
+  } else {
+    endDateInput.min = '';
+  }
+});
+
+document.getElementById("filter-btn").addEventListener("click", () => {
+  const start = startDateInput.value;
+  const end = endDateInput.value;
+  loadBookings(start, end);
+});
+
+document.getElementById("reset-btn").addEventListener("click", () => {
+  startDateInput.value = '';
+  endDateInput.value = '';
+  endDateInput.min = '';
+  loadBookings();
+});
+
+/* 🔍 RICERCA RAPIDA */
+document.getElementById("search-input").addEventListener("input", (e) => {
+  const query = e.target.value.toLowerCase();
+  const items = document.querySelectorAll("#booking-list li");
+  items.forEach(li => {
+    const text = li.innerText.toLowerCase();
+    li.style.display = text.includes(query) ? "flex" : "none";
+  });
+});
+
+/* 📦 ESPORTA EXCEL */
+document.getElementById("export-btn").addEventListener("click", async () => {
+  const snapshot = await getDocs(bookingsRef);
+  const data = snapshot.docs.map(d => d.data());
+
+  const worksheetData = data.map(b => ({
+    Nome: b.nome,
+    Email: b.email,
+    "Data Inizio": b.data_inizio,
+    "Data Fine": b.data_fine
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Prenotazioni");
+  XLSX.writeFile(workbook, "prenotazioni.xlsx");
+});
 </script>
 </head>
 
@@ -105,10 +170,24 @@ window.logoutAdmin = async () => {
 
 <header class="bg-gray-900 text-white p-4 flex justify-between items-center">
   <h1 class="text-xl font-bold">Admin – Prenotazioni</h1>
-  <button onclick="logoutAdmin()" class="bg-red-600 px-4 py-2 rounded">Logout</button>
+  <div class="flex gap-2">
+    <button onclick="goToPrezzario()" class="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700">Calendario</button>
+    <button onclick="logoutAdmin()" class="bg-red-600 px-4 py-2 rounded hover:bg-red-700">Logout</button>
+  </div>
 </header>
 
 <main class="max-w-4xl mx-auto p-6">
+  <!-- FILTRI, RICERCA, EXPORT -->
+  <div class="flex flex-wrap gap-2 mb-4">
+    <input type="date" id="start-date" class="border rounded px-2 py-1" placeholder="Data inizio">
+    <input type="date" id="end-date" class="border rounded px-2 py-1" placeholder="Data fine">
+    <button id="filter-btn" class="bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700">Filtra</button>
+    <button id="reset-btn" class="bg-gray-500 text-white px-4 py-1 rounded hover:bg-gray-600">Reset</button>
+    <input type="text" id="search-input" placeholder="Cerca per nome o email" class="border rounded px-2 py-1 flex-grow">
+    <button id="export-btn" class="bg-purple-600 text-white px-4 py-1 rounded hover:bg-purple-700">Esporta Excel</button>
+  </div>
+
+  <!-- LISTA PRENOTAZIONI -->
   <ul id="booking-list" class="space-y-4"></ul>
 </main>
 
