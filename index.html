@@ -23,7 +23,6 @@
       color: var(--text-dark);
     }
 
-    /* Stile per disabilitare lo scroll del body quando il modale è aperto */
     body.no-scroll {
       overflow: hidden;
     }
@@ -33,7 +32,6 @@
     }
 
     .hero-gradient {
-      /* Modificato per usare l'immagine di sfondo */
       background-image: url('spiaggia4.jpg');
       background-size: cover;
       background-position: center;
@@ -53,10 +51,6 @@
     .card-hover:hover {
       transform: translateY(-8px);
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    }
-
-    .feature-icon {
-      background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
     }
 
     .pulse-glow {
@@ -83,18 +77,12 @@
       50% { transform: translateY(-20px); }
     }
 
-    .section-divider {
-      height: 1px;
-      background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
-    }
-
-    /* Stile per l'immagine del profilo nella testata */
     .profile-pic {
-      width: 48px; /* Dimensione desiderata */
-      height: 48px; /* Dimensione desiderata */
-      border-radius: 50%; /* Rende l'immagine rotonda */
-      object-fit: cover; /* Assicura che l'immagine copra l'area senza distorsioni */
-      cursor: pointer; /* Indica che l'elemento è cliccabile */
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      cursor: pointer;
       transition: transform 0.3s ease;
     }
 
@@ -102,8 +90,7 @@
       transform: scale(1.05);
     }
 
-    /* Stili per il modale dei contatti */
-    .contact-modal {
+    .contact-modal, .auth-modal {
       position: fixed;
       top: 0;
       left: 0;
@@ -117,11 +104,11 @@
       backdrop-filter: blur(10px);
     }
 
-    .contact-modal.show {
+    .contact-modal.show, .auth-modal.show {
       display: flex;
     }
 
-    .contact-modal-content {
+    .modal-content {
       background: white;
       padding: 2rem;
       border-radius: 1rem;
@@ -130,9 +117,11 @@
       width: 400px;
       position: relative;
       text-align: center;
+      max-height: 90vh;
+      overflow-y: auto;
     }
 
-    .contact-modal-close {
+    .modal-close {
       position: absolute;
       top: 1rem;
       right: 1rem;
@@ -144,22 +133,21 @@
       transition: color 0.3s ease;
     }
 
-    .contact-modal-close:hover {
+    .modal-close:hover {
       color: #ef4444;
     }
 
-    /* Stili per il modale della galleria (lightbox) */
     .lightbox-modal {
       position: fixed;
       top: 0;
       left: 0;
-      width: 100vw; /* Usa unità di viewport per coprire l'intera finestra */
-      height: 100vh; /* Usa unità di viewport per coprire l'intera finestra */
+      width: 100vw;
+      height: 100vh;
       background: rgba(0, 0, 0, 0.9);
       display: none;
       justify-content: center;
       align-items: center;
-      z-index: 10001; /* Superiore al modale dei contatti */
+      z-index: 10001;
       backdrop-filter: blur(15px);
     }
 
@@ -169,35 +157,31 @@
 
     .lightbox-content {
       position: relative;
-      max-width: 90vw; /* Contenitore del lightbox più grande per permettere lo scroll */
-      max-height: 90vh; /* Contenitore del lightbox più grande per permettere lo scroll */
+      max-width: 90vw;
+      max-height: 90vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      overflow: auto; /* Abilita lo scorrimento all'interno del lightbox se l'immagine è più grande */
+      overflow: auto;
       background-color: transparent;
     }
 
     .lightbox-content img {
-      max-width: 50vw; /* L'immagine si adatta inizialmente al 50% della larghezza del viewport */
-      max-height: 50vh; /* L'immagine si adatta inizialmente al 50% dell'altezza del viewport */
-      object-fit: contain; /* Ridimensiona l'immagine per adattarsi al contenitore mantenendo le proporzioni */
+      max-width: 50vw;
+      max-height: 50vh;
+      object-fit: contain;
       display: block;
       border-radius: 0.5rem;
       box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
-      transition: transform 0.1s ease-out; /* Transizione fluida per lo zoom */
-      transform-origin: center center; /* Lo zoom parte dal centro dell'immagine */
-      cursor: grab; /* Indica che l'immagine può essere trascinata */
-    }
-
-    .lightbox-content img.dragging {
-      cursor: grabbing;
+      transition: transform 0.1s ease-out;
+      transform-origin: center center;
+      cursor: grab;
     }
 
     .lightbox-close {
       position: absolute;
-      top: -20px; /* Sposta il pulsante fuori dall'immagine */
-      right: -20px; /* Sposta il pulsante fuori dall'immagine */
+      top: -20px;
+      right: -20px;
       background: #fff;
       border: none;
       border-radius: 50%;
@@ -218,7 +202,6 @@
       color: #fff;
     }
 
-    /* Rendi le immagini delle feature cliccabili */
     .feature-image-container {
       cursor: pointer;
       transition: transform 0.3s ease;
@@ -230,13 +213,10 @@
   </style>
 </head>
 <body class="min-h-screen">
-  <!-- Navigation Header -->
   <header class="fixed top-0 w-full z-50 glass-effect">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-20">
-        <!-- Logo -->
         <div class="flex items-center space-x-3">
-          <!-- Immagine di Gianna al posto dell'icona 'G' -->
           <img id="gianna-profile-pic" src="gianna1.jpg" alt="Gianna" class="profile-pic">
           <div>
             <h1 class="heading-font text-xl font-semibold text-gray-900">Casa Gianna</h1>
@@ -244,21 +224,10 @@
           </div>
         </div>
 
-        <!-- Language Selector and Private Area Link -->
         <div class="flex items-center space-x-4">
           <a href="#" id="private-area-link" class="text-gray-700 hover:text-blue-600 transition duration-300 font-medium whitespace-nowrap" data-key="private-area">Area Privata</a>
-
-
-
-<a href="prezzario.html" class="text-gray-700 hover:text-blue-600 transition duration-300 font-medium whitespace-nowrap" data-key="prices">
-  Prezzi <span id="current-year-link"></span>
-</a>
-
-
-
-
-
-          <select id="language-select" class="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          <a href="#" id="logout-link" class="hidden text-gray-700 hover:text-red-600 font-medium" data-key="nav-logout">Esci</a>
+          <select id="language-select" class="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700">
             <option value="it">🇮🇹 Italiano</option>
             <option value="en">🇬🇧 English</option>
             <option value="de">🇩🇪 Deutsch</option>
@@ -268,7 +237,6 @@
     </div>
   </header>
 
-  <!-- Hero Section -->
   <section class="hero-gradient pt-32 pb-20 relative overflow-hidden">
     <div class="absolute inset-0 bg-black/20"></div>
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -280,11 +248,10 @@
           Villa elegante a 200 metri dal mare, nel cuore del Lido delle Nazioni
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <a href="#booking" class="pulse-glow bg-amber-500 hover:bg-amber-600 text-white px-8 py-4 rounded-xl text-lg font-semibold transition duration-300">
+          <a href="prezzario.html" class="pulse-glow bg-amber-500 hover:bg-amber-600 text-white px-8 py-4 rounded-xl text-lg font-semibold transition duration-300">
             <span data-key="hero-book">Prenota Ora</span>
           </a>
-          <!-- Modificato l'href per scorrere alla sezione della galleria -->
-          <a href="#gallery" class="glass-effect text-amber-500 px-8 py-4 rounded-xl text-lg font-semibold hover:bg-white/20 transition duration-300">
+          <a href="gallery.html" class="glass-effect text-amber-500 px-8 py-4 rounded-xl text-lg font-semibold hover:bg-white/20 transition duration-300">
             <span data-key="hero-gallery">Esplora la Galleria</span>
           </a>
         </div>
@@ -292,7 +259,6 @@
     </div>
   </section>
 
-  <!-- Features Section -->
   <section class="py-20 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-16">
@@ -305,7 +271,6 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        <!-- Ogni card della feature è ora cliccabile per aprire l'immagine nel lightbox -->
         <div class="card-hover bg-gradient-to-br from-blue-50 to-cyan-50 p-8 rounded-2xl">
           <div class="w-16 h-16 rounded-2xl overflow-hidden mb-6 shadow-lg feature-image-container">
             <img src="casa36.png" alt="Baia Thaiti Beach Club" class="w-full h-full object-cover">
@@ -341,16 +306,11 @@
     </div>
   </section>
 
-  <!-- Services Section -->
   <section class="py-20 bg-gradient-to-br from-slate-50 to-blue-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-16">
-        <h2 class="heading-font text-4xl font-bold text-gray-900 mb-4" data-key="services-title">
-          Servizi Inclusi
-        </h2>
-        <p class="text-xl text-gray-600" data-key="services-subtitle">
-          Tutto ciò di cui hai bisogno per una vacanza perfetta
-        </p>
+        <h2 class="heading-font text-4xl font-bold text-gray-900 mb-4" data-key="services-title">Servizi Inclusi</h2>
+        <p class="text-xl text-gray-600" data-key="services-subtitle">Tutto ciò di cui hai bisogno per una vacanza perfetta</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -394,7 +354,6 @@
           </div>
         </div>
         
-        <!-- Nuovi servizi aggiunti -->
         <div class="flex items-center space-x-4 bg-white p-6 rounded-xl shadow-sm">
           <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
             <span class="text-orange-600 text-xl">🛏️</span>
@@ -434,23 +393,15 @@
             <p class="text-gray-600" data-key="service-bbq-desc">Barbecue per grigliate disponibile</p>
           </div>
         </div>
-        <!-- Fine nuovi servizi -->
-
       </div>
     </div>
   </section>
 
-  <!-- Gallery Section -->
   <section id="gallery" class="py-20 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-16">
-        <h2 class="heading-font text-4xl font-bold text-gray-900 mb-4" data-key="gallery-title">
-          Scopri Casa Gianna
-        </h2>
-        <p class="text-xl text-gray-600 mb-8" data-key="gallery-subtitle">
-          Lasciati ispirare dalle immagini della tua prossima vacanza
-        </p>
-        <!-- Link della galleria aggiornato a gallery.html -->
+        <h2 class="heading-font text-4xl font-bold text-gray-900 mb-4" data-key="gallery-title">Scopri Casa Gianna</h2>
+        <p class="text-xl text-gray-600 mb-8" data-key="gallery-subtitle">Lasciati ispirare dalle immagini della tua prossima vacanza</p>
         <a href="gallery.html" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl hover:from-blue-700 hover:to-cyan-700 transition duration-300 text-lg font-semibold">
           <span data-key="gallery-link">Esplora la Galleria Completa</span>
           <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -461,16 +412,11 @@
     </div>
   </section>
 
-  <!-- Contact Section -->
   <section id="booking" class="py-20 bg-gradient-to-br from-blue-600 to-cyan-600">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center text-white mb-16">
-        <h2 class="heading-font text-4xl font-bold mb-4" data-key="contact-title">
-          Prenota la Tua Vacanza
-        </h2>
-        <p class="text-xl text-blue-100 max-w-2xl mx-auto" data-key="contact-subtitle">
-          Contattaci per disponibilità e preventivi personalizzati
-        </p>
+        <h2 class="heading-font text-4xl font-bold mb-4" data-key="contact-title">Prenota la Tua Vacanza</h2>
+        <p class="text-xl text-blue-100 max-w-2xl mx-auto" data-key="contact-subtitle">Contattaci per disponibilità e preventivi personalizzati</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -509,7 +455,6 @@
     </div>
   </section>
 
-  <!-- Footer -->
   <footer class="bg-gray-900 text-white py-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex flex-col md:flex-row justify-between items-center">
@@ -525,10 +470,9 @@
     </div>
   </footer>
 
-  <!-- Modale per i contatti di Gianna -->
   <div class="contact-modal" id="contactModal">
-    <div class="contact-modal-content">
-      <button class="contact-modal-close" id="closeContactModalBtn">×</button>
+    <div class="modal-content">
+      <button class="modal-close" id="closeContactModalBtn">×</button>
       <h3 class="heading-font text-2xl font-bold mb-4" data-key="contact-card-title">Contatti di Gianna</h3>
       <div class="text-center mb-4">
         <img id="contact-modal-img" src="gianna1.jpg" alt="Gianna" class="mx-auto rounded-full w-32 h-32 object-cover mb-4">
@@ -542,7 +486,43 @@
     </div>
   </div>
 
-  <!-- Lightbox Modal per le immagini delle feature -->
+  <div class="auth-modal" id="authModal">
+    <div class="modal-content">
+      <button class="modal-close" id="closeAuthModalBtn">×</button>
+      
+      <div id="login-box">
+        <h2 class="text-2xl font-bold mb-4 text-gray-800" data-key="login-title">Area Privata</h2>
+        <form id="login-form" class="grid grid-cols-1 gap-4">
+          <input id="login-email" type="email" required placeholder="Email" class="border p-2 rounded">
+          <input id="login-password" type="password" required placeholder="Password" class="border p-2 rounded">
+          <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded font-bold hover:bg-blue-700" data-key="btn-login">Accedi</button>
+        </form>
+        <p class="mt-4 text-sm text-gray-500"><span data-key="login-no-account">Non hai un account?</span> <a href="#" id="show-register" class="text-blue-600 underline" data-key="link-register">Registrati</a></p>
+      </div>
+
+      <div id="register-box" class="hidden">
+        <h2 class="text-2xl font-bold mb-4 text-gray-800" data-key="register-title">Registrazione</h2>
+        <form id="register-form" class="grid grid-cols-1 gap-4">
+          <input id="register-name" type="text" required placeholder="Nome completo" class="border p-2 rounded">
+          <div class="flex gap-2">
+            <select id="register-phone-prefix" class="border p-2 rounded w-1/3">
+              <option value="+39">🇮🇹 +39</option>
+              <option value="+44">🇬🇧 +44</option>
+              <option value="+49">🇩🇪 +49</option>
+              <option value="+33">🇫🇷 +33</option>
+              <option value="+1">🇺🇸 +1</option>
+            </select>
+            <input id="register-phone" type="tel" required placeholder="Numero di telefono" class="border p-2 rounded w-2/3">
+          </div>
+          <input id="register-email" type="email" required placeholder="Email" class="border p-2 rounded">
+          <input id="register-password" type="password" required placeholder="Password" class="border p-2 rounded">
+          <button type="submit" class="bg-green-600 text-white py-2 px-4 rounded font-bold hover:bg-green-700" data-key="btn-register">Registrati</button>
+        </form>
+        <p class="mt-4 text-sm text-gray-500"><span data-key="register-already">Hai già un account?</span> <a href="#" id="show-login" class="text-blue-600 underline" data-key="link-login">Accedi</a></p>
+      </div>
+    </div>
+  </div>
+
   <div class="lightbox-modal" id="lightboxModal">
     <div class="lightbox-content">
       <button class="lightbox-close" id="closeLightboxBtn">×</button>
@@ -550,8 +530,25 @@
     </div>
   </div>
 
-  <script>
-    // Dettagli di contatto di Gianna
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getFirestore, collection, addDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyALyvupZcBogh5KGATUQur4AeCrpZtzDLo",
+      authDomain: "casa-mare-c974a.firebaseapp.com",
+      projectId: "casa-mare-c974a",
+      storageBucket: "casa-mare-c974a.firebasestorage.app",
+      messagingSenderId: "596357064782",
+      appId: "1:596357064782:web:d86b0f1d57b7ea5989fb1f",
+      measurementId: "G-12EP9VBJQK"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth();
+
     const contactDetails = {
         name: "Gianna Santececca",
         phone: "+393388984269",
@@ -559,73 +556,9 @@
         email: "casamarenazioni@gmail.com"
     };
 
-    // Funzionalità del modale dei contatti
-    const profilePic = document.getElementById('gianna-profile-pic');
-    const contactModal = document.getElementById('contactModal');
-    const closeContactModalBtn = document.getElementById('closeContactModalBtn');
-    const contactModalImg = document.getElementById('contact-modal-img');
-    const contactPhoneLink = document.getElementById('contact-phone-link');
-    const contactWhatsappLink = document.getElementById('contact-whatsapp-link');
-    const contactEmailLink = document.getElementById('contact-email-link');
-    const privateAreaLink = document.getElementById('private-area-link');
-
-    // Funzione per aprire il modale dei contatti
-    function openContactModal() {
-        contactModalImg.src = "gianna1.jpg"; 
-        // Aggiorna il testo del nome della persona di contatto in base alla lingua corrente
-        document.querySelector('#contactModal [data-key="contact-person-name"]').textContent = translations[document.documentElement.lang]["contact-person-name"];
-        
-        // Imposta i link per telefono, WhatsApp ed email
-        contactPhoneLink.href = `tel:${contactDetails.phone}`;
-        contactPhoneLink.textContent = contactDetails.phone;
-
-        // Per WhatsApp, il link wa.me di solito funziona meglio senza il '+'
-        contactWhatsappLink.href = `https://wa.me/${contactDetails.whatsapp.replace('+', '')}`; 
-        contactWhatsappLink.textContent = contactDetails.whatsapp; // Visualizza con il '+'
-
-        contactEmailLink.href = `mailto:${contactDetails.email}`;
-        contactEmailLink.textContent = contactDetails.email;
-
-        contactModal.classList.add('show');
-    }
-
-    // Funzione per chiudere il modale dei contatti
-    function closeContactModal() {
-        contactModal.classList.remove('show');
-    }
-
-    // Listener degli eventi per il modale dei contatti
-    if (profilePic) {
-        profilePic.addEventListener('click', openContactModal);
-    }
-    if (closeContactModalBtn) {
-        closeContactModalBtn.addEventListener('click', closeContactModal);
-    }
-
-    // Chiude il modale dei contatti con il tasto ESC
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && contactModal.classList.contains('show')) {
-        closeContactModal();
-      }
-    });
-
-    // Gestione del link "Area Privata"
-    if (privateAreaLink) {
-        privateAreaLink.addEventListener('click', (e) => {
-            e.preventDefault(); // Previene la navigazione diretta
-            const password = prompt(translations[document.documentElement.lang]["password-prompt"]);
-            if (password === "imagroup") {
-                window.location.href = "private.html";
-            } else {
-                alert(translations[document.documentElement.lang]["wrong-password"]);
-            }
-        });
-    }
-
-    // Translations object
     const translations = {
       it: {
-	"nav-location": "Lido delle Nazioni",
+        "nav-location": "Lido delle Nazioni",
         "hero-title": "Casa Vacanze Gianna",
         "hero-subtitle": "Villa elegante a 200 metri dal mare, nel cuore del Lido delle Nazioni",
         "hero-book": "Prenota Ora",
@@ -679,13 +612,19 @@
         "contact-person-phone": "Telefono:",
         "contact-person-whatsapp": "WhatsApp:",
         "contact-person-email": "Email:",
-        "private-area": "Area Privata",
-        "password-prompt": "Inserisci la password per accedere all'area privata:",
-        "wrong-password": "Password errata. Accesso negato.",
-"prices": "Prezzi"
+        "private-area": "Accedi",
+        "prices": "Prezzi",
+        "nav-logout": "Esci",
+        "login-title": "Area Privata",
+        "btn-login": "Accedi",
+        "login-no-account": "Non hai un account?",
+        "link-register": "Registrati",
+        "register-title": "Registrazione",
+        "btn-register": "Registrati",
+        "register-already": "Hai già un account?",
+        "link-login": "Accedi"
       },
       en: {
-
         "nav-location": "Lido delle Nazioni",
         "hero-title": "Casa Vacanze Gianna",
         "hero-subtitle": "Elegant villa 200 meters from the sea, in the heart of Lido delle Nazioni",
@@ -740,14 +679,20 @@
         "contact-person-phone": "Phone:",
         "contact-person-whatsapp": "WhatsApp:",
         "contact-person-email": "Email:",
-        "private-area": "Private Area",
-        "password-prompt": "Please enter the password to access the private area:",
-        "wrong-password": "Wrong password. Access denied.",
-"prices": "Prices"
+        "private-area": "Sign In",
+        "prices": "Prices",
+        "nav-logout": "Logout",
+        "login-title": "Private Area",
+        "btn-login": "Login",
+        "login-no-account": "Don't have an account?",
+        "link-register": "Register",
+        "register-title": "Registration",
+        "btn-register": "Register",
+        "register-already": "Already have an account?",
+        "link-login": "Login"
       },
       de: {
-
-	"nav-location": "Lido delle Nazioni",
+        "nav-location": "Lido delle Nazioni",
         "hero-title": "Casa Vacanze Gianna",
         "hero-subtitle": "Stilvolle Villa 200 Meter vom Meer entfernt, im Herzen von Lido delle Nazioni",
         "hero-book": "Jetzt Buchen",
@@ -761,9 +706,9 @@
         "feature-capacity-title": "Ideal für 4 Personen",
         "feature-capacity-desc": "Zwei Doppelzimmer für maximalen Komfort, plus optional ein Schlafsofa",
         "feature-parking-title": "Privater Parkplatz",
-        "feature-parking-desc": "Bequemlichkeit und Sicherheit per Ihr Auto während des gesamten Urlaubs",
+        "feature-parking-desc": "Bequemlichkeit und Sicherheit für Ihr Auto während des gesamten Urlaubs",
         "services-title": "Inbegriffene Dienstleistungen",
-        "services-subtitle": "Alles was Sie per einen perfekten Urlaub brauchen",
+        "services-subtitle": "Alles was Sie für einen perfekten Urlaub brauchen",
         "service-wifi": "Kostenloses WLAN",
         "service-wifi-desc": "Schnelle und zuverlässige Verbindung",
         "service-ac": "Klimaanlage",
@@ -784,91 +729,247 @@
         "gallery-subtitle": "Lassen Sie sich von Bildern Ihres nächsten Urlaubs inspirieren",
         "gallery-link": "Vollständige Galerie Erkunden",
         "contact-title": "Buchen Sie Ihren Urlaub",
-        "contact-subtitle": "Contattaci per disponibilità e preventivi personalizzati",
+        "contact-subtitle": "Kontaktieren Sie uns für Verfügbarkeit und personalisierte Angebote",
         "contact-whatsapp": "WhatsApp",
-        "contact-whatsapp-desc": "Sofortige risposta alle tue domande",
-        "contact-whatsapp-action": "Chatten Sie con us",
+        "contact-whatsapp-desc": "Sofortige Antwort auf Ihre Fragen",
+        "contact-whatsapp-action": "Chatten Sie mit uns",
         "contact-email": "E-Mail",
         "contact-email-desc": "Senden Sie Ihre detaillierte Anfrage",
         "contact-email-action": "E-Mail schreiben",
         "contact-location": "Standort",
         "contact-location-desc": "Standort auf Maps anzeigen",
         "contact-location-action": "Maps Öffnen",
-        "footer-location": "Lido delle Nazioni, Comacchio (FE), Italia",
-        "footer-rights": "Tutti i diritti riservati",
+        "footer-location": "Lido delle Nazioni, Comacchio (FE), Italien",
+        "footer-rights": "Alle Rechte vorbehalten",
         "contact-card-title": "Giannas Kontakte",
         "contact-person-name": "Gianna Santececca",
-        "contact-person-phone": "Telefono:",
+        "contact-person-phone": "Telefon:",
         "contact-person-whatsapp": "WhatsApp:",
         "contact-person-email": "E-Mail:",
-        "private-area": "Privater Bereich",
-        "password-prompt": "Bitte geben Sie das Passwort ein, um den privaten Bereich zu betreten:",
-        "wrong-password": "Falsches Passwort. Zugang verweigert.",
-"prices": "Preise"
+        "private-area": "Anmelden",
+        "prices": "Preise",
+        "nav-logout": "Abmelden",
+        "login-title": "Privater Bereich",
+        "btn-login": "Einloggen",
+        "login-no-account": "Noch kein Konto?",
+        "link-register": "Registrieren",
+        "register-title": "Registrierung",
+        "btn-register": "Registrieren",
+        "register-already": "Schon ein Konto?",
+        "link-login": "Einloggen"
       }
     };
 
-    // Function to set the language
     function setLanguage(lang) {
-	// ✅ salva la lingua scelta
-    localStorage.setItem('selectedLanguage', lang);		
+      localStorage.setItem('selectedLanguage', lang);
       document.querySelectorAll('[data-key]').forEach(element => {
         const key = element.getAttribute('data-key');
         if (translations[lang] && translations[lang][key]) {
-          element.textContent = translations[lang][key];
+          if (element.tagName === 'INPUT') {
+            element.placeholder = translations[lang][key];
+          } else {
+            element.textContent = translations[lang][key];
+          }
         }
       });
-      
-      // Update the lang attribute of the html tag
       document.documentElement.lang = lang;
-
-      // Aggiorna anche il nome della persona di contatto nel modale quando la lingua cambia
-      if (contactModal.classList.contains('show')) { // Solo se il modale è aperto
-          document.querySelector('#contactModal [data-key="contact-person-name"]').textContent = translations[lang]["contact-person-name"];
+      
+      if (contactModal.classList.contains('show')) {
+        document.querySelector('#contactModal [data-key="contact-person-name"]').textContent = translations[lang]["contact-person-name"];
       }
     }
 
-	  document.addEventListener('DOMContentLoaded', () => {
-  const savedLang = localStorage.getItem('selectedLanguage') || 'it';
-  const langSelect = document.getElementById('language-select');
+    const profilePic = document.getElementById('gianna-profile-pic');
+    const contactModal = document.getElementById('contactModal');
+    const closeContactModalBtn = document.getElementById('closeContactModalBtn');
+    const contactModalImg = document.getElementById('contact-modal-img');
+    const contactPhoneLink = document.getElementById('contact-phone-link');
+    const contactWhatsappLink = document.getElementById('contact-whatsapp-link');
+    const contactEmailLink = document.getElementById('contact-email-link');
+    const privateAreaLink = document.getElementById('private-area-link');
+    const logoutLink = document.getElementById('logout-link');
+    
+    const authModal = document.getElementById('authModal');
+    const closeAuthModalBtn = document.getElementById('closeAuthModalBtn');
+    const loginBox = document.getElementById('login-box');
+    const registerBox = document.getElementById('register-box');
+    const showRegister = document.getElementById('show-register');
+    const showLogin = document.getElementById('show-login');
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
 
-  if (langSelect) {
-    langSelect.value = savedLang;
-  }
-
-  setLanguage(savedLang);
-});
-
-
-    // Initialize page
-    document.addEventListener('DOMContentLoaded', () => {
-      const langSelect = document.getElementById('language-select');
+    function openContactModal() {
+      const lang = document.documentElement.lang;
+      contactModalImg.src = "gianna1.jpg"; 
+      document.querySelector('#contactModal [data-key="contact-person-name"]').textContent = translations[lang]["contact-person-name"];
       
-      // Set initial language based on browser or default to Italian
-      const initialLang = localStorage.getItem('lang') || 'it';
-      langSelect.value = initialLang;
-      setLanguage(initialLang);
+      contactPhoneLink.href = `tel:${contactDetails.phone}`;
+      contactPhoneLink.textContent = contactDetails.phone;
+      contactWhatsappLink.href = `https://wa.me/${contactDetails.whatsapp.replace('+', '')}`;
+      contactWhatsappLink.textContent = contactDetails.whatsapp;
+      contactEmailLink.href = `mailto:${contactDetails.email}`;
+      contactEmailLink.textContent = contactDetails.email;
 
-      // Add event listener for language changes
-      langSelect.addEventListener('change', (event) => {
-        const selectedLang = event.target.value;
-        localStorage.setItem('lang', selectedLang); // Save preference
-        setLanguage(selectedLang);
+      contactModal.classList.add('show');
+      document.body.classList.add('no-scroll');
+    }
+
+    function closeContactModal() {
+      contactModal.classList.remove('show');
+      document.body.classList.remove('no-scroll');
+    }
+
+    function openAuthModal() {
+      authModal.classList.add('show');
+      loginBox.classList.remove('hidden');
+      registerBox.classList.add('hidden');
+      document.body.classList.add('no-scroll');
+    }
+
+    function closeAuthModal() {
+      authModal.classList.remove('show');
+      document.body.classList.remove('no-scroll');
+    }
+
+    if (profilePic) {
+      profilePic.addEventListener('click', openContactModal);
+    }
+
+    if (closeContactModalBtn) {
+      closeContactModalBtn.addEventListener('click', closeContactModal);
+    }
+
+    if (closeAuthModalBtn) {
+      closeAuthModalBtn.addEventListener('click', closeAuthModal);
+    }
+
+    if (privateAreaLink) {
+      privateAreaLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        const user = auth.currentUser;
+        if (user) {
+          window.location.href = "prezzario.html";
+        } else {
+          openAuthModal();
+        }
       });
+    }
 
-      // Set current year in footer
+    if (showRegister) {
+      showRegister.addEventListener('click', (e) => {
+        e.preventDefault();
+        loginBox.classList.add('hidden');
+        registerBox.classList.remove('hidden');
+      });
+    }
+
+    if (showLogin) {
+      showLogin.addEventListener('click', (e) => {
+        e.preventDefault();
+        registerBox.classList.add('hidden');
+        loginBox.classList.remove('hidden');
+      });
+    }
+
+    if (registerForm) {
+      registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('register-email').value;
+        const password = document.getElementById('register-password').value;
+        const nome = document.getElementById('register-name').value;
+        const prefix = document.getElementById('register-phone-prefix').value;
+        const phone = document.getElementById('register-phone').value;
+        const fullPhone = prefix + phone;
+
+        try {
+          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+          await updateProfile(userCredential.user, { displayName: nome });
+          await addDoc(collection(db, "utenti"), { 
+            userId: userCredential.user.uid, 
+            nome, 
+            telefono: fullPhone, 
+            email 
+          });
+          
+          registerForm.reset();
+          closeAuthModal();
+          alert("Registrazione completata! Ora puoi accedere all'area riservata.");
+        } catch (err) {
+          alert("Errore durante la registrazione: " + err.message);
+        }
+      });
+    }
+
+    if (loginForm) {
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+          loginForm.reset();
+          closeAuthModal();
+        } catch (err) {
+          alert("Errore durante il login: " + err.message);
+        }
+      });
+    }
+
+    if (logoutLink) {
+      logoutLink.addEventListener('click', async (e) => {
+        e.preventDefault();
+        try {
+          await signOut(auth);
+        } catch (err) {
+          alert("Errore durante il logout: " + err.message);
+        }
+      });
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const firstName = user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0];
+        privateAreaLink.textContent = firstName;
+        logoutLink.classList.remove('hidden');
+      } else {
+        const lang = document.documentElement.lang;
+        privateAreaLink.textContent = translations[lang]["private-area"];
+        logoutLink.classList.add('hidden');
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (contactModal.classList.contains('show')) {
+          closeContactModal();
+        }
+        if (authModal.classList.contains('show')) {
+          closeAuthModal();
+        }
+        if (lightboxModal && lightboxModal.classList.contains('show')) {
+          closeLightbox();
+        }
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedLang = localStorage.getItem('selectedLanguage') || 'it';
+      const langSelect = document.getElementById('language-select');
+
+      if (langSelect) {
+        langSelect.value = savedLang;
+        langSelect.addEventListener('change', (e) => {
+          setLanguage(e.target.value);
+        });
+      }
+
+      setLanguage(savedLang);
       document.getElementById('current-year').textContent = new Date().getFullYear();
 
-
-      // Set current year in 
-document.getElementById('current-year-link').textContent = new Date().getFullYear();
-
-
-      // Smooth scrolling for anchor links
       document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
           const href = this.getAttribute('href');
-          // Ignora i link che hanno solo "#" come href per evitare errori di querySelector
           if (href === "#" || href.trim() === "") {
             e.preventDefault(); 
             return; 
@@ -885,69 +986,53 @@ document.getElementById('current-year-link').textContent = new Date().getFullYea
         });
       });
 
-      // Funzionalità del modale dei contatti (esistente)
-      // ... (il codice esistente per il modale dei contatti è stato mantenuto)
-
-      // Lightbox functionality for feature images
       const lightboxModal = document.getElementById('lightboxModal');
-      const lightboxContent = document.querySelector('.lightbox-content'); // Seleziona il contenitore per lo scroll
+      const lightboxContent = document.querySelector('.lightbox-content');
       const lightboxImage = document.getElementById('lightboxImage');
       const closeLightboxBtn = document.getElementById('closeLightboxBtn');
       const featureImageContainers = document.querySelectorAll('.feature-image-container');
 
-      let currentZoom = 1; // Inizializza il livello di zoom
-      const zoomStep = 0.1; // Incremento/decremento dello zoom
+      let currentZoom = 1;
+      const zoomStep = 0.1;
 
-      // Funzione per aprire il lightbox
       function openLightbox(imageSrc, imageAlt) {
         lightboxImage.src = imageSrc;
         lightboxImage.alt = imageAlt;
         lightboxModal.classList.add('show');
-        document.body.classList.add('no-scroll'); // Disabilita lo scroll del body
-        currentZoom = 1; // Resetta lo zoom all'apertura
-        lightboxImage.style.transform = `scale(${currentZoom})`; // Applica lo zoom iniziale
-
-        // Aggiunge l'event listener per lo zoom con la rotellina del mouse
+        document.body.classList.add('no-scroll');
+        currentZoom = 1;
+        lightboxImage.style.transform = `scale(${currentZoom})`;
         lightboxImage.addEventListener('wheel', handleImageZoom, { passive: false });
       }
 
-      // Funzione per chiudere il lightbox
       function closeLightbox() {
         lightboxModal.classList.remove('show');
-        lightboxImage.src = ""; // Pulisce la sorgente dell'immagine
-        lightboxImage.alt = ""; // Pulisce il testo alt
-        document.body.classList.remove('no-scroll'); // Riabilita lo scroll del body
-        
-        // Rimuove l'event listener per lo zoom
+        lightboxImage.src = "";
+        lightboxImage.alt = "";
+        document.body.classList.remove('no-scroll');
         lightboxImage.removeEventListener('wheel', handleImageZoom);
       }
 
-      // Gestore dello zoom dell'immagine
       function handleImageZoom(e) {
-        e.preventDefault(); // Previene lo zoom della pagina
-        
-        const delta = Math.sign(e.deltaY); // -1 per zoom in, 1 per zoom out
+        e.preventDefault();
+        const delta = Math.sign(e.deltaY);
 
-        if (delta === -1) { // Zoom in
+        if (delta === -1) {
           currentZoom += zoomStep;
-        } else { // Zoom out
+        } else {
           currentZoom -= zoomStep;
         }
 
-        // Limita lo zoom a valori ragionevoli
-        currentZoom = Math.max(0.5, Math.min(currentZoom, 3)); // Min 0.5x, Max 3x
-
+        currentZoom = Math.max(0.5, Math.min(currentZoom, 3));
         lightboxImage.style.transform = `scale(${currentZoom})`;
 
-        // Se l'immagine è ingrandita, abilita lo scroll del contenitore
         if (currentZoom > 1) {
-            lightboxContent.style.overflow = 'auto';
+          lightboxContent.style.overflow = 'auto';
         } else {
-            lightboxContent.style.overflow = 'hidden'; // Nasconde le scrollbar se l'immagine è rimpicciolita
+          lightboxContent.style.overflow = 'hidden';
         }
       }
 
-      // Add click listeners to each feature image container
       featureImageContainers.forEach(container => {
         const img = container.querySelector('img');
         if (img) {
@@ -957,30 +1042,18 @@ document.getElementById('current-year-link').textContent = new Date().getFullYea
         }
       });
 
-      // Add click listener to close button
       if (closeLightboxBtn) {
         closeLightboxBtn.addEventListener('click', closeLightbox);
       }
 
-      // Close lightbox when clicking outside the image content
       if (lightboxModal) {
         lightboxModal.addEventListener('click', (e) => {
-          // Check if the click occurred directly on the modal background, not on the image itself
           if (e.target === lightboxModal) {
             closeLightbox();
           }
         });
       }
-
-      // Close lightbox with ESC key
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && lightboxModal.classList.contains('show')) {
-          closeLightbox();
-        }
-      });
     });
-
-
   </script>
 </body>
 </html>
