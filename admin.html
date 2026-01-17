@@ -1,211 +1,239 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin – Prenotazioni Casa Gianna</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin – Prenotazioni Casa Gianna</title>
 
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, onSnapshot, deleteDoc, doc, query, where, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { 
+            getFirestore, collection, onSnapshot, deleteDoc, doc, query, where, getDocs 
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-/* 🔥 FIREBASE CONFIG */
-const firebaseConfig = {
-  apiKey: "AIzaSyALyvupZcBogh5KGATUQur4AeCrpZtzDLo",
-  authDomain: "casa-mare-c974a.firebaseapp.com",
-  projectId: "casa-mare-c974a",
-  storageBucket: "casa-mare-c974a.firebasestorage.app",
-  messagingSenderId: "596357064782",
-  appId: "1:596357064782:web:d86b0f1d57b7ea5989fb1f"
-};
+        /* 🔥 FIREBASE CONFIG */
+        const firebaseConfig = {
+            apiKey: "AIzaSyALyvupZcBogh5KGATUQur4AeCrpZtzDLo",
+            authDomain: "casa-mare-c974a.firebaseapp.com",
+            projectId: "casa-mare-c974a",
+            storageBucket: "casa-mare-c974a.firebasestorage.app",
+            messagingSenderId: "596357064782",
+            appId: "1:596357064782:web:d86b0f1d57b7ea5989fb1f"
+        };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth();
-const bookingsRef = collection(db, "prenotazioni casa mare");
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth();
+        const bookingsRef = collection(db, "prenotazioni casa mare");
 
-/* 🔐 Recupera ruolo */
-async function getUserRole(uid){
-  const q = query(collection(db,"utenti"), where("userId","==", uid));
-  const snap = await getDocs(q);
-  if(snap.empty) return "user";
-  return snap.docs[0].data().role || "user";
-}
+        let unsubscribe = null;
 
-/* 🛡️ PROTEZIONE PAGINA */
-let uidAdmin = "";
-onAuthStateChanged(auth, async user => {
-  if(!user){
-    window.location.href = "prezzario.html";
-    return;
-  }
-
-  uidAdmin = user.uid;
-  const role = await getUserRole(user.uid);
-  if(role !== "admin"){
-    alert("Accesso non autorizzato");
-    await signOut(auth);
-    window.location.href = "prezzario.html";
-    return;
-  }
-
-  loadBookings(); // carica prenotazioni
-});
-
-/* 📊 CARICA PRENOTAZIONI con filtri */
-function loadBookings(startDate = null, endDate = null, filterColor = "tutti"){
-  const list = document.getElementById("booking-list");
-
-  onSnapshot(bookingsRef, snapshot => {
-    list.innerHTML = "";
-
-    snapshot.docs.forEach(d => {
-      const b = d.data();
-
-      // Filtro per date
-      if(startDate && b.data_fine < startDate) return;
-      if(endDate && b.data_inizio > endDate) return;
-
-      // Determina se prenotazione admin
-      const isAdminBooking = b.email === "casamarenazioni@gmail.com";
-
-
-      // Filtro colore
-      if(filterColor === "admin" && !isAdminBooking) return;
-      if(filterColor === "clienti" && isAdminBooking) return;
-
-      const li = document.createElement("li");
-      li.className = "p-4 rounded shadow flex justify-between items-center";
-      li.classList.add(isAdminBooking ? "bg-yellow-100" : "bg-white");
-
-      const info = document.createElement("div");
-      info.innerHTML = `
-        <strong>${b.nome}</strong> ${isAdminBooking ? '<span class="text-sm text-yellow-800 font-semibold">(Admin)</span>' : ''}<br>
-        ${b.data_inizio} → ${b.data_fine}<br>
-        <span class="text-sm text-gray-500">${b.email}</span>
-      `;
-
-      const btn = document.createElement("button");
-      btn.textContent = "🗑️ Elimina";
-      btn.className = "text-red-600 font-bold hover:text-red-800";
-      btn.onclick = async () => {
-        if(confirm("Eliminare questa prenotazione?")){
-          await deleteDoc(doc(db,"prenotazioni casa mare", d.id));
+        /* 🔐 Recupera ruolo */
+        async function getUserRole(uid){
+            try {
+                const q = query(collection(db,"utenti"), where("userId","==", uid));
+                const snap = await getDocs(q);
+                if(snap.empty) return "user";
+                return snap.docs[0].data().role || "user";
+            } catch (e) {
+                console.error("Errore recupero ruolo:", e);
+                return "user";
+            }
         }
-      };
 
-      li.appendChild(info);
-      li.appendChild(btn);
-      list.appendChild(li);
-    });
-  });
-}
+        /* 🛡️ PROTEZIONE PAGINA */
+        onAuthStateChanged(auth, async user => {
+            const list = document.getElementById("booking-list");
+            if(!user){
+                list.innerHTML = `<li class="p-4 bg-red-100 text-red-700 rounded text-center">Effettuare l'accesso per visualizzare i dati.</li>`;
+                return;
+            }
 
-/* 🚪 LOGOUT */
-window.logoutAdmin = async () => {
-  await signOut(auth);
-  window.location.href = "index.html";
-};
+            const role = await getUserRole(user.uid);
+            if(role !== "admin"){
+                list.innerHTML = `<li class="p-4 bg-red-100 text-red-700 rounded text-center">Accesso negato: permessi admin richiesti.</li>`;
+                return;
+            }
 
-/* 🔹 TORNA AL CALENDARIO/PREZZARIO */
-window.goToPrezzario = () => {
-  window.location.href = 'prezzario.html';
-};
+            loadBookings(); 
+        });
 
-/* 🟢 FILTRA PER DATA */
-const startDateInput = document.getElementById("start-date");
-const endDateInput = document.getElementById("end-date");
+        /* 📊 CARICA PRENOTAZIONI */
+        function loadBookings(){
+            const list = document.getElementById("booking-list");
+            
+            if (unsubscribe) unsubscribe();
 
-startDateInput.addEventListener("change", () => {
-  const start = startDateInput.value;
-  if(start){
-    endDateInput.min = start;
-    if(endDateInput.value && endDateInput.value < start){
-      endDateInput.value = start;
-    }
-  } else {
-    endDateInput.min = '';
-  }
-});
+            unsubscribe = onSnapshot(bookingsRef, snapshot => {
+                const startDate = document.getElementById("start-date").value;
+                const endDate = document.getElementById("end-date").value;
+                const selectedColor = document.getElementById("color-filter").value;
+                const searchQuery = document.getElementById("search-input").value.toLowerCase();
 
-document.getElementById("filter-btn").addEventListener("click", () => {
-  const start = startDateInput.value;
-  const end = endDateInput.value;
-  const color = document.getElementById("color-filter").value;
-  loadBookings(start, end, color);
-});
+                list.innerHTML = "";
 
-document.getElementById("reset-btn").addEventListener("click", () => {
-  startDateInput.value = '';
-  endDateInput.value = '';
-  endDateInput.min = '';
-  document.getElementById("color-filter").value = 'tutti';
-  loadBookings();
-});
+                if (snapshot.empty) {
+                    list.innerHTML = `<li class="text-center py-10 text-gray-400 italic">Nessuna prenotazione trovata.</li>`;
+                    return;
+                }
 
-/* 🔍 RICERCA RAPIDA */
-document.getElementById("search-input").addEventListener("input", (e) => {
-  const query = e.target.value.toLowerCase();
-  const items = document.querySelectorAll("#booking-list li");
-  items.forEach(li => {
-    const text = li.innerText.toLowerCase();
-    li.style.display = text.includes(query) ? "flex" : "none";
-  });
-});
+                snapshot.docs.forEach(d => {
+                    const b = d.data();
 
-/* 📦 ESPORTA EXCEL */
-document.getElementById("export-btn").addEventListener("click", async () => {
-  const snapshot = await getDocs(bookingsRef);
-  const data = snapshot.docs.map(d => d.data());
+                    // 1. Filtri per date
+                    if(startDate && b.data_fine < startDate) return;
+                    if(endDate && b.data_inizio > endDate) return;
 
-  const worksheetData = data.map(b => ({
-    Nome: b.nome,
-    Email: b.email,
-    "Data Inizio": b.data_inizio,
-    "Data Fine": b.data_fine,
-    CreatoDa: b.createdBy === uidAdmin ? "Admin" : "Cliente"
-  }));
+                    // 2. Determina se prenotazione admin
+                    const isAdminBooking = b.email === "casamarenazioni@gmail.com";
 
-  const worksheet = XLSX.utils.json_to_sheet(worksheetData);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Prenotazioni");
-  XLSX.writeFile(workbook, "prenotazioni.xlsx");
-});
-</script>
+                    // 3. Filtro colore
+                    if(selectedColor === "admin" && !isAdminBooking) return;
+                    if(selectedColor === "clienti" && isAdminBooking) return;
+
+                    // 4. Filtro ricerca
+                    const text = `${b.nome || ''} ${b.email || ''}`.toLowerCase();
+                    if(searchQuery && !text.includes(searchQuery)) return;
+
+                    const li = document.createElement("li");
+                    li.className = "p-4 rounded shadow flex justify-between items-center transition-all bg-white border-l-4";
+                    li.style.borderLeftColor = isAdminBooking ? "#EAB308" : "#E5E7EB";
+                    if(isAdminBooking) li.classList.add("bg-yellow-50");
+
+                    const info = document.createElement("div");
+                    info.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <strong class="text-gray-800">${b.nome || 'N/A'}</strong> 
+                            ${isAdminBooking ? '<span class="text-[10px] bg-yellow-500 text-white px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Admin</span>' : ''}
+                        </div>
+                        <span class="text-sm font-mono text-blue-600">${b.data_inizio} ➔ ${b.data_fine}</span><br>
+                        <span class="text-xs text-gray-400">${b.email || 'Senza email'}</span>
+                    `;
+
+                    const btn = document.createElement("button");
+                    btn.textContent = "🗑️ Elimina";
+                    btn.className = "text-red-500 text-xs font-bold hover:bg-red-50 px-3 py-2 rounded transition";
+                    btn.onclick = async () => {
+                        const confirmDelete = window.confirm("Eliminare questa prenotazione?");
+                        if(confirmDelete){
+                            await deleteDoc(doc(db,"prenotazioni casa mare", d.id));
+                        }
+                    };
+
+                    li.appendChild(info);
+                    li.appendChild(btn);
+                    list.appendChild(li);
+                });
+            }, (error) => {
+                console.error("Errore Firestore:", error);
+                list.innerHTML = `<li class="p-4 bg-red-50 text-red-600 rounded">Errore nel caricamento: ${error.message}</li>`;
+            });
+        }
+
+        /* 🚪 GESTIONE EVENTI */
+        document.getElementById("start-date").addEventListener("change", (e) => {
+            document.getElementById("end-date").min = e.target.value;
+            loadBookings();
+        });
+        document.getElementById("end-date").addEventListener("change", loadBookings);
+        document.getElementById("color-filter").addEventListener("change", loadBookings);
+        document.getElementById("search-input").addEventListener("input", loadBookings);
+        
+        document.getElementById("reset-btn").addEventListener("click", () => {
+            document.getElementById("start-date").value = '';
+            document.getElementById("end-date").value = '';
+            document.getElementById("end-date").min = '';
+            document.getElementById("color-filter").value = 'tutti';
+            document.getElementById("search-input").value = '';
+            loadBookings();
+        });
+
+        window.logoutAdmin = async () => {
+            try {
+                await signOut(auth);
+                window.location.reload();
+            } catch (e) {
+                console.error("Logout fallito:", e);
+            }
+        };
+
+        window.goToPrezzario = () => {
+            window.location.href = 'prezzario.html';
+        };
+
+        /* 📦 EXPORT */
+        document.getElementById("export-btn").addEventListener("click", async () => {
+            const snapshot = await getDocs(bookingsRef);
+            const data = snapshot.docs.map(d => d.data());
+            const worksheetData = data.map(b => ({
+                Nome: b.nome,
+                Email: b.email,
+                "Data Inizio": b.data_inizio,
+                "Data Fine": b.data_fine,
+                Tipo: b.email === "casamarenazioni@gmail.com" ? "Admin" : "Cliente"
+            }));
+            const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Prenotazioni");
+            XLSX.writeFile(workbook, "prenotazioni_casa_gianna.xlsx");
+        });
+
+    </script>
 </head>
 
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-gray-50 min-h-screen font-sans text-gray-900">
 
-<header class="bg-gray-900 text-white p-4 flex justify-between items-center">
-  <h1 class="text-xl font-bold">Admin – Prenotazioni</h1>
-  <div class="flex gap-2">
-    <button onclick="goToPrezzario()" class="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700">Calendario</button>
-    <button onclick="logoutAdmin()" class="bg-red-600 px-4 py-2 rounded hover:bg-red-700">Logout</button>
-  </div>
+<header class="bg-gray-900 text-white p-4 sticky top-0 z-50 shadow-md flex justify-between items-center">
+    <div class="flex flex-col">
+        <h1 class="text-xl font-bold leading-tight">Admin – Prenotazioni</h1>
+        <span class="text-[10px] text-gray-400 uppercase tracking-widest">Casa Gianna</span>
+    </div>
+    <div class="flex gap-2">
+        <button onclick="goToPrezzario()" class="bg-gray-800 border border-gray-700 px-4 py-2 rounded text-sm hover:bg-gray-700 transition">Calendario</button>
+        <button onclick="logoutAdmin()" class="bg-red-600 px-4 py-2 rounded text-sm hover:bg-red-700 transition shadow-lg shadow-red-900/20">Logout</button>
+    </div>
 </header>
 
 <main class="max-w-4xl mx-auto p-6">
-  <!-- FILTRI, RICERCA, EXPORT -->
-  <div class="flex flex-wrap gap-2 mb-4 items-center">
-    <input type="date" id="start-date" class="border rounded px-2 py-1" placeholder="Data inizio">
-    <input type="date" id="end-date" class="border rounded px-2 py-1" placeholder="Data fine">
-    <button id="filter-btn" class="bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700">Filtra</button>
-    <button id="reset-btn" class="bg-gray-500 text-white px-4 py-1 rounded hover:bg-gray-600">Reset</button>
-    <input type="text" id="search-input" placeholder="Cerca per nome o email" class="border rounded px-2 py-1 flex-grow">
-    <select id="color-filter" class="border rounded px-2 py-1">
-      <option value="tutti">Tutti</option>
-      <option value="admin">Admin (gialle)</option>
-      <option value="clienti">Clienti (bianche)</option>
-    </select>
-    <button id="export-btn" class="bg-purple-600 text-white px-4 py-1 rounded hover:bg-purple-700">Esporta Excel</button>
-  </div>
+    <!-- BARRA STRUMENTI -->
+    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 mb-6 flex flex-wrap gap-4 items-end">
+        <div class="flex flex-col gap-1.5">
+            <label class="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Dal giorno</label>
+            <input type="date" id="start-date" class="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none bg-gray-50">
+        </div>
+        <div class="flex flex-col gap-1.5">
+            <label class="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Al giorno</label>
+            <input type="date" id="end-date" class="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none bg-gray-50">
+        </div>
+        <button id="reset-btn" class="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-50 transition active:scale-95">Reset</button>
+        
+        <div class="w-full h-px bg-gray-50 my-1"></div>
 
-  <!-- LISTA PRENOTAZIONI -->
-  <ul id="booking-list" class="space-y-4"></ul>
+        <div class="flex-grow flex flex-col gap-1.5">
+            <label class="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Ricerca Testuale</label>
+            <input type="text" id="search-input" placeholder="Cerca nome o email..." class="border border-gray-200 rounded-lg px-3 py-2 text-sm w-full focus:ring-2 focus:ring-blue-500 focus:outline-none bg-gray-50">
+        </div>
+        
+        <div class="flex flex-col gap-1.5">
+            <label class="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Tipo Prenotazione</label>
+            <select id="color-filter" class="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 cursor-pointer focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <option value="tutti">Tutti i tipi</option>
+                <option value="admin">Solo Admin (Gialle)</option>
+                <option value="clienti">Solo Clienti (Bianche)</option>
+            </select>
+        </div>
+        
+        <button id="export-btn" class="bg-purple-600 text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-purple-700 transition shadow-md active:scale-95">Excel</button>
+    </div>
+
+    <!-- LISTA PRENOTAZIONI -->
+    <ul id="booking-list" class="space-y-3">
+        <li class="text-center py-10 text-gray-400 animate-pulse italic">In attesa di autenticazione...</li>
+    </ul>
 </main>
 
 </body>
