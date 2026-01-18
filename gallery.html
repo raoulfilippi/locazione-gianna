@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Galleria - Casa Vacanze Gianna</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Aggiunto FontAwesome come in prezzario.html -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -33,7 +35,6 @@
     }
 
     .hero-gradient {
-      /* Modificato per usare l'immagine di sfondo */
       background-image: url('spiaggia4.jpg');
       background-size: cover;
       background-position: center;
@@ -41,8 +42,8 @@
     }
 
     .glass-effect {
-      backdrop-filter: blur(20px);
-      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(8px);
+      background: rgba(255, 255, 255, 0.85);
       border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
@@ -117,32 +118,31 @@
 
     .lightbox-content {
       position: relative;
-      max-width: 90vw; /* Contenitore del lightbox più grande per permettere lo scroll */
-      max-height: 90vh; /* Contenitore del lightbox più grande per permettere lo scroll */
+      max-width: 90vw;
+      max-height: 90vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      overflow: auto; /* Abilita lo scorrimento all'interno del lightbox se l'immagine è più grande */
+      overflow: auto;
       background-color: transparent;
     }
 
     .lightbox-content img {
-      max-width: 70vw; /* L'immagine si adatta inizialmente al 70% della larghezza del viewport */
-      max-height: 70vh; /* L'immagine si adatta inizialmente al 70% dell'altezza del viewport */
-      object-fit: contain; /* Ridimensiona l'immagine per adattarsi al contenitore mantenendo le proporzioni */
+      max-width: 70vw;
+      max-height: 70vh;
+      object-fit: contain;
       display: block;
       border-radius: 0.5rem;
       box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
-      transition: transform 0.1s ease-out; /* Transizione fluida per lo zoom */
-      transform-origin: center center; /* Lo zoom parte dal centro dell'immagine */
-      cursor: grab; /* Indica che l'immagine può essere trascinata */
+      transition: transform 0.1s ease-out;
+      transform-origin: center center;
+      cursor: grab;
     }
 
     .lightbox-content img.dragging {
       cursor: grabbing;
     }
 
-    /* Stili per i pulsanti di navigazione della lightbox (precedente/successivo) */
     .lightbox-nav {
       position: absolute;
       top: 50%;
@@ -152,14 +152,13 @@
       border: none;
       color: white;
       font-size: 2rem;
-      /* Imposta larghezza e altezza fisse per garantire la rotondità */
-      width: 60px; /* Larghezza del pulsante */
-      height: 60px; /* Altezza del pulsante */
-      display: flex; /* Usa flexbox per centrare il contenuto */
-      justify-content: center; /* Centra orizzontalmente */
-      align-items: center; /* Centra verticalmente */
+      width: 60px;
+      height: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       cursor: pointer;
-      border-radius: 50%; /* Rende il pulsante perfettamente rotondo */
+      border-radius: 50%;
       transition: all 0.3s ease;
       z-index: 10001;
     }
@@ -177,7 +176,6 @@
       right: 2rem;
     }
 
-    /* Stili per il pulsante di chiusura della lightbox */
     .lightbox-close {
       position: absolute;
       top: 2rem;
@@ -187,14 +185,13 @@
       border: none;
       color: white;
       font-size: 2rem;
-      /* Imposta larghezza e altezza fisse per garantire la rotondità */
-      width: 60px; /* Larghezza del pulsante */
-      height: 60px; /* Altezza del pulsante */
-      display: flex; /* Usa flexbox per centrare il contenuto */
-      justify-content: center; /* Centra orizzontalmente */
-      align-items: center; /* Centra verticalmente */
+      width: 60px;
+      height: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       cursor: pointer;
-      border-radius: 50%; /* Rende il pulsante perfettamente rotondo */
+      border-radius: 50%;
       transition: all 0.3s ease;
       z-index: 10001;
     }
@@ -213,15 +210,6 @@
       50% { transform: translateY(-10px); }
     }
 
-    .fade-in {
-      animation: fadeIn 0.8s ease-in-out;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
     .stagger-animation {
       animation: staggerIn 0.6s ease-out forwards;
       opacity: 0;
@@ -235,7 +223,6 @@
       }
     }
 
-    /* Stili per il modale dei contatti */
     .contact-modal {
       position: fixed;
       top: 0;
@@ -281,13 +268,12 @@
       color: #ef4444;
     }
 
-    /* Stile per l'immagine del profilo nella testata */
     .profile-pic {
-      width: 48px; /* Dimensione desiderata */
-      height: 48px; /* Dimensione desiderata */
-      border-radius: 50%; /* Rende l'immagine rotonda */
-      object-fit: cover; /* Assicura che l'immagine copra l'area senza distorsioni */
-      cursor: pointer; /* Indica che l'elemento è cliccabile */
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      cursor: pointer;
       transition: transform 0.3s ease;
     }
 
@@ -295,36 +281,35 @@
       transform: scale(1.05);
     }
 
+    /* --- REGOLE RESPONSIVE AGGIUNTE DA PREZZARIO.HTML --- */
+    /* Mobile menu + overlay - FIXED z-index */
+    #mobile-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 55; }
+    #mobile-overlay.show { display: block; }
+    #mobile-menu { display: none; position: fixed; top: 80px; left: 0; width: 100%; background: #fff; border-top: 1px solid #e5e7eb; box-shadow: 0 6px 20px rgba(0,0,0,0.12); z-index: 56; max-height: calc(100vh - 80px); overflow:auto; }
+    #mobile-menu.show { display: block; }
+    #menu-btn { position: relative; z-index: 60; }
+
     @media (max-width: 768px) {
-      /* Adatta le dimensioni dei pulsanti per schermi più piccoli */
       .lightbox-nav, .lightbox-close {
         font-size: 1.5rem;
-        width: 45px; /* Larghezza ridotta */
-        height: 45px; /* Altezza ridotta */
-        padding: 0; /* Rimuovi il padding per evitare ovalizzazione */
+        width: 45px;
+        height: 45px;
+        padding: 0;
       }
-      
-      .lightbox-prev {
-        left: 1rem;
-      }
-      
-      .lightbox-next {
-        right: 1rem;
-      }
-      
-      .lightbox-close {
-        top: 1rem;
-        right: 1rem;
-      }
+      .lightbox-prev { left: 1rem; }
+      .lightbox-next { right: 1rem; }
+      .lightbox-close { top: 1rem; right: 1rem; }
     }
   </style>
 </head>
 <body class="min-h-screen">
+
+  <!-- HEADER UGUALE A PREZZARIO -->
   <header class="fixed top-0 w-full z-50 glass-effect">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-20">
+        <!-- Logo e info -->
         <div class="flex items-center space-x-3">
-          <!-- Immagine di Gianna al posto dell'icona 'G' -->
           <img id="gianna-profile-pic" src="gianna1.jpg" alt="Gianna" class="profile-pic">
           <div>
             <h1 class="heading-font text-xl font-semibold text-gray-900">Casa Gianna</h1>
@@ -332,41 +317,46 @@
           </div>
         </div>
 
-        <div class="flex items-center space-x-4">
-          <nav class="hidden md:flex space-x-6">
-            <a href="index.html" class="text-gray-700 hover:text-blue-600 transition duration-300 font-medium" data-key="nav-home-desktop">Home</a>
-            <a href="#gallery-section" class="text-gray-700 hover:text-blue-600 transition duration-300 font-medium" data-key="nav-gallery-desktop">Galleria</a>
-            <a href="#features-section" class="text-gray-700 hover:text-blue-600 transition duration-300 font-medium" data-key="nav-features-desktop">Caratteristiche</a>
-            <a href="#contact-section" class="text-gray-700 hover:text-blue-600 transition duration-300 font-medium" data-key="nav-contact-desktop">Contatti</a>
-          </nav>
-
-          <select id="language-select" class="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        <!-- Desktop links -->
+        <div class="hidden md:flex items-center space-x-4">
+          <a href="index.html" class="text-gray-700 hover:text-blue-600 font-medium" data-key="nav-home-desktop">Home</a>
+          <a href="#gallery-section" class="text-gray-700 hover:text-blue-600 font-medium" data-key="nav-gallery-desktop">Galleria</a>
+          <a href="#features-section" class="text-gray-700 hover:text-blue-600 font-medium" data-key="nav-features-desktop">Caratteristiche</a>
+          <a href="#contact-section" class="text-gray-700 hover:text-blue-600 font-medium" data-key="nav-contact-desktop">Contatti</a>
+          
+          <select id="language-select" class="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700">
             <option value="it">🇮🇹 Italiano</option>
-            <option value="en"> 🇧 English</option>
+            <option value="en">🇬🇧 English</option>
             <option value="de">🇩🇪 Deutsch</option>
           </select>
-          
-          <button id="mobile-menu-button" class="md:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
-            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-            </svg>
+        </div>
+
+        <!-- Hamburger mobile -->
+        <div class="md:hidden flex items-center">
+          <button id="menu-btn" class="text-gray-700 hover:text-blue-600 focus:outline-none" aria-label="Apri menu">
+            <i class="fa-solid fa-bars fa-lg"></i>
           </button>
         </div>
       </div>
     </div>
-
-    <div id="mobile-menu" class="hidden md:hidden fixed inset-0 bg-white bg-opacity-95 z-40 flex flex-col items-center justify-center space-y-8 py-20 transition-transform transform -translate-y-full">
-      <button id="close-mobile-menu" class="absolute top-6 right-6 p-2 rounded-md text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
-        <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
-      </button>
-      <a href="index.html" class="text-3xl text-gray-800 hover:text-blue-600 transition duration-300 font-medium" data-key="nav-home-mobile">Home</a>
-      <a href="#gallery-section" class="text-3xl text-gray-800 hover:text-blue-600 transition duration-300 font-medium" data-key="nav-gallery-mobile">Galleria</a>
-      <a href="#features-section" class="text-3xl text-gray-800 hover:text-blue-600 transition duration-300 font-medium" data-key="nav-features-mobile">Caratteristiche</a>
-      <a href="#contact-section" class="text-3xl text-gray-800 hover:text-blue-600 transition duration-300 font-medium" data-key="nav-contact-mobile">Contatti</a>
-    </div>
   </header>
+
+  <!-- OVERLAY E MENU MOBILE FUORI DALL'HEADER (Come prezzario) -->
+  <div id="mobile-overlay" aria-hidden="true"></div>
+
+  <nav id="mobile-menu" class="md:hidden" aria-hidden="true">
+    <div class="flex flex-col p-4 space-y-2">
+      <a href="index.html" class="text-gray-700 hover:text-blue-600 font-medium" data-key="nav-home-mobile">Home</a>
+      <a href="#gallery-section" class="text-gray-700 hover:text-blue-600 font-medium" data-key="nav-gallery-mobile">Galleria</a>
+      <a href="#features-section" class="text-gray-700 hover:text-blue-600 font-medium" data-key="nav-features-mobile">Caratteristiche</a>
+      <a href="#contact-section" class="text-gray-700 hover:text-blue-600 font-medium" data-key="nav-contact-mobile">Contatti</a>
+      <select id="mobile-language-select" class="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 mt-2">
+        <option value="it">🇮🇹 Italiano</option>
+        <option value="en">🇬🇧 English</option>
+        <option value="de">🇩🇪 Deutsch</option>
+      </select>
+    </div>
+  </nav>
 
   <section class="hero-gradient pt-32 pb-20 relative overflow-hidden">
     <div class="absolute inset-0 bg-black/20"></div>
@@ -550,7 +540,7 @@
   </div>
 
   <script>
-    // Dati delle immagini della galleria - Assicurati che questi percorsi siano corretti!
+    // Dati delle immagini della galleria
     const galleryImages = [
       { src: "casa29.jpg", key: "gallery-img-1" },
       { src: "casa35.jpg", key: "gallery-img-2" },
@@ -566,7 +556,6 @@
       { src: "casa36.png", key: "gallery-img-12" }
     ];
 
-    // Dettagli di contatto di Gianna
     const contactDetails = {
         name: "Gianna Santececca",
         phone: "+393388984269",
@@ -574,7 +563,6 @@
         email: "casamarenazioni@gmail.com"
     };
 
-    // Funzionalità della galleria
     let currentIndex = 0;
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = document.getElementById('lightbox-img');
@@ -582,22 +570,18 @@
     const nextBtn = document.getElementById('nextBtn');
     const prevBtn = document.getElementById('prevBtn');
     const gallery = document.getElementById('gallery');
-    const lightboxContent = document.querySelector('.lightbox-content'); // Seleziona il contenitore per lo scroll
+    const lightboxContent = document.querySelector('.lightbox-content');
+    let currentZoom = 1;
+    const zoomStep = 0.1;
 
-    let currentZoom = 1; // Inizializza il livello di zoom
-    const zoomStep = 0.1; // Incremento/decremento dello zoom
-
-    // Funzione per creare gli elementi della galleria
     function createGalleryItems() {
-      gallery.innerHTML = ''; // Pulisce gli elementi esistenti
-      const currentLang = document.documentElement.lang; // Ottiene la lingua corrente
+      gallery.innerHTML = '';
+      const currentLang = document.documentElement.lang;
       
       galleryImages.forEach((image, index) => {
         const galleryItem = document.createElement('div');
         galleryItem.className = 'gallery-item stagger-animation';
         galleryItem.style.animationDelay = `${index * 0.1}s`;
-
-        // Ottiene il testo alt tradotto
         const translatedAlt = translations[currentLang][image.key] || image.key;
         
         galleryItem.innerHTML = `
@@ -614,7 +598,6 @@
         gallery.appendChild(galleryItem);
       });
 
-      // Aggiunge i listener di click ai nuovi elementi della galleria
       document.querySelectorAll('.gallery-overlay').forEach(overlay => {
         overlay.addEventListener('click', (e) => {
           currentIndex = parseInt(e.currentTarget.dataset.index);
@@ -623,89 +606,56 @@
       });
     }
 
-    // Funzione per aprire la lightbox
     function openLightbox(index) {
       const currentLang = document.documentElement.lang;
       const translatedAlt = translations[currentLang][galleryImages[index].key] || galleryImages[index].key;
 
       lightboxImg.src = galleryImages[index].src;
-      lightboxImg.alt = translatedAlt; // Usa il testo alt tradotto
+      lightboxImg.alt = translatedAlt;
       lightbox.classList.add('show');
-      document.body.classList.add('no-scroll'); // Disabilita lo scroll del body
-      currentZoom = 1; // Resetta lo zoom all'apertura
-      lightboxImg.style.transform = `scale(${currentZoom})`; // Applica lo zoom iniziale
-
-      // Aggiunge l'event listener per lo zoom con la rotellina del mouse
+      document.body.classList.add('no-scroll');
+      currentZoom = 1;
+      lightboxImg.style.transform = `scale(${currentZoom})`;
       lightboxImg.addEventListener('wheel', handleImageZoom, { passive: false });
     }
 
-    // Funzione per chiudere la lightbox
     function closeLightbox() {
       lightbox.classList.remove('show');
-      lightboxImg.src = ""; // Pulisce la sorgente dell'immagine
-      lightboxImg.alt = ""; // Pulisce il testo alt
-      document.body.classList.remove('no-scroll'); // Riabilita lo scroll del body
-      
-      // Rimuove l'event listener per lo zoom
+      lightboxImg.src = "";
+      lightboxImg.alt = "";
+      document.body.classList.remove('no-scroll');
       lightboxImg.removeEventListener('wheel', handleImageZoom);
     }
 
-    // Gestore dello zoom dell'immagine
     function handleImageZoom(e) {
-      e.preventDefault(); // Previene lo zoom della pagina
-      
-      const delta = Math.sign(e.deltaY); // -1 per zoom in, 1 per zoom out
-
-      if (delta === -1) { // Zoom in
-        currentZoom += zoomStep;
-      } else { // Zoom out
-        currentZoom -= zoomStep;
-      }
-
-      // Limita lo zoom a valori ragionevoli
-      currentZoom = Math.max(0.5, Math.min(currentZoom, 3)); // Min 0.5x, Max 3x
-
+      e.preventDefault();
+      const delta = Math.sign(e.deltaY);
+      if (delta === -1) currentZoom += zoomStep; else currentZoom -= zoomStep;
+      currentZoom = Math.max(0.5, Math.min(currentZoom, 3));
       lightboxImg.style.transform = `scale(${currentZoom})`;
-
-      // Se l'immagine è ingrandita, abilita lo scroll del contenitore
-      if (currentZoom > 1) {
-          lightboxContent.style.overflow = 'auto';
-      } else {
-          lightboxContent.style.overflow = 'hidden'; // Nasconde le scrollbar se l'immagine è rimpicciolita
-      }
+      if (currentZoom > 1) lightboxContent.style.overflow = 'auto'; else lightboxContent.style.overflow = 'hidden';
     }
 
-    // Funzione per mostrare l'immagine successiva
     function showNextImage() {
       currentIndex = (currentIndex + 1) % galleryImages.length;
       openLightbox(currentIndex);
     }
 
-    // Funzione per mostrare l'immagine precedente
     function showPrevImage() {
       currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
       openLightbox(currentIndex);
     }
 
-    // Listener degli eventi della lightbox
     closeBtn.addEventListener('click', closeLightbox);
     nextBtn.addEventListener('click', showNextImage);
     prevBtn.addEventListener('click', showPrevImage);
 
-    // Chiude la lightbox con il tasto ESC e naviga con le frecce
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && lightbox.classList.contains('show')) {
-        closeLightbox();
-      }
-      if (e.key === 'ArrowRight' && lightbox.classList.contains('show')) {
-        showNextImage();
-      }
-      if (e.key === 'ArrowLeft' && lightbox.classList.contains('show')) {
-        showPrevImage();
-      }
+      if (e.key === 'Escape' && lightbox.classList.contains('show')) closeLightbox();
+      if (e.key === 'ArrowRight' && lightbox.classList.contains('show')) showNextImage();
+      if (e.key === 'ArrowLeft' && lightbox.classList.contains('show')) showPrevImage();
     });
 
-    // Funzionalità del modale dei contatti
     const profilePic = document.getElementById('gianna-profile-pic');
     const contactModal = document.getElementById('contactModal');
     const closeContactModalBtn = document.getElementById('closeContactModalBtn');
@@ -714,49 +664,32 @@
     const contactWhatsappLink = document.getElementById('contact-whatsapp-link');
     const contactEmailLink = document.getElementById('contact-email-link');
 
-    // Funzione per aprire il modale dei contatti
     function openContactModal() {
-        contactModalImg.src = "gianna1.jpg"; // Assicurati che questo percorso sia corretto per l'immagine completa
-        // Aggiorna il testo del nome della persona di contatto in base alla lingua corrente
+        contactModalImg.src = "gianna1.jpg";
         document.querySelector('#contactModal [data-key="contact-person-name"]').textContent = translations[document.documentElement.lang]["contact-person-name"];
-        
-        // Imposta i link per telefono, WhatsApp ed email
         contactPhoneLink.href = `tel:${contactDetails.phone}`;
         contactPhoneLink.textContent = contactDetails.phone;
-
         contactWhatsappLink.href = `https://wa.me/${contactDetails.whatsapp}`;
         contactWhatsappLink.textContent = contactDetails.whatsapp;
-
         contactEmailLink.href = `mailto:${contactDetails.email}`;
         contactEmailLink.textContent = contactDetails.email;
-
         contactModal.classList.add('show');
     }
 
-    // Funzione per chiudere il modale dei contatti
     function closeContactModal() {
         contactModal.classList.remove('show');
     }
 
-    // Listener degli eventi per il modale dei contatti
-    if (profilePic) {
-        profilePic.addEventListener('click', openContactModal);
-    }
-    if (closeContactModalBtn) {
-        closeContactModalBtn.addEventListener('click', closeContactModal);
-    }
+    if (profilePic) profilePic.addEventListener('click', openContactModal);
+    if (closeContactModalBtn) closeContactModalBtn.addEventListener('click', closeContactModal);
 
-    // Chiude il modale dei contatti con il tasto ESC
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && contactModal.classList.contains('show')) {
-        closeContactModal();
-      }
+      if (e.key === 'Escape' && contactModal.classList.contains('show')) closeContactModal();
     });
 
-    // Funzionalità di cambio lingua
     const languageSelect = document.getElementById('language-select');
+    const mobileLanguageSelect = document.getElementById('mobile-language-select');
 
-    // Oggetto delle traduzioni
     const translations = {
       it: {
         "nav-location": "Lido delle Nazioni",
@@ -802,7 +735,6 @@
         "contact-person-phone": "Telefono:",
         "contact-person-whatsapp": "WhatsApp:",
         "contact-person-email": "E-mail:",
-        // Traduzioni per i titoli delle immagini della galleria
         "gallery-img-1": "Esterno Casa Gianna",
         "gallery-img-2": "Ingresso principale",
         "gallery-img-3": "Camera da letto con libreria",
@@ -860,7 +792,6 @@
         "contact-person-phone": "Phone:",
         "contact-person-whatsapp": "WhatsApp:",
         "contact-person-email": "Email:",
-        // Traduzioni per i titoli delle immagini della galleria
         "gallery-img-1": "Casa Gianna Exterior",
         "gallery-img-2": "Main Entrance",
         "gallery-img-3": "Bedroom with Bookshelf",
@@ -918,7 +849,6 @@
         "contact-person-phone": "Telefono:",
         "contact-person-whatsapp": "WhatsApp:",
         "contact-person-email": "E-Mail:",
-        // Traduzioni per i titoli delle immagini della galleria
         "gallery-img-1": "Außenansicht Casa Gianna",
         "gallery-img-2": "Haupteingang",
         "gallery-img-3": "Schlafzimmer mit Bücherregal",
@@ -934,7 +864,6 @@
       }
     };
 
-    // Funzione per impostare la lingua
     function setLanguage(lang) {
       document.documentElement.lang = lang;
       document.querySelectorAll('[data-key]').forEach(element => {
@@ -943,60 +872,61 @@
           element.textContent = translations[lang][key];
         }
       });
-      // Aggiorna anche il nome della persona di contatto nel modale quando la lingua cambia
-      if (contactModal.classList.contains('show')) { // Solo se il modale è aperto
+      if (contactModal.classList.contains('show')) {
           document.querySelector('#contactModal [data-key="contact-person-name"]').textContent = translations[lang]["contact-person-name"];
       }
-      // Ricrea gli elementi della galleria per aggiornare i testi alt delle immagini
       createGalleryItems();
+      
+      // Sincronizza i selettori
+      if(languageSelect) languageSelect.value = lang;
+      if(mobileLanguageSelect) mobileLanguageSelect.value = lang;
+      
+      localStorage.setItem('selectedLanguage', lang);
     }
 
-    // Listener per il cambio di lingua
-    languageSelect.addEventListener('change', (e) => {
-      setLanguage(e.target.value);
-    });
+    // Gestione cambio lingua
+    languageSelect.addEventListener('change', (e) => setLanguage(e.target.value));
+    mobileLanguageSelect.addEventListener('change', (e) => setLanguage(e.target.value));
 
-// Imposta la lingua iniziale: prima la lingua salvata, poi il browser, poi 'it'
-const savedLang = localStorage.getItem('selectedLanguage') || localStorage.getItem('lang');
-const userLang = (navigator.language || navigator.userLanguage || 'it').split('-')[0];
-const initialLang = savedLang || (translations[userLang] ? userLang : 'it');
+    const savedLang = localStorage.getItem('selectedLanguage') || localStorage.getItem('lang');
+    const userLang = (navigator.language || navigator.userLanguage || 'it').split('-')[0];
+    const initialLang = savedLang || (translations[userLang] ? userLang : 'it');
 
-languageSelect.value = initialLang;
-setLanguage(initialLang);
+    setLanguage(initialLang);
 
-    // Imposta dinamicamente l'anno corrente nel footer
     document.getElementById('current-year').textContent = new Date().getFullYear();
 
-    // Mobile menu functionality
-    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    // --- NUOVA LOGICA MENU MOBILE (SIMILE A PREZZARIO) ---
+    const menuBtn = document.getElementById('menu-btn');
     const mobileMenu = document.getElementById('mobile-menu');
-    const closeMobileMenu = document.getElementById('close-mobile-menu');
+    const mobileOverlay = document.getElementById('mobile-overlay');
 
-    mobileMenuButton.addEventListener('click', () => {
-      mobileMenu.classList.remove('hidden');
-      setTimeout(() => {
-        mobileMenu.classList.add('translate-y-0');
-        mobileMenu.classList.remove('-translate-y-full');
-      }, 10); // Piccolo ritardo per applicare la transizione
+    function openMobileMenu(){
+      mobileMenu.classList.add('show');
+      mobileOverlay.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeMobileMenu(){
+      mobileMenu.classList.remove('show');
+      mobileOverlay.classList.remove('show');
+      document.body.style.overflow = 'auto';
+    }
+    function closeMobileMenuIfOpen(){ if(mobileMenu.classList.contains('show')) closeMobileMenu(); }
+
+    if(menuBtn){
+      menuBtn.addEventListener('click', () => {
+        if(mobileMenu.classList.contains('show')) closeMobileMenu(); else openMobileMenu();
+      });
+    }
+    if(mobileOverlay){
+      mobileOverlay.addEventListener('click', closeMobileMenu);
+    }
+
+    // Chiude il menu quando si clicca su un link
+    mobileMenu.querySelectorAll('a').forEach(el => {
+      el.addEventListener('click', () => setTimeout(closeMobileMenu, 60));
     });
 
-    closeMobileMenu.addEventListener('click', () => {
-      mobileMenu.classList.remove('translate-y-0');
-      mobileMenu.classList.add('-translate-y-full');
-      setTimeout(() => {
-        mobileMenu.classList.add('hidden');
-      }, 300); // Attende la fine della transizione prima di nascondere
-    });
-
-    // Chiude il menu mobile quando si clicca su un link
-    document.querySelectorAll('#mobile-menu a').forEach(link => {
-        link.addEventListener('click', () => {
-            closeMobileMenu.click(); // Simula il click sul pulsante di chiusura
-        });
-    });
-
-    // Creazione iniziale della galleria
-    // createGalleryItems(); // Questa chiamata è ora gestita da setLanguage all'inizializzazione
   </script>
 </body>
 </html>
