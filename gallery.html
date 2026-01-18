@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Galleria - Casa Vacanze Gianna</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Aggiunto FontAwesome come in prezzario.html -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
@@ -25,7 +24,6 @@
       color: var(--text-dark);
     }
 
-    /* Stile per disabilitare lo scroll del body quando il modale è aperto */
     body.no-scroll {
       overflow: hidden;
     }
@@ -223,7 +221,7 @@
       }
     }
 
-    .contact-modal {
+    .contact-modal, .auth-modal {
       position: fixed;
       top: 0;
       left: 0;
@@ -237,11 +235,11 @@
       backdrop-filter: blur(10px);
     }
 
-    .contact-modal.show {
+    .contact-modal.show, .auth-modal.show {
       display: flex;
     }
 
-    .contact-modal-content {
+    .modal-content {
       background: white;
       padding: 2rem;
       border-radius: 1rem;
@@ -250,9 +248,11 @@
       width: 400px;
       position: relative;
       text-align: center;
+      max-height: 90vh;
+      overflow-y: auto;
     }
 
-    .contact-modal-close {
+    .modal-close {
       position: absolute;
       top: 1rem;
       right: 1rem;
@@ -264,7 +264,7 @@
       transition: color 0.3s ease;
     }
 
-    .contact-modal-close:hover {
+    .modal-close:hover {
       color: #ef4444;
     }
 
@@ -281,8 +281,6 @@
       transform: scale(1.05);
     }
 
-    /* --- REGOLE RESPONSIVE AGGIUNTE DA PREZZARIO.HTML --- */
-    /* Mobile menu + overlay - FIXED z-index */
     #mobile-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 55; }
     #mobile-overlay.show { display: block; }
     #mobile-menu { display: none; position: fixed; top: 80px; left: 0; width: 100%; background: #fff; border-top: 1px solid #e5e7eb; box-shadow: 0 6px 20px rgba(0,0,0,0.12); z-index: 56; max-height: calc(100vh - 80px); overflow:auto; }
@@ -304,11 +302,9 @@
 </head>
 <body class="min-h-screen">
 
-  <!-- HEADER UGUALE A PREZZARIO -->
   <header class="fixed top-0 w-full z-50 glass-effect">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-20">
-        <!-- Logo e info -->
         <div class="flex items-center space-x-3">
           <img id="gianna-profile-pic" src="gianna1.jpg" alt="Gianna" class="profile-pic">
           <div>
@@ -317,11 +313,17 @@
           </div>
         </div>
 
-        <!-- Desktop links -->
         <div class="hidden md:flex items-center space-x-4">
           <a href="index.html" class="text-gray-700 hover:text-blue-600 font-medium" data-key="nav-home-desktop">Home</a>
-          <!-- Link Prenota aggiunto -->
           <a href="prezzario.html" class="text-gray-700 hover:text-blue-600 font-medium" data-key="nav-book">Prenota</a>
+          <a href="#" id="auth-link" class="text-gray-700 hover:text-blue-600 font-medium" data-key="auth-login">Accedi</a>
+          <a href="private.html" id="nav-directions" class="hidden text-blue-600 hover:text-blue-800 font-bold flex items-center gap-1" data-key="nav-directions">
+            <i class="fa-solid fa-location-dot"></i> <span>Indicazioni</span>
+          </a>
+          <a href="#" id="logout-link" class="hidden text-gray-700 hover:text-red-600 font-medium" data-key="nav-logout">Esci</a>
+          <a href="admin.html" id="admin-link" class="hidden text-gray-700 hover:text-purple-600 font-medium flex items-center gap-2">
+            Admin <span id="admin-badge" class="hidden bg-purple-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">ADMIN</span>
+          </a>
           
           <select id="language-select" class="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700">
             <option value="it">🇮🇹 Italiano</option>
@@ -330,7 +332,6 @@
           </select>
         </div>
 
-        <!-- Hamburger mobile -->
         <div class="md:hidden flex items-center">
           <button id="menu-btn" class="text-gray-700 hover:text-blue-600 focus:outline-none" aria-label="Apri menu">
             <i class="fa-solid fa-bars fa-lg"></i>
@@ -340,14 +341,20 @@
     </div>
   </header>
 
-  <!-- OVERLAY E MENU MOBILE FUORI DALL'HEADER (Come prezzario) -->
   <div id="mobile-overlay" aria-hidden="true"></div>
 
   <nav id="mobile-menu" class="md:hidden" aria-hidden="true">
     <div class="flex flex-col p-4 space-y-2">
       <a href="index.html" class="text-gray-700 hover:text-blue-600 font-medium" data-key="nav-home-mobile">Home</a>
-      <!-- Link Prenota aggiunto nel menu mobile -->
       <a href="prezzario.html" class="text-gray-700 hover:text-blue-600 font-medium" data-key="nav-book">Prenota</a>
+      <a href="#" id="mobile-auth-link" class="text-gray-700 hover:text-blue-600 font-medium" data-key="auth-login">Accedi</a>
+      <a href="private.html" id="mobile-nav-directions" class="hidden text-blue-600 hover:text-blue-800 font-bold flex items-center gap-1">
+        <i class="fa-solid fa-location-dot"></i> <span data-key="nav-directions">Indicazioni</span>
+      </a>
+      <a href="#" id="mobile-logout-link" class="hidden text-gray-700 hover:text-red-600 font-medium" data-key="nav-logout">Esci</a>
+      <a href="admin.html" id="mobile-admin-link" class="hidden text-gray-700 hover:text-purple-600 font-medium flex items-center gap-2">
+        Admin <span id="mobile-admin-badge" class="hidden bg-purple-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">ADMIN</span>
+      </a>
 
       <select id="mobile-language-select" class="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 mt-2">
         <option value="it">🇮🇹 Italiano</option>
@@ -397,7 +404,6 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="gallery">
-        <!-- Gallery items will be injected here by JavaScript -->
       </div>
     </div>
   </section>
@@ -416,7 +422,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         <div class="card-hover bg-white p-8 rounded-2xl shadow-sm">
           <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mb-6">
-            <span class="text-white text-2xl">🏖️</span>
+            <span class="text-white text-2xl">🖏️</span>
           </div>
           <h3 class="text-xl font-semibold text-gray-900 mb-3" data-key="feature-beach-title">Vicino al Mare</h3>
           <p class="text-gray-600" data-key="feature-beach-desc">200 metri dalla spiaggia di Lido delle Nazioni</p>
@@ -511,20 +517,18 @@
     </div>
   </footer>
 
-  <!-- Lightbox per le immagini della galleria -->
   <div class="lightbox" id="lightbox">
     <button class="lightbox-close" id="closeBtn">×</button>
-    <button class="lightbox-nav lightbox-prev" id="prevBtn">❮</button>
+    <button class="lightbox-nav lightbox-prev" id="prevBtn">◀</button>
     <div class="lightbox-content">
       <img id="lightbox-img" src="" alt="">
     </div>
-    <button class="lightbox-nav lightbox-next" id="nextBtn">❯</button>
+    <button class="lightbox-nav lightbox-next" id="nextBtn">▶</button>
   </div>
 
-  <!-- Modale per i contatti di Gianna -->
   <div class="contact-modal" id="contactModal">
-    <div class="contact-modal-content">
-      <button class="contact-modal-close" id="closeContactModalBtn">×</button>
+    <div class="modal-content">
+      <button class="modal-close" id="closeContactModalBtn">×</button>
       <h3 class="heading-font text-2xl font-bold mb-4" data-key="contact-card-title">Contatti di Gianna</h3>
       <div class="text-center mb-4">
         <img id="contact-modal-img" src="gianna1.jpg" alt="Gianna" class="mx-auto rounded-full w-32 h-32 object-cover mb-4">
@@ -538,8 +542,62 @@
     </div>
   </div>
 
-  <script>
-    // Dati delle immagini della galleria
+  <div class="auth-modal" id="authModal">
+    <div class="modal-content">
+      <button class="modal-close" id="closeAuthModalBtn">×</button>
+      
+      <div id="login-box">
+        <h2 class="text-2xl font-bold mb-4 text-gray-800" data-key="login-title">Area Privata</h2>
+        <form id="login-form" class="grid grid-cols-1 gap-4">
+          <input id="login-email" type="email" required placeholder="Email" class="border p-2 rounded">
+          <input id="login-password" type="password" required placeholder="Password" class="border p-2 rounded">
+          <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded font-bold hover:bg-blue-700" data-key="btn-login">Accedi</button>
+        </form>
+        <p class="mt-4 text-sm text-gray-500"><span data-key="login-no-account">Non hai un account?</span> <a href="#" id="show-register" class="text-blue-600 underline" data-key="link-register">Registrati</a></p>
+      </div>
+
+      <div id="register-box" class="hidden">
+        <h2 class="text-2xl font-bold mb-4 text-gray-800" data-key="register-title">Registrazione</h2>
+        <form id="register-form" class="grid grid-cols-1 gap-4">
+          <input id="register-name" type="text" required placeholder="Nome completo" class="border p-2 rounded">
+          <div class="flex gap-2">
+            <select id="register-phone-prefix" class="border p-2 rounded w-1/3">
+              <option value="+39">🇮🇹 +39</option>
+              <option value="+44">🇬🇧 +44</option>
+              <option value="+49">🇩🇪 +49</option>
+              <option value="+33">🇫🇷 +33</option>
+              <option value="+1">🇺🇸 +1</option>
+            </select>
+            <input id="register-phone" type="tel" required placeholder="Numero di telefono" class="border p-2 rounded w-2/3">
+          </div>
+          <input id="register-email" type="email" required placeholder="Email" class="border p-2 rounded">
+          <input id="register-password" type="password" required placeholder="Password" class="border p-2 rounded">
+          <button type="submit" class="bg-green-600 text-white py-2 px-4 rounded font-bold hover:bg-green-700" data-key="btn-register">Registrati</button>
+        </form>
+        <p class="mt-4 text-sm text-gray-500"><span data-key="register-already">Hai già un account?</span> <a href="#" id="show-login" class="text-blue-600 underline" data-key="link-login">Accedi</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getFirestore, collection, addDoc, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyALyvupZcBogh5KGATUQur4AeCrpZtzDLo",
+      authDomain: "casa-mare-c974a.firebaseapp.com",
+      projectId: "casa-mare-c974a",
+      storageBucket: "casa-mare-c974a.firebasestorage.app",
+      messagingSenderId: "596357064782",
+      appId: "1:596357064782:web:d86b0f1d57b7ea5989fb1f",
+      measurementId: "G-12EP9VBJQK"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth();
+
     const galleryImages = [
       { src: "casa29.jpg", key: "gallery-img-1" },
       { src: "casa35.jpg", key: "gallery-img-2" },
@@ -572,6 +630,463 @@
     const lightboxContent = document.querySelector('.lightbox-content');
     let currentZoom = 1;
     const zoomStep = 0.1;
+
+    const profilePic = document.getElementById('gianna-profile-pic');
+    const contactModal = document.getElementById('contactModal');
+    const closeContactModalBtn = document.getElementById('closeContactModalBtn');
+    const contactModalImg = document.getElementById('contact-modal-img');
+    const contactPhoneLink = document.getElementById('contact-phone-link');
+    const contactWhatsappLink = document.getElementById('contact-whatsapp-link');
+    const contactEmailLink = document.getElementById('contact-email-link');
+    
+    const authLink = document.getElementById('auth-link');
+    const mobileAuthLink = document.getElementById('mobile-auth-link');
+    const logoutLink = document.getElementById('logout-link');
+    const mobileLogoutLink = document.getElementById('mobile-logout-link');
+    
+    const authModal = document.getElementById('authModal');
+    const closeAuthModalBtn = document.getElementById('closeAuthModalBtn');
+    const loginBox = document.getElementById('login-box');
+    const registerBox = document.getElementById('register-box');
+    const showRegister = document.getElementById('show-register');
+    const showLogin = document.getElementById('show-login');
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mobileOverlay = document.getElementById('mobile-overlay');
+
+    function openMobileMenu(){
+      mobileMenu.classList.add('show');
+      mobileOverlay.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeMobileMenu(){
+      mobileMenu.classList.remove('show');
+      mobileOverlay.classList.remove('show');
+      document.body.style.overflow = 'auto';
+    }
+    function closeMobileMenuIfOpen(){ if(mobileMenu.classList.contains('show')) closeMobileMenu(); }
+
+    if(menuBtn){
+      menuBtn.addEventListener('click', () => {
+        if(mobileMenu.classList.contains('show')) closeMobileMenu(); else openMobileMenu();
+      });
+    }
+    if(mobileOverlay){
+      mobileOverlay.addEventListener('click', closeMobileMenu);
+    }
+    mobileMenu.querySelectorAll('a').forEach(el => {
+      el.addEventListener('click', () => setTimeout(closeMobileMenu, 60));
+    });
+
+    function openContactModal() {
+      const lang = document.documentElement.lang;
+      contactModalImg.src = "gianna1.jpg";
+      document.querySelector('#contactModal [data-key="contact-person-name"]').textContent = translations[lang]["contact-person-name"];
+      contactPhoneLink.href = `tel:${contactDetails.phone}`;
+      contactPhoneLink.textContent = contactDetails.phone;
+      contactWhatsappLink.href = `https://wa.me/${contactDetails.whatsapp}`;
+      contactWhatsappLink.textContent = contactDetails.whatsapp;
+      contactEmailLink.href = `mailto:${contactDetails.email}`;
+      contactEmailLink.textContent = contactDetails.email;
+      contactModal.classList.add('show');
+      document.body.classList.add('no-scroll');
+    }
+
+    function closeContactModal() {
+      contactModal.classList.remove('show');
+      document.body.classList.remove('no-scroll');
+    }
+
+    function openAuthModal() {
+      closeMobileMenuIfOpen();
+      authModal.classList.add('show');
+      loginBox.classList.remove('hidden');
+      registerBox.classList.add('hidden');
+      document.body.classList.add('no-scroll');
+    }
+
+    function closeAuthModal() {
+      authModal.classList.remove('show');
+      document.body.classList.remove('no-scroll');
+    }
+
+    if (profilePic) profilePic.addEventListener('click', openContactModal);
+    if (closeContactModalBtn) closeContactModalBtn.addEventListener('click', closeContactModal);
+    if (closeAuthModalBtn) closeAuthModalBtn.addEventListener('click', closeAuthModal);
+
+    const handleAuthClick = (e) => {
+        e.preventDefault();
+        const user = auth.currentUser;
+        if (!user) {
+          openAuthModal();
+        }
+    };
+
+    if (authLink) authLink.addEventListener('click', handleAuthClick);
+    if (mobileAuthLink) mobileAuthLink.addEventListener('click', handleAuthClick);
+
+    if (showRegister) {
+      showRegister.addEventListener('click', (e) => {
+        e.preventDefault();
+        loginBox.classList.add('hidden');
+        registerBox.classList.remove('hidden');
+      });
+    }
+
+    if (showLogin) {
+      showLogin.addEventListener('click', (e) => {
+        e.preventDefault();
+        registerBox.classList.add('hidden');
+        loginBox.classList.remove('hidden');
+      });
+    }
+
+    if (registerForm) {
+      registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('register-email').value;
+        const password = document.getElementById('register-password').value;
+        const nome = document.getElementById('register-name').value;
+        const prefix = document.getElementById('register-phone-prefix').value;
+        const phone = document.getElementById('register-phone').value;
+        const fullPhone = prefix + phone;
+
+        try {
+          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+          await updateProfile(userCredential.user, { displayName: nome });
+          await addDoc(collection(db, "utenti"), { 
+            userId: userCredential.user.uid, 
+            nome, 
+            telefono: fullPhone, 
+            email 
+          });
+          
+          registerForm.reset();
+          closeAuthModal();
+          alert("Registrazione completata! Ora puoi accedere all'area riservata.");
+        } catch (err) {
+          alert("Errore durante la registrazione: " + err.message);
+        }
+      });
+    }
+
+    if (loginForm) {
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+          loginForm.reset();
+          closeAuthModal();
+        } catch (err) {
+          alert("Errore durante il login: " + err.message);
+        }
+      });
+    }
+
+    const handleLogout = async (e) => {
+      e.preventDefault();
+      try {
+        await signOut(auth);
+        closeMobileMenuIfOpen();
+      } catch (err) {
+        alert("Errore durante il logout: " + err.message);
+      }
+    };
+
+    if (logoutLink) logoutLink.addEventListener('click', handleLogout);
+    if (mobileLogoutLink) mobileLogoutLink.addEventListener('click', handleLogout);
+
+    onAuthStateChanged(auth, async (user) => {
+      const adminLink = document.getElementById('admin-link');
+      const adminBadge = document.getElementById('admin-badge');
+      const mobileAdminLink = document.getElementById('mobile-admin-link');
+      const mobileAdminBadge = document.getElementById('mobile-admin-badge');
+      const navDirections = document.getElementById('nav-directions');
+      const mobileNavDirections = document.getElementById('mobile-nav-directions');
+
+      if (user) {
+        const firstName = user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0];
+        if(authLink) authLink.textContent = firstName;
+        if(mobileAuthLink) mobileAuthLink.textContent = firstName;
+        
+        if(logoutLink) logoutLink.classList.remove('hidden');
+        if(mobileLogoutLink) mobileLogoutLink.classList.remove('hidden');
+
+        try {
+          const utentiRef = collection(db, "utenti");
+          const q = query(utentiRef, where("userId", "==", user.uid));
+          const snap = await getDocs(q);
+          const isAdmin = !snap.empty && snap.docs[0].data().role === "admin";
+
+          if (isAdmin) {
+            if (adminLink) adminLink.classList.remove('hidden');
+            if (adminBadge) adminBadge.classList.remove('hidden');
+            if (mobileAdminLink) mobileAdminLink.classList.remove('hidden');
+            if (mobileAdminBadge) mobileAdminBadge.classList.remove('hidden');
+          } else {
+            if (adminLink) adminLink.classList.add('hidden');
+            if (adminBadge) adminBadge.classList.add('hidden');
+            if (mobileAdminLink) mobileAdminLink.classList.add('hidden');
+            if (mobileAdminBadge) mobileAdminBadge.classList.add('hidden');
+          }
+        } catch (e) {
+          console.warn(e);
+        }
+
+        if(navDirections) navDirections.classList.remove('hidden');
+        if(mobileNavDirections) mobileNavDirections.classList.remove('hidden');
+
+      } else {
+        const lang = document.documentElement.lang || 'it';
+        if(authLink) authLink.textContent = translations[lang]["auth-login"];
+        if(mobileAuthLink) mobileAuthLink.textContent = translations[lang]["auth-login"];
+        
+        if(logoutLink) logoutLink.classList.add('hidden');
+        if(mobileLogoutLink) mobileLogoutLink.classList.add('hidden');
+        
+        if (adminLink) adminLink.classList.add('hidden');
+        if (adminBadge) adminBadge.classList.add('hidden');
+        if (mobileAdminLink) mobileAdminLink.classList.add('hidden');
+        if (mobileAdminBadge) mobileAdminBadge.classList.add('hidden');
+        
+        if(navDirections) navDirections.classList.add('hidden');
+        if(mobileNavDirections) mobileNavDirections.classList.add('hidden');
+      }
+    });
+
+    const translations = {
+      it: {
+        "nav-location": "Lido delle Nazioni",
+        "nav-home-desktop": "Home",
+        "nav-home-mobile": "Home",
+        "nav-book": "Prenota",
+        "auth-login": "Accedi",
+        "nav-logout": "Esci",
+        "nav-directions": "Indicazioni",
+        "hero-title": "Galleria Casa Gianna",
+        "hero-subtitle": "Scopri ogni angolo della tua prossima casa vacanze",
+        "hero-photos": "Dettagli Cristallini",
+        "hero-rooms": "Un Tour Completo",
+        "gallery-title": "Esplora Casa Gianna",
+        "gallery-subtitle": "Ogni foto racconta la storia del tuo perfetto soggiorno al mare",
+        "features-title": "Caratteristiche Uniche",
+        "features-subtitle": "Dettagli che fanno la differenza",
+        "feature-beach-title": "Vicino al Mare",
+        "feature-beach-desc": "200 metri dalla spiaggia di Lido delle Nazioni",
+        "feature-garden-title": "Giardino Privato",
+        "feature-garden-desc": "Spazi verdi per relax e privacy",
+        "feature-rooms-title": "Camere Confortevoli",
+        "feature-rooms-desc": "Arredamento curato e spazi luminosi",
+        "feature-kitchen-title": "Cucina Completa",
+        "feature-kitchen-desc": "Elettrodomestici moderni e funzionali",
+        "contact-title": "Ti Piace Quello Che Vedi?",
+        "contact-subtitle": "Prenota ora la tua vacanza da sogno",
+        "contact-whatsapp": "WhatsApp",
+        "contact-whatsapp-desc": "Risposta immediata",
+        "contact-whatsapp-action": "Chatta con noi",
+        "contact-email": "Email",
+        "contact-email-desc": "Richiesta dettagliata",
+        "contact-email-action": "Scrivi una mail",
+        "contact-location": "Posizione",
+        "contact-location-desc": "Visualizza su Maps",
+        "contact-location-action": "Apri Maps",
+        "footer-location": "Lido delle Nazioni, Comacchio (FE), Italia",
+        "footer-rights": "Tutti i diritti riservati",
+        "contact-card-title": "Contatti di Gianna",
+        "contact-person-name": "Gianna Santececca",
+        "contact-person-phone": "Telefono:",
+        "contact-person-whatsapp": "WhatsApp:",
+        "contact-person-email": "E-mail:",
+        "login-title": "Area Privata",
+        "btn-login": "Accedi",
+        "login-no-account": "Non hai un account?",
+        "link-register": "Registrati",
+        "register-title": "Registrazione",
+        "btn-register": "Registrati",
+        "register-already": "Hai già un account?",
+        "link-login": "Accedi",
+        "gallery-img-1": "Esterno Casa Gianna",
+        "gallery-img-2": "Ingresso principale",
+        "gallery-img-3": "Camera da letto con libreria",
+        "gallery-img-4": "Soggiorno luminoso",
+        "gallery-img-5": "Zona relax",
+        "gallery-img-6": "Parcheggio privato",
+        "gallery-img-7": "Zona pranzo e cucina",
+        "gallery-img-8": "Seconda camera da letto",
+        "gallery-img-9": "Giardino posteriore",
+        "gallery-img-10": "Doccia all'aperto",
+        "gallery-img-11": "Patio posteriore",
+        "gallery-img-12": "Distanza dal mare"
+      },
+      en: {
+        "nav-location": "Lido delle Nazioni",
+        "nav-home-desktop": "Home",
+        "nav-home-mobile": "Home",
+        "nav-book": "Book",
+        "auth-login": "Login",
+        "nav-logout": "Logout",
+        "nav-directions": "Directions",
+        "hero-title": "Casa Gianna Gallery",
+        "hero-subtitle": "Discover every corner of your next holiday home",
+        "hero-photos": "Crystal-Clear Details",
+        "hero-rooms": "A Complete Tour",
+        "gallery-title": "Explore Casa Gianna",
+        "gallery-subtitle": "Every photo tells the story of your perfect seaside stay",
+        "features-title": "Unique Features",
+        "features-subtitle": "Details that make the difference",
+        "feature-beach-title": "Near the Sea",
+        "feature-beach-desc": "200 meters from Lido delle Nazioni beach",
+        "feature-garden-title": "Private Garden",
+        "feature-garden-desc": "Green spaces for relaxation and privacy",
+        "feature-rooms-title": "Comfortable Rooms",
+        "feature-rooms-desc": "Carefully furnished and bright spaces",
+        "feature-kitchen-title": "Complete Kitchen",
+        "feature-kitchen-desc": "Modern and functional appliances",
+        "contact-title": "Like What You See?",
+        "contact-subtitle": "Book your dream vacation now",
+        "contact-whatsapp": "WhatsApp",
+        "contact-whatsapp-desc": "Immediate response",
+        "contact-whatsapp-action": "Chat with us",
+        "contact-email": "Email",
+        "contact-email-desc": "Detailed request",
+        "contact-email-action": "Write an email",
+        "contact-location": "Location",
+        "contact-location-desc": "View on Maps",
+        "contact-location-action": "Open Maps",
+        "footer-location": "Lido delle Nazioni, Comacchio (FE), Italy",
+        "footer-rights": "All rights reserved",
+        "contact-card-title": "Gianna's Contacts",
+        "contact-person-name": "Gianna Santececca",
+        "contact-person-phone": "Phone:",
+        "contact-person-whatsapp": "WhatsApp:",
+        "contact-person-email": "Email:",
+        "login-title": "Private Area",
+        "btn-login": "Login",
+        "login-no-account": "Don't have an account?",
+        "link-register": "Register",
+        "register-title": "Registration",
+        "btn-register": "Register",
+        "register-already": "Already have an account?",
+        "link-login": "Login",
+        "gallery-img-1": "Casa Gianna Exterior",
+        "gallery-img-2": "Main Entrance",
+        "gallery-img-3": "Bedroom with Bookshelf",
+        "gallery-img-4": "Bright Living Room",
+        "gallery-img-5": "Relaxation Area",
+        "gallery-img-6": "Private Parking",
+        "gallery-img-7": "Dining and Kitchen Area",
+        "gallery-img-8": "Second Bedroom",
+        "gallery-img-9": "Backyard Garden",
+        "gallery-img-10": "Outdoor Shower",
+        "gallery-img-11": "Back Patio",
+        "gallery-img-12": "Distance from the Sea"
+      },
+      de: {
+        "nav-location": "Lido delle Nazioni",
+        "nav-home-desktop": "Startseite",
+        "nav-home-mobile": "Startseite",
+        "nav-book": "Buchen",
+        "auth-login": "Einloggen",
+        "nav-logout": "Abmelden",
+        "nav-directions": "Wegbeschreibung",
+        "hero-title": "Casa Gianna Galerie",
+        "hero-subtitle": "Entdecken Sie jede Ecke Ihres nächsten Ferienhauses",
+        "hero-photos": "Kristallklare Details",
+        "hero-rooms": "Eine Komplette Tour",
+        "gallery-title": "Erkunden Sie Casa Gianna",
+        "gallery-subtitle": "Jedes Foto erzählt die Geschichte Ihres perfekten Aufenthalts am Meer",
+        "features-title": "Einzigartige Merkmale",
+        "features-subtitle": "Details, die den Unterschied machen",
+        "feature-beach-title": "Nahe dem Meer",
+        "feature-beach-desc": "200 Meter vom Strand Lido delle Nazioni entfernt",
+        "feature-garden-title": "Privater Garten",
+        "feature-garden-desc": "Grünflächen für Entspannung und Privatsphäre",
+        "feature-rooms-title": "Komfortable Zimmer",
+        "feature-rooms-desc": "Sorgfältig eingerichtete und helle Räume",
+        "feature-kitchen-title": "Vollständige Küche",
+        "feature-kitchen-desc": "Moderne und funktionale Geräte",
+        "contact-title": "Gefällt Ihnen was Sie sehen?",
+        "contact-subtitle": "Buchen Sie jetzt Ihren Traumurlaub",
+        "contact-whatsapp": "WhatsApp",
+        "contact-whatsapp-desc": "Sofortige Antwort",
+        "contact-whatsapp-action": "Chatten Sie mit uns",
+        "contact-email": "E-Mail",
+        "contact-email-desc": "Detaillierte Anfrage",
+        "contact-email-action": "E-Mail schreiben",
+        "contact-location": "Standort",
+        "contact-location-desc": "Auf Maps anzeigen",
+        "contact-location-action": "Maps öffnen",
+        "footer-location": "Lido delle Nazioni, Comacchio (FE), Italien",
+        "footer-rights": "Alle Rechte vorbehalten",
+        "contact-card-title": "Giannas Kontakte",
+        "contact-person-name": "Gianna Santececca",
+        "contact-person-phone": "Telefono:",
+        "contact-person-whatsapp": "WhatsApp:",
+        "contact-person-email": "E-Mail:",
+        "login-title": "Privater Bereich",
+        "btn-login": "Einloggen",
+        "login-no-account": "Noch kein Konto?",
+        "link-register": "Registrieren",
+        "register-title": "Registrierung",
+        "btn-register": "Registrieren",
+        "register-already": "Schon ein Konto?",
+        "link-login": "Einloggen",
+        "gallery-img-1": "Außenansicht Casa Gianna",
+        "gallery-img-2": "Haupteingang",
+        "gallery-img-3": "Schlafzimmer mit Bücherregal",
+        "gallery-img-4": "Helles Wohnzimmer",
+        "gallery-img-5": "Entspannungsbereich",
+        "gallery-img-6": "Privatparkplatz",
+        "gallery-img-7": "Ess- und Küchenbereich",
+        "gallery-img-8": "Zweites Schlafzimmer",
+        "gallery-img-9": "Hinterer Garten",
+        "gallery-img-10": "Außendusche",
+        "gallery-img-11": "Hintere Terrasse",
+        "gallery-img-12": "Entfernung zum Meer"
+      }
+    };
+
+    function setLanguage(lang) {
+      document.documentElement.lang = lang;
+      document.querySelectorAll('[data-key]').forEach(element => {
+        const key = element.dataset.key;
+        if (translations[lang] && translations[lang][key]) {
+          if (element.tagName === 'INPUT') {
+            element.placeholder = translations[lang][key];
+          } else {
+            element.textContent = translations[lang][key];
+          }
+        }
+      });
+      
+      const user = auth.currentUser;
+      if (!user) {
+         if(authLink) authLink.textContent = translations[lang]["auth-login"];
+         if(mobileAuthLink) mobileAuthLink.textContent = translations[lang]["auth-login"];
+      } else {
+         const firstName = user.displayName ? user.displayName.split(' ')[0] : user.email;
+         if(authLink) authLink.textContent = firstName;
+         if(mobileAuthLink) mobileAuthLink.textContent = firstName;
+      }
+      
+      if (contactModal.classList.contains('show')) {
+          document.querySelector('#contactModal [data-key="contact-person-name"]').textContent = translations[lang]["contact-person-name"];
+      }
+      createGalleryItems();
+      
+      const s1 = document.getElementById('language-select');
+      const s2 = document.getElementById('mobile-language-select');
+      if(s1) s1.value = lang;
+      if(s2) s2.value = lang;
+      
+      localStorage.setItem('selectedLanguage', lang);
+    }
 
     function createGalleryItems() {
       gallery.innerHTML = '';
@@ -650,267 +1165,24 @@
     prevBtn.addEventListener('click', showPrevImage);
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && lightbox.classList.contains('show')) closeLightbox();
+      if (e.key === 'Escape') {
+        if (lightbox.classList.contains('show')) closeLightbox();
+        if (contactModal.classList.contains('show')) closeContactModal();
+        if (authModal.classList.contains('show')) closeAuthModal();
+      }
       if (e.key === 'ArrowRight' && lightbox.classList.contains('show')) showNextImage();
       if (e.key === 'ArrowLeft' && lightbox.classList.contains('show')) showPrevImage();
-    });
-
-    const profilePic = document.getElementById('gianna-profile-pic');
-    const contactModal = document.getElementById('contactModal');
-    const closeContactModalBtn = document.getElementById('closeContactModalBtn');
-    const contactModalImg = document.getElementById('contact-modal-img');
-    const contactPhoneLink = document.getElementById('contact-phone-link');
-    const contactWhatsappLink = document.getElementById('contact-whatsapp-link');
-    const contactEmailLink = document.getElementById('contact-email-link');
-
-    function openContactModal() {
-        contactModalImg.src = "gianna1.jpg";
-        document.querySelector('#contactModal [data-key="contact-person-name"]').textContent = translations[document.documentElement.lang]["contact-person-name"];
-        contactPhoneLink.href = `tel:${contactDetails.phone}`;
-        contactPhoneLink.textContent = contactDetails.phone;
-        contactWhatsappLink.href = `https://wa.me/${contactDetails.whatsapp}`;
-        contactWhatsappLink.textContent = contactDetails.whatsapp;
-        contactEmailLink.href = `mailto:${contactDetails.email}`;
-        contactEmailLink.textContent = contactDetails.email;
-        contactModal.classList.add('show');
-    }
-
-    function closeContactModal() {
-        contactModal.classList.remove('show');
-    }
-
-    if (profilePic) profilePic.addEventListener('click', openContactModal);
-    if (closeContactModalBtn) closeContactModalBtn.addEventListener('click', closeContactModal);
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && contactModal.classList.contains('show')) closeContactModal();
     });
 
     const languageSelect = document.getElementById('language-select');
     const mobileLanguageSelect = document.getElementById('mobile-language-select');
 
-    const translations = {
-      it: {
-        "nav-location": "Lido delle Nazioni",
-        "nav-home-desktop": "Home",
-        "nav-home-mobile": "Home",
-        "nav-book": "Prenota",
-        "hero-title": "Galleria Casa Gianna",
-        "hero-subtitle": "Scopri ogni angolo della tua prossima casa vacanze",
-        "hero-photos": "Dettagli Cristallini",
-        "hero-rooms": "Un Tour Completo",
-        "gallery-title": "Esplora Casa Gianna",
-        "gallery-subtitle": "Ogni foto racconta la storia del tuo perfetto soggiorno al mare",
-        "features-title": "Caratteristiche Uniche",
-        "features-subtitle": "Dettagli che fanno la differenza",
-        "feature-beach-title": "Vicino al Mare",
-        "feature-beach-desc": "200 metri dalla spiaggia di Lido delle Nazioni",
-        "feature-garden-title": "Giardino Privato",
-        "feature-garden-desc": "Spazi verdi per relax e privacy",
-        "feature-rooms-title": "Camere Confortevoli",
-        "feature-rooms-desc": "Arredamento curato e spazi luminosi",
-        "feature-kitchen-title": "Cucina Completa",
-        "feature-kitchen-desc": "Elettrodomestici moderni e funzionali",
-        "contact-title": "Ti Piace Quello Che Vedi?",
-        "contact-subtitle": "Prenota ora la tua vacanza da sogno",
-        "contact-whatsapp": "WhatsApp",
-        "contact-whatsapp-desc": "Risposta immediata",
-        "contact-whatsapp-action": "Chatta con noi",
-        "contact-email": "Email",
-        "contact-email-desc": "Richiesta dettagliata",
-        "contact-email-action": "Scrivi una mail",
-        "contact-location": "Posizione",
-        "contact-location-desc": "Visualizza su Maps",
-        "contact-location-action": "Apri Maps",
-        "footer-location": "Lido delle Nazioni, Comacchio (FE), Italia",
-        "footer-rights": "Tutti i diritti riservati",
-        "contact-card-title": "Contatti di Gianna",
-        "contact-person-name": "Gianna Santececca",
-        "contact-person-phone": "Telefono:",
-        "contact-person-whatsapp": "WhatsApp:",
-        "contact-person-email": "E-mail:",
-        "gallery-img-1": "Esterno Casa Gianna",
-        "gallery-img-2": "Ingresso principale",
-        "gallery-img-3": "Camera da letto con libreria",
-        "gallery-img-4": "Soggiorno luminoso",
-        "gallery-img-5": "Zona relax",
-        "gallery-img-6": "Parcheggio privato",
-        "gallery-img-7": "Zona pranzo e cucina",
-        "gallery-img-8": "Seconda camera da letto",
-        "gallery-img-9": "Giardino posteriore",
-        "gallery-img-10": "Doccia all'aperto",
-        "gallery-img-11": "Patio posteriore",
-        "gallery-img-12": "Distanza dal mare"
-      },
-      en: {
-        "nav-location": "Lido delle Nazioni",
-        "nav-home-desktop": "Home",
-        "nav-home-mobile": "Home",
-        "nav-book": "Book",
-        "hero-title": "Casa Gianna Gallery",
-        "hero-subtitle": "Discover every corner of your next holiday home",
-        "hero-photos": "Crystal-Clear Details",
-        "hero-rooms": "A Complete Tour",
-        "gallery-title": "Explore Casa Gianna",
-        "gallery-subtitle": "Every photo tells the story of your perfect seaside stay",
-        "features-title": "Unique Features",
-        "features-subtitle": "Details that make the difference",
-        "feature-beach-title": "Near the Sea",
-        "feature-beach-desc": "200 meters from Lido delle Nazioni beach",
-        "feature-garden-title": "Private Garden",
-        "feature-garden-desc": "Green spaces for relaxation and privacy",
-        "feature-rooms-title": "Comfortable Rooms",
-        "feature-rooms-desc": "Carefully furnished and bright spaces",
-        "feature-kitchen-title": "Complete Kitchen",
-        "feature-kitchen-desc": "Modern and functional appliances",
-        "contact-title": "Like What You See?",
-        "contact-subtitle": "Book your dream vacation now",
-        "contact-whatsapp": "WhatsApp",
-        "contact-whatsapp-desc": "Immediate response",
-        "contact-whatsapp-action": "Chat with us",
-        "contact-email": "Email",
-        "contact-email-desc": "Detailed request",
-        "contact-email-action": "Write an email",
-        "contact-location": "Location",
-        "contact-location-desc": "View on Maps",
-        "contact-location-action": "Open Maps",
-        "footer-location": "Lido delle Nazioni, Comacchio (FE), Italy",
-        "footer-rights": "All rights reserved",
-        "contact-card-title": "Gianna's Contacts",
-        "contact-person-name": "Gianna Santececca",
-        "contact-person-phone": "Phone:",
-        "contact-person-whatsapp": "WhatsApp:",
-        "contact-person-email": "Email:",
-        "gallery-img-1": "Casa Gianna Exterior",
-        "gallery-img-2": "Main Entrance",
-        "gallery-img-3": "Bedroom with Bookshelf",
-        "gallery-img-4": "Bright Living Room",
-        "gallery-img-5": "Relaxation Area",
-        "gallery-img-6": "Private Parking",
-        "gallery-img-7": "Dining and Kitchen Area",
-        "gallery-img-8": "Second Bedroom",
-        "gallery-img-9": "Backyard Garden",
-        "gallery-img-10": "Outdoor Shower",
-        "gallery-img-11": "Back Patio",
-        "gallery-img-12": "Distance from the Sea"
-      },
-      de: {
-        "nav-location": "Lido delle Nazioni",
-        "nav-home-desktop": "Startseite",
-        "nav-home-mobile": "Startseite",
-        "nav-book": "Buchen",
-        "hero-title": "Casa Gianna Galerie",
-        "hero-subtitle": "Entdecken Sie jede Ecke Ihres nächsten Ferienhauses",
-        "hero-photos": "Kristallklare Details",
-        "hero-rooms": "Eine Komplette Tour",
-        "gallery-title": "Erkunden Sie Casa Gianna",
-        "gallery-subtitle": "Jedes Foto erzählt die Geschichte Ihres perfekten Aufenthalts am Meer",
-        "features-title": "Einzigartige Merkmale",
-        "features-subtitle": "Details, die den Unterschied machen",
-        "feature-beach-title": "Nahe dem Meer",
-        "feature-beach-desc": "200 Meter vom Strand Lido delle Nazioni entfernt",
-        "feature-garden-title": "Privater Garten",
-        "feature-garden-desc": "Grünflächen für Entspannung und Privatsphäre",
-        "feature-rooms-title": "Komfortable Zimmer",
-        "feature-rooms-desc": "Sorgfältig eingerichtete und helle Räume",
-        "feature-kitchen-title": "Vollständige Küche",
-        "feature-kitchen-desc": "Moderne und funktionale Geräte",
-        "contact-title": "Gefällt Ihnen was Sie sehen?",
-        "contact-subtitle": "Buchen Sie jetzt Ihren Traumurlaub",
-        "contact-whatsapp": "WhatsApp",
-        "contact-whatsapp-desc": "Sofortige Antwort",
-        "contact-whatsapp-action": "Chatten Sie mit uns",
-        "contact-email": "E-Mail",
-        "contact-email-desc": "Detaillierte Anfrage",
-        "contact-email-action": "E-Mail schreiben",
-        "contact-location": "Standort",
-        "contact-location-desc": "Auf Maps anzeigen",
-        "contact-location-action": "Maps öffnen",
-        "footer-location": "Lido delle Nazioni, Comacchio (FE), Italien",
-        "footer-rights": "Alle Rechte vorbehalten",
-        "contact-card-title": "Giannas Kontakte",
-        "contact-person-name": "Gianna Santececca",
-        "contact-person-phone": "Telefono:",
-        "contact-person-whatsapp": "WhatsApp:",
-        "contact-person-email": "E-Mail:",
-        "gallery-img-1": "Außenansicht Casa Gianna",
-        "gallery-img-2": "Haupteingang",
-        "gallery-img-3": "Schlafzimmer mit Bücherregal",
-        "gallery-img-4": "Helles Wohnzimmer",
-        "gallery-img-5": "Entspannungsbereich",
-        "gallery-img-6": "Privatparkplatz",
-        "gallery-img-7": "Ess- und Küchenbereich",
-        "gallery-img-8": "Zweites Schlafzimmer",
-        "gallery-img-9": "Hinterer Garten",
-        "gallery-img-10": "Außendusche",
-        "gallery-img-11": "Hintere Terrasse",
-        "gallery-img-12": "Entfernung zum Meer"
-      }
-    };
-
-    function setLanguage(lang) {
-      document.documentElement.lang = lang;
-      document.querySelectorAll('[data-key]').forEach(element => {
-        const key = element.dataset.key;
-        if (translations[lang] && translations[lang][key]) {
-          element.textContent = translations[lang][key];
-        }
-      });
-      if (contactModal.classList.contains('show')) {
-          document.querySelector('#contactModal [data-key="contact-person-name"]').textContent = translations[lang]["contact-person-name"];
-      }
-      createGalleryItems();
-      
-      // Sincronizza i selettori
-      if(languageSelect) languageSelect.value = lang;
-      if(mobileLanguageSelect) mobileLanguageSelect.value = lang;
-      
-      localStorage.setItem('selectedLanguage', lang);
-    }
-
-    // Gestione cambio lingua
     languageSelect.addEventListener('change', (e) => setLanguage(e.target.value));
     mobileLanguageSelect.addEventListener('change', (e) => setLanguage(e.target.value));
 
-    const savedLang = localStorage.getItem('selectedLanguage') || localStorage.getItem('lang');
-    const userLang = (navigator.language || navigator.userLanguage || 'it').split('-')[0];
-    const initialLang = savedLang || (translations[userLang] ? userLang : 'it');
-
-    setLanguage(initialLang);
-
+    const savedLang = localStorage.getItem('selectedLanguage') || 'it';
+    setLanguage(savedLang);
     document.getElementById('current-year').textContent = new Date().getFullYear();
-
-    // --- NUOVA LOGICA MENU MOBILE (SIMILE A PREZZARIO) ---
-    const menuBtn = document.getElementById('menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    const mobileOverlay = document.getElementById('mobile-overlay');
-
-    function openMobileMenu(){
-      mobileMenu.classList.add('show');
-      mobileOverlay.classList.add('show');
-      document.body.style.overflow = 'hidden';
-    }
-    function closeMobileMenu(){
-      mobileMenu.classList.remove('show');
-      mobileOverlay.classList.remove('show');
-      document.body.style.overflow = 'auto';
-    }
-    function closeMobileMenuIfOpen(){ if(mobileMenu.classList.contains('show')) closeMobileMenu(); }
-
-    if(menuBtn){
-      menuBtn.addEventListener('click', () => {
-        if(mobileMenu.classList.contains('show')) closeMobileMenu(); else openMobileMenu();
-      });
-    }
-    if(mobileOverlay){
-      mobileOverlay.addEventListener('click', closeMobileMenu);
-    }
-
-    // Chiude il menu quando si clicca su un link
-    mobileMenu.querySelectorAll('a').forEach(el => {
-      el.addEventListener('click', () => setTimeout(closeMobileMenu, 60));
-    });
-
   </script>
 </body>
 </html>
