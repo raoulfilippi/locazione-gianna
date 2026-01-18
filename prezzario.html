@@ -70,6 +70,10 @@
       <!-- Desktop links -->
       <div class="hidden md:flex items-center space-x-4">
         <a href="index.html" id="nav-back" class="text-gray-700 hover:text-blue-600 font-medium" data-key="nav-back">Home</a>
+
+<!-- Gallery link (desktop) -->
+<a href="gallery.html" id="nav-gallery" class="text-gray-700 hover:text-blue-600 font-medium" data-key="nav-gallery">Galleria</a>
+
         <a href="#" id="auth-link" class="text-gray-700 hover:text-blue-600 font-medium" data-key="auth-login">Accedi</a>
         <a href="private.html" id="nav-directions" class="hidden text-blue-600 hover:text-blue-800 font-bold flex items-center gap-1" data-key="nav-directions">
           <i class="fa-solid fa-location-dot"></i> <span>Indicazioni</span>
@@ -78,6 +82,9 @@
         <a href="admin.html" id="admin-link" class="hidden text-gray-700 hover:text-purple-600 font-medium flex items-center gap-2">
           Admin <span id="admin-badge" class="hidden bg-purple-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">ADMIN</span>
         </a>
+
+
+
         <select id="language-select" class="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700">
           <option value="it">🇮🇹 Italiano</option>
           <option value="en">🇬🇧 English</option>
@@ -102,6 +109,12 @@
 <nav id="mobile-menu" class="md:hidden" aria-hidden="true">
   <div class="flex flex-col p-4 space-y-2">
     <a href="index.html" id="mobile-nav-back" class="text-gray-700 hover:text-blue-600 font-medium" data-key="nav-back">Home</a>
+
+
+<!-- Gallery link (mobile) -->
+<a href="gallery.html" id="mobile-nav-gallery" class="text-gray-700 hover:text-blue-600 font-medium" data-key="nav-gallery">Galleria</a>
+
+
     <a href="#" id="mobile-auth-link" class="text-gray-700 hover:text-blue-600 font-medium" data-key="auth-login">Accedi</a>
     <a href="private.html" id="mobile-nav-directions" class="hidden text-blue-600 hover:text-blue-800 font-bold flex items-center gap-1">
       <i class="fa-solid fa-location-dot"></i> <span data-key="nav-directions">Indicazioni</span>
@@ -110,7 +123,10 @@
     <a href="admin.html" id="mobile-admin-link" class="hidden text-gray-700 hover:text-purple-600 font-medium flex items-center gap-2">
       Admin <span id="mobile-admin-badge" class="hidden bg-purple-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">ADMIN</span>
     </a>
-    <select id="mobile-language-select" class="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700">
+   
+
+
+ <select id="mobile-language-select" class="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700">
       <option value="it">🇮🇹 Italiano</option>
       <option value="en">🇬🇧 English</option>
       <option value="de">🇩🇪 Deutsch</option>
@@ -264,7 +280,7 @@ const translations = {
     "btn-book":"Prenota","login-title":"Area Privata","login-email":"Email","login-password":"Password","btn-login":"Accedi",
     "login-no-account":"Non hai un account?","link-register":"Registrati","register-title":"Registrazione","register-name":"Nome completo",
     "register-phone":"Numero di telefono","register-email":"Email","register-password":"Password","btn-register":"Registrati","register-already":"Hai già un account?",
-    "link-login":"Accedi","welcome":"Benvenuto/a","my-bookings":"Le mie prenotazioni","status-logged":"Scegli il periodo e prenota"
+    "link-login":"Accedi","welcome":"Benvenuto/a","my-bookings":"Le mie prenotazioni","status-logged":"Scegli il periodo e prenota","nav-gallery":"Galleria"
   },
   en: {
     "nav-location":"Lido delle Nazioni","nav-back":"Home","nav-logout":"Logout","nav-directions":"Directions",
@@ -277,7 +293,7 @@ const translations = {
     "btn-book":"Book","login-title":"Private Area","login-email":"Email","login-password":"Password","btn-login":"Login",
     "login-no-account":"Don't have an account?","link-register":"Register","register-title":"Registration","register-name":"Full Name",
     "register-phone":"Phone Number","register-email":"Email","register-password":"Password","btn-register":"Register","register-already":"Already have an account?",
-    "link-login":"Login","welcome":"Welcome","my-bookings":"My Bookings","status-logged":"Choose dates and book"
+    "link-login":"Login","welcome":"Welcome","my-bookings":"My Bookings","status-logged":"Choose dates and book","nav-gallery":"Gallery"
   },
   de: {
     "nav-location":"Lido delle Nazioni","nav-back":"Home","nav-logout":"Abmelden","nav-directions":"Wegbeschreibung",
@@ -290,7 +306,7 @@ const translations = {
     "btn-book":"Buchen","login-title":"Privater Bereich","login-email":"Email","login-password":"Passwort","btn-login":"Einloggen",
     "login-no-account":"Noch kein Konto?","link-register":"Registrieren","register-title":"Registrierung","register-name":"Vollständiger Name",
     "register-phone":"Telefonnummer","register-email":"Email","register-password":"Passwort","btn-register":"Registrieren","register-already":"Schon ein Konto?",
-    "link-login":"Einloggen","welcome":"Willkommen","my-bookings":"Meine Buchungen","status-logged":"Zeitraum wählen und buchen"
+    "link-login":"Einloggen","welcome":"Willkommen","my-bookings":"Meine Buchungen","status-logged":"Zeitraum wählen und buchen","nav-gallery":"Galerie"
   }
 };
 
