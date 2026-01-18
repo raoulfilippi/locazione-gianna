@@ -58,14 +58,15 @@
 <header class="fixed top-0 w-full z-50 glass-effect">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center h-20">
-      <!-- Logo e info -->
-      <div class="flex items-center space-x-3">
-        <img src="gianna1.jpg" alt="Gianna" class="profile-pic">
-        <div>
-          <h1 class="heading-font text-xl font-semibold text-gray-900">Casa Gianna</h1>
-          <p class="text-sm text-gray-600" data-key="nav-location">Lido delle Nazioni</p>
-        </div>
-      </div>
+     
+<!-- Logo e info -->
+<a id="brand-link" href="index.html" class="flex items-center space-x-3 hover:opacity-90 transition" style="position:relative; z-index:60;">
+  <img src="gianna1.jpg" alt="Gianna" class="profile-pic">
+  <div>
+    <h1 class="heading-font text-xl font-semibold text-gray-900">Casa Gianna</h1>
+    <p class="text-sm text-gray-600" data-key="nav-location">Lido delle Nazioni</p>
+  </div>
+</a>
 
       <!-- Desktop links -->
       <div class="hidden md:flex items-center space-x-4">
@@ -851,3 +852,4 @@ onAuthStateChanged(auth, async user => {
 </script>
 </body>
 </html>
+
