@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title data-key="private-page-title">Area Privata - Casa Vacanze Gianna</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -198,6 +199,41 @@
     .form-link-card a:hover {
       background-color: rgba(255, 255, 255, 0.3);
     }
+
+    /* Mobile menu + overlay */
+    #mobile-overlay { 
+      display: none; 
+      position: fixed; 
+      inset: 0; 
+      background: rgba(0,0,0,0.35); 
+      z-index: 55; 
+    }
+    #mobile-overlay.show { 
+      display: block; 
+    }
+    
+    #mobile-menu { 
+      display: none; 
+      position: fixed; 
+      top: 80px; 
+      left: 0; 
+      width: 100%; 
+      background: #fff; 
+      border-top: 1px solid #e5e7eb; 
+      box-shadow: 0 6px 20px rgba(0,0,0,0.12); 
+      z-index: 56; 
+      max-height: calc(100vh - 80px); 
+      overflow: auto; 
+    }
+    #mobile-menu.show { 
+      display: block; 
+    }
+
+    /* Ensure hamburger clickable */
+    #menu-btn { 
+      position: relative; 
+      z-index: 60; 
+    }
   </style>
 </head>
 <body class="min-h-screen">
@@ -205,23 +241,17 @@
   <header class="fixed top-0 w-full z-50 glass-effect">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-20">
-    
-        
-        
-<!-- Logo -->
-<a id="brand-link" href="index.html" class="flex items-center space-x-3 hover:opacity-90 transition" style="position:relative; z-index:60;" aria-label="Vai alla home - Casa Gianna">
-  <img id="gianna-profile-pic" src="gianna1.jpg" alt="Gianna" class="profile-pic">
-  <div>
-    <h1 class="heading-font text-xl font-semibold text-gray-900">Casa Gianna</h1>
-    <p class="text-sm text-gray-600" data-key="nav-location">Lido delle Nazioni</p>
-  </div>
-</a>
+        <!-- Logo -->
+        <a id="brand-link" href="index.html" class="flex items-center space-x-3 hover:opacity-90 transition" style="position:relative; z-index:60;" aria-label="Vai alla home - Casa Gianna">
+          <img id="gianna-profile-pic" src="gianna1.jpg" alt="Gianna" class="profile-pic">
+          <div>
+            <h1 class="heading-font text-xl font-semibold text-gray-900">Casa Gianna</h1>
+            <p class="text-sm text-gray-600" data-key="nav-location">Lido delle Nazioni</p>
+          </div>
+        </a>
 
-
-        
-        <!-- Language Selector and Home Link -->
-        <div class="flex items-center space-x-4">
-          <!-- Link "Home" al posto di "Area Privata" -->
+        <!-- Desktop links -->
+        <div class="hidden md:flex items-center space-x-4">
           <a href="index.html" class="text-gray-700 hover:text-blue-600 transition duration-300 font-medium whitespace-nowrap" data-key="home-link">Home</a>
           <select id="language-select" class="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
             <option value="it">🇮🇹 Italiano</option>
@@ -229,9 +259,31 @@
             <option value="de">🇩🇪 Deutsch</option>
           </select>
         </div>
+
+        <!-- Hamburger mobile -->
+        <div class="md:hidden flex items-center">
+          <button id="menu-btn" class="text-gray-700 hover:text-blue-600 focus:outline-none" aria-label="Apri menu">
+            <i class="fa-solid fa-bars fa-lg"></i>
+          </button>
+        </div>
       </div>
     </div>
   </header>
+
+  <!-- overlay (quando il menu è aperto) -->
+  <div id="mobile-overlay" aria-hidden="true"></div>
+
+  <!-- Mobile menu -->
+  <nav id="mobile-menu" class="md:hidden" aria-hidden="true">
+    <div class="flex flex-col p-4 space-y-2">
+      <a href="index.html" class="text-gray-700 hover:text-blue-600 font-medium" data-key="home-link">Home</a>
+      <select id="mobile-language-select" class="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700">
+        <option value="it">🇮🇹 Italiano</option>
+        <option value="en">🇬🇧 English</option>
+        <option value="de">🇩🇪 Deutsch</option>
+      </select>
+    </div>
+  </nav>
 
   <!-- Hero Section for Private Area -->
   <section class="hero-gradient pt-32 pb-20 relative overflow-hidden">
@@ -422,7 +474,7 @@
         "content-subtitle": "Video utili e modulo di registrazione dati.",
         "video-ita-title": "Come Raggiungerci",
         "video-eng-title": "Video: Instructions (English)",
-        "video-key-title": "Utilizzo delle chiavi", // Modificato
+        "video-key-title": "Utilizzo delle chiavi",
         "form-title": "Forniscici i Tuoi Dati",
         "form-subtitle": "La legge italiana richiede l'acquisizione dei seguenti dati al fine di registrare correttamente l'ospite.",
         "form-button": "Apri il Modulo Google",
@@ -444,7 +496,7 @@
         "content-subtitle": "Useful videos and data registration form.",
         "video-ita-title": "How to Reach Us",
         "video-eng-title": "Video: Instructions (English)",
-        "video-key-title": "Key Usage", // Modificato
+        "video-key-title": "Key Usage",
         "form-title": "Provide Your Data",
         "form-subtitle": "Italian law requires the acquisition of the following data in order to correctly register the guest.",
         "form-button": "Open Google Form",
@@ -466,7 +518,7 @@
         "content-subtitle": "Nützliche Videos und Datenregistrierungsformular.",
         "video-ita-title": "Wie Sie uns erreichen",
         "video-eng-title": "Video: Anweisungen (Englisch)",
-        "video-key-title": "Schlüsselnutzung", // Modificato
+        "video-key-title": "Schlüsselnutzung",
         "form-title": "Geben Sie Ihre Daten an",
         "form-subtitle": "Das italienische Gesetz erfordert die Erfassung der folgenden Daten, um den Gast korrekt zu registrieren.",
         "form-button": "Google Formular öffnen",
@@ -474,7 +526,7 @@
         "footer-rights": "Alle Rechte vorbehalten",
         "contact-card-title": "Giannas Kontakte",
         "contact-person-name": "Gianna Santececca",
-        "contact-person-phone": "Telefono:",
+        "contact-person-phone": "Telefon:",
         "contact-person-whatsapp": "WhatsApp:",
         "contact-person-email": "E-Mail:"
       }
@@ -510,34 +562,85 @@
         }
       }
     }
-document.addEventListener('DOMContentLoaded', () => {
-  const langSelect = document.getElementById('language-select');
 
-  // Recupera la lingua salvata: prima 'selectedLanguage', poi 'lang' (compatibilità)
-  const savedLang = localStorage.getItem('selectedLanguage') || localStorage.getItem('lang') || 'it';
+    document.addEventListener('DOMContentLoaded', () => {
+      const langSelect = document.getElementById('language-select');
+      const mobileLangSelect = document.getElementById('mobile-language-select');
+      const menuBtn = document.getElementById('menu-btn');
+      const mobileMenu = document.getElementById('mobile-menu');
+      const mobileOverlay = document.getElementById('mobile-overlay');
 
-  // Imposta la lingua se esiste la funzione setLanguage
-  if (typeof setLanguage === 'function') {
-    setLanguage(savedLang);
-  }
+      // Recupera la lingua salvata: prima 'selectedLanguage', poi 'lang' (compatibilità)
+      const savedLang = localStorage.getItem('selectedLanguage') || localStorage.getItem('lang') || 'it';
 
-  // Sincronizza la select lingua (se presente) e salva la scelta
-  if (langSelect) {
-    langSelect.value = savedLang;
+      // Imposta la lingua
+      setLanguage(savedLang);
 
-    langSelect.addEventListener('change', (e) => {
-      const selected = e.target.value;
-      localStorage.setItem('selectedLanguage', selected);
-      if (typeof setLanguage === 'function') setLanguage(selected);
+      // Sincronizza la select lingua (se presente) e salva la scelta
+      if (langSelect) {
+        langSelect.value = savedLang;
+
+        langSelect.addEventListener('change', (e) => {
+          const selected = e.target.value;
+          localStorage.setItem('selectedLanguage', selected);
+          if (mobileLangSelect) mobileLangSelect.value = selected;
+          setLanguage(selected);
+        });
+      }
+
+      if (mobileLangSelect) {
+        mobileLangSelect.value = savedLang;
+
+        mobileLangSelect.addEventListener('change', (e) => {
+          const selected = e.target.value;
+          localStorage.setItem('selectedLanguage', selected);
+          if (langSelect) langSelect.value = selected;
+          setLanguage(selected);
+        });
+      }
+
+      // Imposta l'anno corrente nel footer
+      const yearEl = document.getElementById('current-year');
+      if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+      // Menu mobile functionality
+      function openMobileMenu() {
+        if (mobileMenu && mobileOverlay) {
+          mobileMenu.classList.add('show');
+          mobileOverlay.classList.add('show');
+          document.body.style.overflow = 'hidden';
+        }
+      }
+
+      function closeMobileMenu() {
+        if (mobileMenu && mobileOverlay) {
+          mobileMenu.classList.remove('show');
+          mobileOverlay.classList.remove('show');
+          document.body.style.overflow = 'auto';
+        }
+      }
+
+      if (menuBtn) {
+        menuBtn.addEventListener('click', () => {
+          if (mobileMenu && mobileMenu.classList.contains('show')) {
+            closeMobileMenu();
+          } else {
+            openMobileMenu();
+          }
+        });
+      }
+
+      if (mobileOverlay) {
+        mobileOverlay.addEventListener('click', () => closeMobileMenu());
+      }
+
+      // Chiude il menu quando si clicca su un link
+      if (mobileMenu) {
+        mobileMenu.querySelectorAll('a').forEach(el => {
+          el.addEventListener('click', () => setTimeout(() => closeMobileMenu(), 60));
+        });
+      }
     });
-  }
-
-  // Imposta l'anno corrente nel footer
-  const yearEl = document.getElementById('current-year');
-  if (yearEl) yearEl.textContent = new Date().getFullYear();
-});
-
   </script>
 </body>
 </html>
-
