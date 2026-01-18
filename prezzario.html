@@ -311,8 +311,182 @@ const translations = {
   }
 };
 
-const dailyRates = { '05':98,'06':150,'07':200,'08':200,'09':120,'10':90 };
-const exceptions = { '2026-05-01':200,'2026-05-02':240,'2026-05-03':130,'2026-10-04':110 };
+// PREZZI CORRETTI CON ECCEZIONI SPECIFICHE
+const exceptions = {
+  // Maggio
+  '2026-05-01': 200,
+  '2026-05-02': 240,
+  '2026-05-03': 130,
+  '2026-05-08': 130, // venerdì
+  '2026-05-09': 240, // sabato
+  '2026-05-10': 130, // domenica
+  '2026-05-15': 130, // venerdì
+  '2026-05-16': 240, // sabato
+  '2026-05-17': 130, // domenica
+  '2026-05-22': 130, // venerdì
+  '2026-05-23': 240, // sabato
+  '2026-05-24': 130, // domenica
+  '2026-05-29': 130, // venerdì
+  '2026-05-30': 240, // sabato
+  '2026-05-31': 200, // domenica (eccezione)
+  
+  // Giugno
+  '2026-06-01': 200, // lunedì (eccezione)
+  '2026-06-02': 150, // martedì (eccezione)
+  '2026-06-05': 135, // venerdì
+  '2026-06-06': 265, // sabato
+  '2026-06-07': 135, // domenica
+  '2026-06-12': 135, // venerdì
+  '2026-06-13': 265, // sabato
+  '2026-06-14': 140, // domenica (eccezione)
+  '2026-06-19': 140, // venerdì
+  '2026-06-20': 300, // sabato
+  '2026-06-21': 140, // domenica
+  '2026-06-26': 160, // venerdì
+  '2026-06-27': 310, // sabato
+  '2026-06-28': 160, // domenica
+  '2026-06-29': 130, // lunedì
+  '2026-06-30': 130, // martedì
+  
+  // Luglio
+  '2026-07-03': 160, // venerdì
+  '2026-07-04': 310, // sabato
+  '2026-07-05': 160, // domenica
+  '2026-07-10': 160, // venerdì
+  '2026-07-11': 310, // sabato
+  '2026-07-12': 160, // domenica
+  '2026-07-17': 160, // venerdì
+  '2026-07-18': 310, // sabato
+  '2026-07-19': 160, // domenica
+  '2026-07-24': 200, // venerdì (eccezione)
+  '2026-07-25': 310, // sabato
+  '2026-07-26': 160, // domenica
+  '2026-07-31': 200, // venerdì (eccezione - corretto dal 160)
+  
+  // Agosto - sabati e domeniche
+  '2026-08-01': 350, // sabato
+  '2026-08-02': 500, // domenica
+  '2026-08-08': 350, // sabato
+  '2026-08-09': 500, // domenica
+  '2026-08-15': 350, // sabato
+  '2026-08-16': 500, // domenica
+  '2026-08-22': 350, // sabato
+  '2026-08-23': 500, // domenica
+  '2026-08-29': 350, // sabato
+  '2026-08-30': 500, // domenica
+  '2026-08-31': 95, // lunedì (eccezione)
+  
+  // Settembre
+  '2026-09-01': 95, // martedì
+  '2026-09-02': 95, // mercoledì
+  '2026-09-03': 95, // giovedì
+  '2026-09-04': 120, // venerdì
+  '2026-09-05': 220, // sabato
+  '2026-09-06': 120, // domenica
+  '2026-09-11': 125, // venerdì
+  '2026-09-12': 225, // sabato
+  '2026-09-13': 125, // domenica
+  '2026-09-18': 125, // venerdì
+  '2026-09-19': 225, // sabato
+  '2026-09-20': 125, // domenica
+  '2026-09-25': 110, // venerdì
+  '2026-09-26': 200, // sabato
+  '2026-09-27': 110, // domenica
+  
+  // Ottobre
+  '2026-10-02': 110, // venerdì
+  '2026-10-03': 200, // sabato
+  '2026-10-04': 110  // domenica
+};
+
+// Funzione per calcolare il prezzo giornaliero
+function getDailyPrice(dateStr) {
+  // Prima controlla le eccezioni specifiche
+  if (exceptions[dateStr]) {
+    return exceptions[dateStr];
+  }
+  
+  const date = new Date(dateStr);
+  const dayOfWeek = date.getDay(); // 0=Dom, 1=Lun, 2=Mar, 3=Mer, 4=Gio, 5=Ven, 6=Sab
+  const month = dateStr.substring(5, 7);
+  const day = parseInt(dateStr.substring(8, 10));
+  
+  // MAGGIO
+  if (month === '05') {
+    if (day >= 8) {
+      if (dayOfWeek === 5) return 130; // venerdì
+      if (dayOfWeek === 6) return 240; // sabato
+      if (dayOfWeek === 0) return 130; // domenica
+      return 98; // lun-gio
+    }
+    return 98; // default maggio
+  }
+  
+  // GIUGNO
+  if (month === '06') {
+    if (day >= 3 && day <= 13) {
+      if (dayOfWeek === 5) return 135; // venerdì
+      if (dayOfWeek === 6) return 265; // sabato
+      if (dayOfWeek === 0) return 135; // domenica
+      return 106; // lun-gio
+    }
+    if (day >= 15 && day <= 21) {
+      if (dayOfWeek === 5) return 140; // venerdì
+      if (dayOfWeek === 6) return 300; // sabato
+      if (dayOfWeek === 0) return 140; // domenica
+      return 110; // lun-gio
+    }
+    if (day >= 22 && day <= 28) {
+      return 110; // lun-gio (ven/sab/dom gestiti da exceptions)
+    }
+    return 150; // default giugno
+  }
+  
+  // LUGLIO
+  if (month === '07') {
+    if (day >= 1 && day <= 30) {
+      if (dayOfWeek === 5) return 160; // venerdì (eccetto 24 e 31 in exceptions)
+      if (dayOfWeek === 6) return 310; // sabato
+      if (dayOfWeek === 0) return 160; // domenica
+      return 130; // lun-gio
+    }
+    return 200; // default luglio
+  }
+  
+  // AGOSTO
+  if (month === '08') {
+    if (dayOfWeek === 0) return 500; // domenica
+    if (dayOfWeek === 6) return 350; // sabato
+    return 200; // lun-ven
+  }
+  
+  // SETTEMBRE
+  if (month === '09') {
+    if (day >= 7 && day <= 20) {
+      if (dayOfWeek === 5) return 125; // venerdì
+      if (dayOfWeek === 6) return 225; // sabato
+      if (dayOfWeek === 0) return 125; // domenica
+      return 98; // lun-gio
+    }
+    if (day >= 21) {
+      if (dayOfWeek === 5) return 110; // venerdì
+      if (dayOfWeek === 6) return 200; // sabato
+      if (dayOfWeek === 0) return 110; // domenica
+      return 90; // lun-gio
+    }
+    return 120; // default settembre
+  }
+  
+  // OTTOBRE
+  if (month === '10') {
+    if (dayOfWeek === 5) return 110; // venerdì
+    if (dayOfWeek === 6) return 200; // sabato
+    if (dayOfWeek === 0) return 110; // domenica
+    return 90; // lun-gio
+  }
+  
+  return 90; // fallback
+}
 
 window.setLanguage = function(lang){
   currentLang = lang;
@@ -342,13 +516,11 @@ window.setLanguage = function(lang){
     if(mainTitle) mainTitle.textContent = `${translations[currentLang]["welcome"]} ${firstName}`;
     if(statusText) statusText.textContent = translations[currentLang]["status-logged"];
     
-    // Update auth link text when logged in
     const authLink = document.getElementById('auth-link');
     const mobileAuthLink = document.getElementById('mobile-auth-link');
     if(authLink) authLink.textContent = firstName || user.email;
     if(mobileAuthLink) mobileAuthLink.textContent = firstName || user.email;
   } else {
-    // Update auth link text when logged out
     const authLink = document.getElementById('auth-link');
     const mobileAuthLink = document.getElementById('mobile-auth-link');
     if(authLink) authLink.textContent = translations[lang]["auth-login"];
@@ -364,12 +536,11 @@ function toTime(s){ return new Date(s).getTime(); }
 function isValidStart(dateStr){ return ALLOWED_START_DAYS.includes(new Date(dateStr).getDay()); }
 
 window.handleDateClick = function(dateStr){
+  console.log('Date clicked:', dateStr);
   if(dateStr < SEASON_START || dateStr > SEASON_END) return;
 
-  // 1. Check if clicked date is already booked (generic check)
   if(bookedDates.includes(dateStr)) return;
 
-  // Se non c'è check-in selezionato oppure entrambi check-in e check-out sono già selezionati
   if(!checkIn || (checkIn && checkOut)){
     if(!isValidStart(dateStr)){
       alert(currentLang === 'it' ? 'Check-in solo Domenica o Lunedì' : 'Check-in only Sunday or Monday');
@@ -377,25 +548,23 @@ window.handleDateClick = function(dateStr){
     }
     checkIn = dateStr;
     checkOut = null;
+    console.log('Check-in set:', checkIn);
     updateUI();
     return;
   }
 
-  // Se l'utente clicca prima della data di check-in corrente
   if(dateStr <= checkIn){
     checkIn = dateStr;
     checkOut = null;
+    console.log('Check-in reset:', checkIn);
     updateUI();
     return;
   }
 
-  // 2. CHECK FOR OVERLAP (Il fix richiesto)
-  // Verifica che non ci siano date occupate TRA checkIn e la nuova dateStr
   let tempDate = new Date(checkIn);
   const targetDate = new Date(dateStr);
   let overlapFound = false;
   
-  // Scorre dal checkIn fino alla data cliccata
   while (tempDate <= targetDate) {
     const isoDate = tempDate.toISOString().split('T')[0];
     if (bookedDates.includes(isoDate)) {
@@ -410,19 +579,45 @@ window.handleDateClick = function(dateStr){
     return;
   }
 
-  // Calcola la durata e verifica il soggiorno minimo
   const diffDays = Math.floor((toTime(dateStr) - toTime(checkIn)) / (24*60*60*1000)) + 1;
+  console.log('Days difference:', diffDays);
   if(diffDays < MIN_STAY_DAYS){
     alert(`${currentLang === 'it' ? 'Soggiorno minimo' : 'Min stay'} ${MIN_STAY_DAYS} ${translations[currentLang]["days"]}`);
     return;
   }
 
-  // Tutto ok, seleziona check-out
   checkOut = dateStr;
+  console.log('Check-out set:', checkOut);
   updateUI();
 };
 
 window.resetSelection = function(){ checkIn=null; checkOut=null; updateUI(); };
+
+function calculateTotal(){
+  console.log('calculateTotal called - checkIn:', checkIn, 'checkOut:', checkOut);
+  if(!checkIn || !checkOut) {
+    console.log('Missing checkIn or checkOut');
+    return 0;
+  }
+  let total=0, daysCount=0;
+  let cur = new Date(checkIn);
+  let end = new Date(checkOut);
+  console.log('Calculating from', cur, 'to', end);
+  while(cur <= end){
+    const dateStr = cur.toISOString().split('T')[0];
+    const price = getDailyPrice(dateStr);
+    console.log('Date:', dateStr, 'Price:', price);
+    total += price;
+    daysCount++;
+    cur.setDate(cur.getDate()+1);
+  }
+  console.log('Total:', total, 'Days:', daysCount);
+  const totalEl = document.getElementById('total-price');
+  const nightsEl = document.getElementById('label-nights');
+  if(totalEl) totalEl.textContent = `€ ${total}`;
+  if(nightsEl) nightsEl.textContent = `${daysCount} ${daysCount===1?translations[currentLang]["day"]:translations[currentLang]["days"]}`;
+  return total;
+}
 
 function updateUI(){
   document.querySelectorAll('.day-card').forEach(card=>{
@@ -442,37 +637,27 @@ function updateUI(){
 
   const bar = document.getElementById('calc-bar');
   const btnBook = document.getElementById('btn-book');
+  const selectedDatesEl = document.getElementById('selected-dates');
+  const totalPriceEl = document.getElementById('total-price');
+  const labelNightsEl = document.getElementById('label-nights');
+  
   if(checkIn){
-    bar.classList.remove('hidden');
+    if(bar) bar.classList.remove('hidden');
     const d1 = new Date(checkIn).toLocaleDateString(currentLang,{day:'numeric',month:'short'});
     if(checkOut){
       const d2 = new Date(checkOut).toLocaleDateString(currentLang,{day:'numeric',month:'short'});
-      document.getElementById('selected-dates').textContent = `${d1} — ${d2}`;
-      btnBook.classList.remove('hidden');
+      if(selectedDatesEl) selectedDatesEl.textContent = `${d1} — ${d2}`;
+      if(btnBook) btnBook.classList.remove('hidden');
       calculateTotal();
     } else {
-      document.getElementById('selected-dates').textContent = `${d1} — ${translations[currentLang]["select-end"]}`;
-      document.getElementById('total-price').textContent = `€ --`;
-      document.getElementById('label-nights').textContent = translations[currentLang]["select-end"];
-      btnBook.classList.add('hidden');
+      if(selectedDatesEl) selectedDatesEl.textContent = `${d1} — ${translations[currentLang]["select-end"]}`;
+      if(totalPriceEl) totalPriceEl.textContent = `€ --`;
+      if(labelNightsEl) labelNightsEl.textContent = translations[currentLang]["select-end"];
+      if(btnBook) btnBook.classList.add('hidden');
     }
   } else {
-    bar.classList.add('hidden');
+    if(bar) bar.classList.add('hidden');
   }
-}
-
-function calculateTotal(){
-  let total=0, daysCount=0;
-  let cur = new Date(checkIn), end = new Date(checkOut);
-  while(cur <= end){
-    const dateStr = cur.toISOString().split('T')[0];
-    total += (exceptions[dateStr] || dailyRates[dateStr.split('-')[1]] || 0);
-    daysCount++;
-    cur.setDate(cur.getDate()+1);
-  }
-  document.getElementById('total-price').textContent = `€ ${total}`;
-  document.getElementById('label-nights').textContent = `${daysCount} ${daysCount===1?translations[currentLang]["day"]:translations[currentLang]["days"]}`;
-  return total;
 }
 
 window.submitBooking = async function(){
@@ -551,7 +736,7 @@ function renderMonth(year,month,monthName){
     const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const isBooked = bookedDates.includes(dateStr);
     const isUserBooked = userBookedDates.has(dateStr);
-    const price = exceptions[dateStr] || dailyRates[dateStr.split('-')[1]];
+    const price = getDailyPrice(dateStr);
     const isClosed = dateStr < SEASON_START || dateStr > SEASON_END;
 
     let classes = 'day-card active';
@@ -577,8 +762,6 @@ window.renderAllCalendars = function(){
   const mesi = [0,1,2,3,4,5].map(i=>({id:4+i,nome:t.months[i]}));
   mesi.forEach(m=>renderMonth(2026,m.id,m.nome));
 };
-
-// --- REMOVED THE DUPLICATE onSnapshot HERE ---
 
 function renderUserBookings(userBookings){
   const container = document.getElementById('user-bookings');
@@ -729,9 +912,6 @@ onAuthStateChanged(auth, async user => {
 
   if (typeof unsubscribeBookings === 'function') unsubscribeBookings();
 
-  // 🔥 SNAPSHOT UNICO: SEMPRE ATTIVO (loggato o no)
-  // Questo listener è all'interno di authStateChanged così possiamo sapere chi è l'user attuale
-  // per colorare le sue prenotazioni di verde (userBookedDates)
   unsubscribeBookings = onSnapshot(collectionRef, snapshot => {
     bookedDates = [];
     userBookedDates.clear();
@@ -746,10 +926,8 @@ onAuthStateChanged(auth, async user => {
         while (start <= end) {
           const ds = start.toISOString().split('T')[0];
 
-          // 🔴 prenotato per TUTTI
           bookedDates.push(ds);
 
-          // 🟢 prenotato dall’utente loggato
           if (user && data.userId === user.uid) {
             userBookedDates.add(ds);
           }
@@ -782,8 +960,6 @@ onAuthStateChanged(auth, async user => {
       if (mobileNavDirections) mobileNavDirections.classList.add('hidden');
     }
   });
-
-  // ───────────── UI LOGIN / LOGOUT ─────────────
 
   if (user) {
     if (authLink) authLink.textContent = user.displayName ? user.displayName.split(' ')[0] : user.email;
@@ -821,7 +997,6 @@ onAuthStateChanged(auth, async user => {
     }
 
   } else {
-    // 👤 NON LOGGATO
     if (loginBox) loginBox.classList.remove('hidden');
     if (registerBox) registerBox.classList.add('hidden');
     if (logoutLink) logoutLink.classList.add('hidden');
@@ -852,4 +1027,3 @@ onAuthStateChanged(auth, async user => {
 </script>
 </body>
 </html>
-
